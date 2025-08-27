@@ -44,7 +44,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
     private final CatalogItem globalOptions;
-    private final @NotNull Config.Settings settings;
+    private final @NotNull Config.CursorSettings settings;
     private final @NotNull Cursor cursor;
     private GridLayout layout;
     private OptionsList optionsList;

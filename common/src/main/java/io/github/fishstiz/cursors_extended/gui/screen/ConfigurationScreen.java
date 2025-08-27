@@ -135,7 +135,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
         return CursorManager.INSTANCE.getCursors()
                 .stream()
                 .map(cursor -> new CatalogItem(
-                        cursor.getTypeName(),
+                        cursor.getName(),
                         cursor.getText().copy().withStyle(getCursorFormat(cursor)),
                         this::renderListCursor
                 ))

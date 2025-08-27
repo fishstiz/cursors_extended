@@ -1,19 +1,19 @@
 package io.github.fishstiz.cursors_extended.config;
 
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
-import static io.github.fishstiz.cursors_extended.util.SettingsUtil.sanitizeHotspot;
-import static io.github.fishstiz.cursors_extended.util.SettingsUtil.sanitizeScale;
+import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
-public class Config extends AbstractConfig<Config.Settings> {
+public class Config implements Serializable {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -24,27 +24,28 @@ public class Config extends AbstractConfig<Config.Settings> {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
-    private boolean remapCursorsEnabled = true;
-    private boolean deferredLoading = false;
     private boolean inactiveWidgetsEnabled = true;
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
-    private final List<String> blacklist = new ArrayList<>();
     private final GlobalSettings global = new GlobalSettings();
-    transient File file;
+    private final Map<String, CursorSettings> cursors = new HashMap<>();
 
     Config() {
     }
 
-    public Settings getOrCreateSettings(Cursor cursor) {
-        return settings.computeIfAbsent(cursor.getTypeName(), k -> new Settings());
+    public CursorSettings getOrCreateSettings(Cursor cursor) {
+        return cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
     }
 
-    @Override
-    public @NotNull String getHash() {
-        if (this._hash == null) {
-            this._hash = generateHash(this.settings);
-        }
+    public boolean hasSettings(Cursor cursor) {
+        return cursors.containsKey(cursor.getName());
+    }
+
+    public void clearSettings() {
+        cursors.clear();
+    }
+
+    public @Nullable String getHash() {
         return _hash;
     }
 
@@ -52,33 +53,21 @@ public class Config extends AbstractConfig<Config.Settings> {
         _hash = hash;
     }
 
+    public static Config load() {
+        return JsonLoader.loadOrDefault(Config.class, Services.PLATFORM.getConfigDir().resolve(CursorsExtended.MOD_ID), Config::new);
+    }
+
     public void save() {
-        ConfigLoader.save(Objects.requireNonNull(file), this);
+        JsonLoader.save(Services.PLATFORM.getConfigDir().resolve(CursorsExtended.MOD_ID + ".json"), this);
     }
 
     public GlobalSettings getGlobal() {
         return global;
     }
 
-    public List<String> getBlacklist() {
-        return this.blacklist;
-    }
-
-    private Settings validateSettings(String key, Settings settings) {
-        Settings old = this.settings.computeIfAbsent(key, k -> new Settings());
-        Settings validated = settings.copy();
-
-        // resource packs can only disable
-        if (!old.enabled) {
-            validated.enabled = false;
-        }
-
-        return validated;
-    }
-
-    private Config.Settings filterInactive(@NotNull Cursor cursor, @NotNull Config.Settings settingsToApply) {
-        Config.Settings currentSettings = this.settings.computeIfAbsent(cursor.getTypeName(), k -> new Config.Settings());
-        Config.Settings validated = settingsToApply.copy();
+    private CursorSettings filterInactive(@NotNull Cursor cursor, @NotNull Config.CursorSettings settingsToApply) {
+        CursorSettings currentSettings = this.cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
+        CursorSettings validated = settingsToApply.copy();
 
         if (this.global.isScaleActive()) {
             validated.setScale(currentSettings.getScale());
@@ -92,15 +81,8 @@ public class Config extends AbstractConfig<Config.Settings> {
         return validated;
     }
 
-    public void replaceActiveSettings(Resource resource, Cursor cursor) {
-        this.settings.put(cursor.getTypeName(), this.filterInactive(cursor, resource.getOrCreateSettings(cursor)));
-    }
-
-    public void merge(Resource resources) {
-        for (Map.Entry<String, Config.Settings> resourceEntry : resources.getAllSettings().entrySet()) {
-            String key = resourceEntry.getKey();
-            this.settings.put(key, this.validateSettings(key, resourceEntry.getValue()));
-        }
+    public void replaceActiveSettings(CursorSettings settings, Cursor cursor) {
+        this.cursors.put(cursor.getName(), this.filterInactive(cursor, settings));
     }
 
     public boolean isCreativeTabsEnabled() {
@@ -175,22 +157,6 @@ public class Config extends AbstractConfig<Config.Settings> {
         this.serverIconEnabled = serverIconEnabled;
     }
 
-    public boolean isRemapCursorsEnabled() {
-        return remapCursorsEnabled;
-    }
-
-    public void setRemapCursorsEnabled(boolean remapCursorsEnabled) {
-        this.remapCursorsEnabled = remapCursorsEnabled;
-    }
-
-    public boolean isDeferredLoading() {
-        return deferredLoading;
-    }
-
-    public void setDeferredLoading(boolean deferredLoading) {
-        this.deferredLoading = deferredLoading;
-    }
-
     public boolean isInactiveWidgetsEnabled() {
         return inactiveWidgetsEnabled;
     }
@@ -215,30 +181,11 @@ public class Config extends AbstractConfig<Config.Settings> {
         this.virtualMode = virtualMode;
     }
 
-    private static String generateHash(Map<String, Settings> settings) {
-        long hash = 0;
-        long prime = 31;
-
-        for (Map.Entry<String, Settings> entry : settings.entrySet()) {
-            String key = entry.getKey();
-            Settings value = entry.getValue();
-            for (char c : key.toCharArray()) {
-                hash = hash * prime + c;
-            }
-            hash = hash * prime + (long) value.scale;
-            hash = hash * prime + value.xhot;
-            hash = hash * prime + value.yhot;
-            hash = hash * prime + (value.enabled ? 1 : 0);
-        }
-
-        return Long.toHexString(hash);
-    }
-
-    public static class Settings extends AbstractConfig.Settings<Settings> {
+    public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {
         protected boolean enabled = SettingsUtil.ENABLED;
         protected Boolean animated;
 
-        Settings() {
+        CursorSettings() {
         }
 
         public void setScale(double scale) {
@@ -269,9 +216,18 @@ public class Config extends AbstractConfig<Config.Settings> {
             this.animated = animated;
         }
 
+        public void merge(CursorSettings settings) {
+            // other settings should not enable the cursor back on.
+            if (this.enabled) this.enabled = settings.enabled;
+            this.scale = sanitizeScale(settings.scale);
+            this.xhot = sanitizeHotspot(settings.xhot, IMAGE_SIZE_MAX);
+            this.yhot = sanitizeHotspot(settings.yhot, IMAGE_SIZE_MAX);
+            this.animated = settings.animated;
+        }
+
         @Override
-        public Settings copy() {
-            Settings settings = new Settings();
+        public CursorSettings copy() {
+            CursorSettings settings = new CursorSettings();
             settings.scale = this.scale;
             settings.xhot = this.xhot;
             settings.yhot = this.yhot;
@@ -281,7 +237,7 @@ public class Config extends AbstractConfig<Config.Settings> {
         }
     }
 
-    public static class GlobalSettings extends AbstractConfig.Settings<GlobalSettings> {
+    public static class GlobalSettings extends AbstractCursorSettings<GlobalSettings> implements Serializable {
         private boolean scaleActive = false;
         private boolean xhotActive = false;
         private boolean yhotActive = false;
@@ -358,27 +314,12 @@ public class Config extends AbstractConfig<Config.Settings> {
             return globalSettings;
         }
 
-        public <T extends AbstractConfig.Settings<T>> T apply(T settings) {
+        public <T extends AbstractCursorSettings<T>> T apply(T settings) {
             T copied = settings.copy();
             copied.scale = this.isScaleActive() ? this.getScale() : copied.getScale();
             copied.xhot = this.isXHotActive() ? this.getXHot() : copied.getXHot();
             copied.yhot = this.isYHotActive() ? this.getYHot() : copied.getYHot();
             return copied;
-        }
-    }
-
-    public static class Resource extends AbstractConfig<Settings> {
-        public Config.Settings getOrCreateSettings(Cursor cursor) {
-            return settings.computeIfAbsent(cursor.getTypeName(), k -> new Config.Settings());
-        }
-
-        @Override
-        public @NotNull String getHash() {
-            return Config.generateHash(this.settings);
-        }
-
-        public void layer(Map<String, Config.Settings> settings) {
-            this.settings.putAll(settings);
         }
     }
 }

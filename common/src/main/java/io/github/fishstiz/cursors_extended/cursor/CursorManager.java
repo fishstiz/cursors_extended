@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.AnimationData;
 import io.github.fishstiz.cursors_extended.config.Config;
+import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -31,29 +32,25 @@ public final class CursorManager {
         this.cursors.put(cursorType.toString(), new Cursor(cursorType, this::onLoad));
     }
 
-    public void loadCursor(
-            Cursor cursor,
-            NativeImage image,
-            Config.Settings settings,
-            @Nullable AnimationData animation
-    ) throws IOException {
-        if (!cursors.containsKey(cursor.getTypeName())) {
-            throw new IllegalStateException("Attempting to load an unregistered cursor: " + cursor.getTypeName());
+    public void loadCursor(Cursor cursor, NativeImage image, Config.CursorSettings settings, CursorMetadata metadata) throws IOException {
+        if (!cursors.containsKey(cursor.getName())) {
+            throw new IllegalStateException("Attempting to load an unregistered cursor: " + cursor.getName());
         }
 
-        boolean animated = animation != null;
+        AnimationData animationData = metadata.getAnimation();
+        boolean animated = animationData != null;
         if (animated != (cursor instanceof AnimatedCursor)) {
             cursor.destroy();
             cursor = animated
                     ? new AnimatedCursor(cursor.getType(), this::onLoad)
                     : new Cursor(cursor.getType(), this::onLoad);
-            cursors.put(cursor.getTypeName(), cursor);
+            cursors.put(cursor.getName(), cursor);
         }
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
-            animatedCursor.loadImage(image, settings, animation);
+            animatedCursor.loadImage(image, settings, metadata, animationData);
         } else {
-            cursor.loadImage(image, settings);
+            cursor.loadImage(image, settings, metadata);
         }
     }
 

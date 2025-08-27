@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.AnimationData;
 import io.github.fishstiz.cursors_extended.config.Config;
+import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 
 import java.io.IOException;
@@ -25,21 +26,21 @@ public class AnimatedCursor extends Cursor {
         super(type, onLoad);
     }
 
-    void loadImage(NativeImage image, Config.Settings settings, AnimationData animation) throws IOException {
-        super.loadImage(image, settings);
+    void loadImage(NativeImage image, Config.CursorSettings settings, CursorMetadata metadata, AnimationData animation) throws IOException {
+        super.loadImage(image, settings, metadata);
 
         int availableFrames = image.getHeight() / this.getTextureWidth();
 
-        Map<Integer, FrameCursor> newCursors = createCursors(image, settings, availableFrames);
+        Map<Integer, FrameCursor> newCursors = createCursors(image, settings, metadata, availableFrames);
         List<FrameData> newFrames = createFrames(animation, newCursors, availableFrames);
 
         updateState(settings.isAnimated(), animation, newCursors, newFrames);
     }
 
-    private HashMap<Integer, FrameCursor> createCursors(NativeImage image, Config.Settings settings, int availableFrames) throws IOException {
+    private HashMap<Integer, FrameCursor> createCursors(NativeImage image, Config.CursorSettings settings, CursorMetadata metadata, int availableFrames) throws IOException {
         HashMap<Integer, FrameCursor> newCursors = new HashMap<>();
         for (int i = 1; i < availableFrames; i++) {
-            newCursors.put(i, createCursor(image, settings, i));
+            newCursors.put(i, createCursor(image, settings, metadata, i));
         }
         return newCursors;
     }
@@ -66,11 +67,11 @@ public class AnimatedCursor extends Cursor {
         return newFrames;
     }
 
-    private FrameCursor createCursor(NativeImage image, Config.Settings settings, int index) throws IOException {
+    private FrameCursor createCursor(NativeImage image, Config.CursorSettings settings, CursorMetadata metadata, int index) throws IOException {
         FrameCursor cursor = new FrameCursor(index);
         int size = this.getTextureWidth();
         try (NativeImage cropped = NativeImageUtil.cropImage(image, 0, index * size, size, size)) {
-            cursor.loadImage(cropped, settings);
+            cursor.loadImage(cropped, settings, metadata);
         }
         return cursor;
     }
@@ -131,7 +132,7 @@ public class AnimatedCursor extends Cursor {
     }
 
     @Override
-    public void apply(Config.Settings settings) {
+    public void apply(Config.CursorSettings settings) {
         this.setAnimated(settings.isAnimated());
         super.apply(settings);
     }

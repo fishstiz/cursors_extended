@@ -1,46 +1,52 @@
 package io.github.fishstiz.cursors_extended.resource;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.config.AnimationData;
 import io.github.fishstiz.cursors_extended.config.Config;
-import io.github.fishstiz.cursors_extended.config.ConfigLoader;
+import io.github.fishstiz.cursors_extended.config.JsonLoader;
+import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
-import static io.github.fishstiz.cursors_extended.CursorsExtended.LOGGER;
+import static io.github.fishstiz.cursors_extended.CursorsExtended.*;
 
 public class CursorResourceLoader {
-    private static final String ANIMATION_TYPE = ".mcmeta";
-    private static final ResourceLocation SETTINGS_LOCATION = CursorsExtended.loc("atlases/cursors.json");
-    private static final ResourceLocation DIR = CursorsExtended.loc("textures/cursors/");
-    private static Config.Resource resourceConfig;
+    private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors/");
 
     private CursorResourceLoader() {
     }
 
     public static ResourceLocation getDirectory() {
-        return DIR;
+        return DIRECTORY;
     }
 
     public static void reload(ResourceManager manager) {
         onReload();
-        loadResourceSettings(manager);
+        LOGGER.info("[cursors_extended] Loading cursors...");
+        checkHash(manager);
         loadCursorTextures(manager);
+        CONFIG.save();
+        LOGGER.info("[cursors_extended] Loading cursors finished.");
         Minecraft.getInstance().execute(CursorResourceLoader::onReload);
     }
 
@@ -48,93 +54,83 @@ public class CursorResourceLoader {
         CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
     }
 
-    private static void loadResourceSettings(ResourceManager manager) {
-        getLayeredSettings(manager.getResourceStack(SETTINGS_LOCATION)).ifPresent(config -> {
-            if (config.isDifferent(CONFIG)) {
-                LOGGER.info("[cursors-extended] New resource pack settings detected, updating config...");
-                CONFIG.setHash(config.getHash());
-                CONFIG.merge(config);
+    private static void checkHash(ResourceManager manager) {
+        getHash(manager.getResourceStack(DIRECTORY)).ifPresent(hash -> {
+            if (!Objects.equals(CONFIG.getHash(), hash)) {
+                LOGGER.info("[cursors-extended] Resource pack hash has changed, updating config...");
+                CONFIG.setHash(hash);
                 CONFIG.getGlobal().setActiveAll(false);
-                CONFIG.save();
+                CONFIG.clearSettings();
             }
-            resourceConfig = config;
         });
     }
 
-    private static Optional<Config.Resource> getLayeredSettings(List<Resource> configResources) {
-        Config.Resource layeredResources = null;
-        for (Resource configResource : configResources) {
-            try (InputStream stream = configResource.open()) {
-                Config.Resource resourceConfig = ConfigLoader.loadResource(stream);
-                if (layeredResources == null) {
-                    layeredResources = resourceConfig;
-                } else {
-                    layeredResources.layer(resourceConfig.getAllSettings());
-                }
-            } catch (IOException e) {
-                LOGGER.error("[cursors-extended] Failed to load settings of resource pack '{}'", configResource.sourcePackId());
+    private static Optional<String> getHash(List<Resource> resources) {
+        if (resources.isEmpty()) return Optional.empty();
+
+        resources.sort(Comparator.comparing(Resource::sourcePackId));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (Resource resource : resources) {
+            try (PackResources packs = resource.source()) {
+                packs.listResources(PackType.CLIENT_RESOURCES, MOD_ID, DIRECTORY.getPath(), (resourceLocation, ioSupplier) -> {
+                    try (InputStream in = ioSupplier.get()) {
+                        in.transferTo(out);
+                    } catch (IOException ignore) {
+                    }
+                });
             }
         }
-        return Optional.ofNullable(layeredResources);
+
+        HashCode hash = Hashing.murmur3_32_fixed().hashBytes(out.toByteArray());
+        return Optional.of(hash.toString());
     }
 
-    public static boolean isResourceSetting(@NotNull Cursor cursor, @Nullable Config.Settings settings) {
-        return SettingsUtil.equalSettings(resourceConfig.getOrCreateSettings(cursor), settings, true);
+    public static boolean isResourceSetting(@NotNull Cursor cursor, @Nullable Config.CursorSettings settings) {
+        return SettingsUtil.equalSettings(cursor.getMetadata().getCursorSettings(), settings, true);
     }
 
     public static boolean retoreActiveResourceSettings(@NotNull Cursor cursor) {
-        if (cursor.isLoaded() && resourceConfig != null) {
-            CONFIG.replaceActiveSettings(resourceConfig, cursor);
+        if (cursor.isLoaded()) {
+            CONFIG.replaceActiveSettings(cursor.getMetadata().getCursorSettings(), cursor);
             cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
             return true;
         } else {
-            LOGGER.error("Failed to apply resource settings for '{}'", cursor.getTypeName());
+            LOGGER.error("Failed to apply resource settings for '{}'", cursor.getName());
         }
         return false;
     }
 
     public static void restoreResourceSettings() {
-        if (resourceConfig != null) {
-            CONFIG.setHash(resourceConfig.getHash());
-            CONFIG.merge(resourceConfig);
-            for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-                cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
-            }
-        } else {
-            LOGGER.error("[cursors-extended] Failed to apply resource config: Not Found.");
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+            settings.merge(cursor.getMetadata().getCursorSettings());
+            cursor.apply(CONFIG.getGlobal().apply(settings));
         }
     }
 
     private static void loadCursorTextures(ResourceManager manager) {
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            Config.Settings settings = CONFIG.getOrCreateSettings(cursor);
-
-            if (!CONFIG.isDeferredLoading() || settings.isEnabled()) {
-                loadCursorTexture(manager, cursor, settings);
-            } else {
-                LOGGER.info("[cursors-extended] Skipped loading of disabled cursor '{}'.", cursor.getTypeName());
-            }
+            loadCursorTexture(manager, cursor);
         }
     }
 
     public static boolean loadCursorTexture(ResourceManager manager, Cursor cursor) {
-        return loadCursorTexture(manager, cursor, CONFIG.getOrCreateSettings(cursor));
-    }
-
-    private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor, Config.Settings settings) {
         ResourceLocation location = cursor.getLocation();
         Optional<Resource> cursorResource = manager.getResource(location);
 
         try {
             if (cursorResource.isEmpty()) {
-                LOGGER.error("[cursors-extended] Cursor Type: '{}' not found", cursor.getTypeName());
+                LOGGER.error("[cursors-extended] Cursor Type: '{}' not found", cursor.getName());
                 cursor.destroy();
                 return false;
             }
 
             try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
-                AnimationData animation = loadAnimation(manager, location, cursorResource.get());
-                CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(settings), animation);
+                CursorMetadata metadata = loadMetadata(manager, location, cursorResource.get());
+                if (!CONFIG.hasSettings(cursor)) {
+                    CONFIG.getOrCreateSettings(cursor).merge(metadata.getCursorSettings());
+                }
+                CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)), metadata);
                 return true;
             } catch (IOException e) {
                 LOGGER.error("[cursors-extended] Failed to load cursor at '{}': {}", location, e.getMessage());
@@ -145,15 +141,10 @@ public class CursorResourceLoader {
         }
     }
 
-    private static AnimationData loadAnimation(ResourceManager manager, ResourceLocation location, Resource cursorResource) {
-        Optional<Resource> animationResource = manager.getResource(location.withSuffix(ANIMATION_TYPE));
-        if (animationResource.isPresent() && animationResource.get().sourcePackId().equals(cursorResource.sourcePackId())) {
-            try (InputStream stream = animationResource.get().open()) {
-                return ConfigLoader.loadAnimationData(stream);
-            } catch (IOException e) {
-                LOGGER.error("[cursors-extended] Failed to load animation data for '{}'", location);
-            }
-        }
-        return null;
+    private static CursorMetadata loadMetadata(ResourceManager manager, ResourceLocation location, Resource cursorResource) {
+        return manager.getResource(location.withSuffix(CursorMetadata.FILE_TYPE))
+                .filter(metadata -> metadata.sourcePackId().equals(cursorResource.sourcePackId()))
+                .map(metadata -> JsonLoader.fromResource(CursorMetadata.class, metadata, "Cursor Metadata at  " + location))
+                .orElse(new CursorMetadata());
     }
 }

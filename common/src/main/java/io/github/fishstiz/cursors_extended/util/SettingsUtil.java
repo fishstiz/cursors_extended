@@ -108,7 +108,7 @@ public class SettingsUtil {
         return max != -1 ? max : GLOBAL_HOT_MAX;
     }
 
-    public static boolean equalSettings(@Nullable Config.Settings a, @Nullable Config.Settings b, boolean excludeGlobal) {
+    public static boolean equalSettings(@Nullable Config.CursorSettings a, @Nullable Config.CursorSettings b, boolean excludeGlobal) {
         if (Objects.equals(a, b)) {
             return true;
         }

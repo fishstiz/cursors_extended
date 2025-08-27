@@ -3,10 +3,8 @@ package io.github.fishstiz.cursors_extended;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.config.Config;
-import io.github.fishstiz.cursors_extended.config.ConfigLoader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.platform.Services;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public final class CursorsExtended {
     public static final String MOD_ID = "cursors_extended";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final Config CONFIG = ConfigLoader.load(Services.PLATFORM.getConfigDir().resolve(MOD_ID + ".json").toFile());
+    public static final Config CONFIG = Config.load();
 
     private CursorsExtended() {
     }

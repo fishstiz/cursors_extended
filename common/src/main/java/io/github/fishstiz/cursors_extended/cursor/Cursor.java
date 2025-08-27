@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
@@ -26,6 +27,7 @@ public class Cursor {
     private final @Nullable Consumer<Cursor> onLoad;
     private final CursorType type;
     private final ResourceLocation location;
+    private CursorMetadata metadata = new CursorMetadata();
     private Component text;
     private String base64Image;
     private double scale;
@@ -47,7 +49,7 @@ public class Cursor {
         this(cursor.type, cursor.onLoad);
     }
 
-    void loadImage(@NotNull NativeImage image, Config.Settings settings) throws IOException {
+    void loadImage(@NotNull NativeImage image, Config.CursorSettings settings, CursorMetadata metadata) throws IOException {
         try {
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
@@ -65,6 +67,7 @@ public class Cursor {
                 this.enabled = settings.isEnabled();
                 this.textureWidth = imageWidth;
                 this.textureHeight = imageHeight;
+                this.metadata = metadata;
 
                 create(validImage, settings.getScale(), settings.getXHot(), settings.getYHot());
             } finally {
@@ -99,15 +102,21 @@ public class Cursor {
         ByteBuffer pixels = null;
 
         double autoScaled = getAutoScale(scale);
-        try (NativeImage scaledImage = scale == 1 ? image : NativeImageUtil.scaleImage(image, autoScaled)) {
+        NativeImage scaledImage = null;
+        try {
+            if (scale != 1) {
+                scaledImage = NativeImageUtil.scaleImage(image, autoScaled);
+            }
+
+            NativeImage validImage = scaledImage != null ? scaledImage : image;
             int scaledXHot = scale == 1 ? xhot : (int) Math.round(xhot * autoScaled);
             int scaledYHot = scale == 1 ? yhot : (int) Math.round(yhot * autoScaled);
-            int scaledWidth = scaledImage.getWidth();
-            int scaledHeight = scaledImage.getHeight();
+            int scaledWidth = validImage.getWidth();
+            int scaledHeight = validImage.getHeight();
 
             GLFWImage glfwImage = GLFWImage.create();
             pixels = MemoryUtil.memAlloc(scaledWidth * scaledHeight * 4);
-            NativeImageUtil.writePixelsRGBA(scaledImage, pixels);
+            NativeImageUtil.writePixelsRGBA(validImage, pixels);
             glfwImage.set(scaledWidth, scaledHeight, pixels);
 
             this.id = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
@@ -125,6 +134,9 @@ public class Cursor {
                 this.onLoad.accept(this);
             }
         } finally {
+            if (scaledImage != null) {
+                scaledImage.close();
+            }
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
             }
@@ -147,7 +159,7 @@ public class Cursor {
         }
     }
 
-    public void apply(Config.Settings settings) {
+    public void apply(Config.CursorSettings settings) {
         this.enable(settings.isEnabled());
         this.updateImage(settings.getScale(), settings.getXHot(), settings.getYHot());
     }
@@ -173,7 +185,7 @@ public class Cursor {
         return type;
     }
 
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return type.toString();
     }
 
@@ -182,6 +194,10 @@ public class Cursor {
             this.text = Component.translatable("cursors_extended.options.cursor-type." + type.toString());
         }
         return this.text;
+    }
+
+    public CursorMetadata getMetadata() {
+        return this.metadata;
     }
 
     public double getScale() {

@@ -13,7 +13,7 @@ public class CursorAnimationHelper {
     private final Map<String, AnimationState> cursorStates = new HashMap<>();
 
     public void reset(AnimatedCursor cursor) {
-        AnimationState cursorState = cursorStates.get(cursor.getTypeName());
+        AnimationState cursorState = cursorStates.get(cursor.getName());
         if (cursorState != null) {
             cursorState.reset();
         }
