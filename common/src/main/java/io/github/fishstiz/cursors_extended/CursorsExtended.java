@@ -22,12 +22,13 @@ public final class CursorsExtended {
     static void init() {
         CursorManager.INSTANCE.registerType(CursorType.DEFAULT);
         CursorManager.INSTANCE.registerType(CursorTypes.POINTING_HAND);
-        CursorManager.INSTANCE.registerType(CursorTypes.RESIZE_ALL);
+        CursorManager.INSTANCE.registerType(CursorTypesExt.GRABBING);
         CursorManager.INSTANCE.registerType(CursorTypes.IBEAM);
         CursorManager.INSTANCE.registerType(CursorTypesExt.SHIFT);
         CursorManager.INSTANCE.registerType(CursorTypesExt.BUSY);
         CursorManager.INSTANCE.registerType(CursorTypes.NOT_ALLOWED);
         CursorManager.INSTANCE.registerType(CursorTypes.CROSSHAIR);
+        CursorManager.INSTANCE.registerType(CursorTypes.RESIZE_ALL);
         CursorManager.INSTANCE.registerType(CursorTypes.RESIZE_EW);
         CursorManager.INSTANCE.registerType(CursorTypes.RESIZE_NS);
         CursorManager.INSTANCE.registerType(CursorTypesExt.RESIZE_NWSE);

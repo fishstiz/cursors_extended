@@ -46,7 +46,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
             }
         }
         if (CONFIG.isItemGrabbingEnabled() && !menu.getCarried().isEmpty()) {
-            return CursorTypes.RESIZE_ALL;
+            return CursorTypesExt.GRABBING;
         }
         return CursorType.DEFAULT;
     }

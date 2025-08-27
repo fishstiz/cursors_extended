@@ -2,7 +2,6 @@ package io.github.fishstiz.cursors_extended.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorType;
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import net.minecraft.client.Minecraft;
@@ -26,12 +25,6 @@ public class CursorTypeUtil {
         return CursorManager.INSTANCE.isEnabled(CursorTypesExt.SHIFT) &&
                (InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                 InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_RIGHT_SHIFT));
-    }
-
-    public static boolean isGrabbing() {
-        return CursorManager.INSTANCE.isEnabled(CursorTypes.RESIZE_ALL) &&
-               nameEquals(CursorManager.INSTANCE.getAppliedCursor().getType(), CursorTypes.RESIZE_ALL) &&
-               isLeftClickHeld();
     }
 
     public static boolean isLeftClickHeld() {

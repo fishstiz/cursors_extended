@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
@@ -149,7 +150,7 @@ public class CursorHotspotWidget extends CursorWidget {
             return CursorType.DEFAULT;
         }
         if (this.dragging) {
-            return CursorTypes.RESIZE_ALL;
+            return CursorTypesExt.GRABBING_HOLD;
         }
         return CursorTypes.POINTING_HAND;
     }

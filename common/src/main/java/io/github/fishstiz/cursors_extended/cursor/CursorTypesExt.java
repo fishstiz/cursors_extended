@@ -8,6 +8,8 @@ public class CursorTypesExt {
     public static final CursorType BUSY = create("busy");
     public static final CursorType RESIZE_NWSE = create("resize_nwse");
     public static final CursorType RESIZE_NESW = create("resize_nesw");
+    public static final CursorType GRABBING = create("grabbing");
+    public static final CursorType GRABBING_HOLD = create(GRABBING.toString());
 
     private CursorTypesExt() {
     }

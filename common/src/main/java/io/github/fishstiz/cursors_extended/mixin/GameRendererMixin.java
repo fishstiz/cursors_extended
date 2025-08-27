@@ -28,18 +28,4 @@ public abstract class GameRendererMixin {
     ) {
         CursorManager.INSTANCE.renderCursor(minecraft, guiGraphics, mouseX, mouseY);
     }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeStorage;endFrame()V"))
-    private void afterGameRender(
-            DeltaTracker deltaTracker,
-            boolean renderLevel,
-            CallbackInfo ci,
-            @Local(ordinal = 0) GuiGraphics guiGraphics,
-            @Local(ordinal = 0) int mouseX,
-            @Local(ordinal = 1) int mouseY
-    ) {
-        if (this.minecraft.screen != null) {
-            CursorListener.INSTANCE.afterGameRender(this.minecraft, this.minecraft.screen, mouseX, mouseY);
-        }
-    }
 }
