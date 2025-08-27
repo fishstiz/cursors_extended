@@ -5,9 +5,9 @@
   "cursors_extended.options.xhot": "Deslocamento X",
   "cursors_extended.options.yhot": "Deslocamento Y",
   "cursors_extended.options.cursor-type.default": "Padrão",
-  "cursors_extended.options.cursor-type.pointer": "Ponteiro",
+  "cursors_extended.options.cursor-type.pointing_hand": "Ponteiro",
   "cursors_extended.options.cursor-type.grabbing": "Agarro",
-  "cursors_extended.options.cursor-type.text": "Texto",
+  "cursors_extended.options.cursor-type.ibeam": "Texto",
   "cursors_extended.options.cursor-type.shift": "Deslocamento",
 
   "cursors_extended.options.adapt.item_slot": "Espaço de Item do Inventário",

@@ -1,5 +1,5 @@
 {
-  "modmenu.descriptionTranslation.minecraft-cursor": "Minecraft için özelleştirilebilir imleç.",
+  "modmenu.descriptionTranslation.cursors_extended": "Minecraft için özelleştirilebilir imleç.",
 
   "cursors_extended.options": "İmleç Ayarları",
   "cursors_extended.options.enabled": "Etkin",
@@ -20,9 +20,9 @@
   "cursors_extended.options.cursor-types": "İmleçler",
   "cursors_extended.options.cursor-type": "%1$s İmleci",
   "cursors_extended.options.cursor-type.default": "Varsayılan",
-  "cursors_extended.options.cursor-type.pointer": "İşaretçi",
+  "cursors_extended.options.cursor-type.pointing_hand": "İşaretçi",
   "cursors_extended.options.cursor-type.grabbing": "Kavrama",
-  "cursors_extended.options.cursor-type.text": "Metin",
+  "cursors_extended.options.cursor-type.ibeam": "Metin",
   "cursors_extended.options.cursor-type.shift": "Kaydır",
   "cursors_extended.options.cursor-type.busy": "Meşgul",
   "cursors_extended.options.cursor-type.crosshair": "Nişangah",
@@ -54,22 +54,16 @@
   "cursors_extended.options.adapt.advancements": "Başarılar Sekmeleri",
   "cursors_extended.options.adapt.world": "Dünya Oynat Düğmesi",
   "cursors_extended.options.adapt.server": "Sunucu Oynat Düğmesi",
-  "cursors_extended.options.adapt.inactive_widgets": "Devre Dışı Araçlar",
 
   "cursors_extended.options.resource_pack.reset": "İmleç Ayarlarını Sıfırla",
   "cursors_extended.options.resource_pack.reset.tooltip": "Kişisel imleç ayarlarını kaynak paketi (veya yerleşik varsayılan) ile eşleşecek şekilde sıfırlar.",
 
   "cursors_extended.options.compat": "Mod Uyumluluğu",
-  "cursors_extended.options.compat.remap_cursors": "Sistem İmleçlerini Yeniden Eşle (GLFW)",
-  "cursors_extended.options.compat.remap_cursors.info": "Sistem imleçlerini Minecraft imleçleriyle yeniden eşleştirir.\n\nUYARI: Devre dışı bırakmak bazı modlarla uyumsuzluk yaratabilir.",
-  "cursors_extended.options.compat.remap_cursors.info_unavailable": "GLFW erken yüklendiyse sistem imleçleri yeniden eşleştirilemez.",
-  "cursors_extended.options.compat.remap_cursors.empty": "Yeniden eşleştirilecek imleç tespit edilemedi.",
   "cursors_extended.options.compat.aggressive_cursor": "Agresif İmleç Güncellemeleri",
   "cursors_extended.options.compat.aggressive_cursor.info": "İmleci sadece değiştiğinde değil, sürekli olarak günceller.\n\nVarsayılan olarak devre dışı.",
 
   "cursors_extended.options.debug": "Hata Ayıklama",
   "cursors_extended.options.debug.inspect": "Öğeyi İncele",
-  "cursors_extended.options.debug.cache.clear": "Önbelleği Temizle: %1$s",
   "cursors_extended.options.debug.report_issues": "Sorun Bildir",
   "cursors_extended.options.debug.open_wiki": "Wiki'yi Aç"
 }

@@ -1,5 +1,5 @@
 {
-  "modmenu.descriptionTranslation.minecraft-cursor": "Настраиваемый курсор для Minecraft.",
+  "modmenu.descriptionTranslation.cursors_extended": "Настраиваемый курсор для Minecraft.",
 
   "cursors_extended.options": "Настройки курсора",
   "cursors_extended.options.enabled": "Включено",
@@ -20,9 +20,9 @@
   "cursors_extended.options.cursor-types": "Типы курсоров",
   "cursors_extended.options.cursor-type": "Курсор %1$s",
   "cursors_extended.options.cursor-type.default": "Стандартный",
-  "cursors_extended.options.cursor-type.pointer": "Указатель",
+  "cursors_extended.options.cursor-type.pointing_hand": "Указатель",
   "cursors_extended.options.cursor-type.grabbing": "Захват",
-  "cursors_extended.options.cursor-type.text": "Текст",
+  "cursors_extended.options.cursor-type.ibeam": "Текст",
   "cursors_extended.options.cursor-type.shift": "Перемещение",
   "cursors_extended.options.cursor-type.busy": "Занят",
   "cursors_extended.options.cursor-type.crosshair": "Прицел",
@@ -50,27 +50,20 @@
   "cursors_extended.options.adapt.creative_tabs": "Вкладки креатива",
   "cursors_extended.options.adapt.enchantments": "Кнопки зачарований",
   "cursors_extended.options.adapt.stonecutter": "Кнопки камнереза",
-  "cursors_extended.options.adapt.book_edit": "Редактор книг",
   "cursors_extended.options.adapt.loom": "Кнопки ткацкого станка",
   "cursors_extended.options.adapt.advancements": "Вкладки достижений",
   "cursors_extended.options.adapt.world": "Кнопка мира",
   "cursors_extended.options.adapt.server": "Кнопка сервера",
-  "cursors_extended.options.adapt.inactive_widgets": "Неактивные элементы",
 
   "cursors_extended.options.resource_pack.reset": "Сбросить настройки",
   "cursors_extended.options.resource_pack.reset.tooltip": "Сбрасывает пользовательские настройки до значений из ресурспака (или стандартных).",
 
   "cursors_extended.options.compat": "Совместимость",
-  "cursors_extended.options.compat.remap_cursors": "Переназначить системные курсоры (GLFW)",
-  "cursors_extended.options.compat.remap_cursors.info": "Сопоставляет системные курсоры с эквивалентами из Minecraft Cursor.\n\nВНИМАНИЕ: Отключение может вызвать проблемы с некоторыми модами.",
-  "cursors_extended.options.compat.remap_cursors.info_unavailable": "Переназначение недоступно при ранней загрузке GLFW.",
-  "cursors_extended.options.compat.remap_cursors.empty": "Нет курсоров для переназначения",
   "cursors_extended.options.compat.aggressive_cursor": "Активное обновление",
   "cursors_extended.options.compat.aggressive_cursor.info": "Постоянно обновляет курсор вместо обновления только при изменениях.\n\nПо умолчанию отключено.",
 
   "cursors_extended.options.debug": "Отладка",
   "cursors_extended.options.debug.inspect": "Инспектор элементов",
-  "cursors_extended.options.debug.cache.clear": "Очистить кэш: %1$s",
   "cursors_extended.options.debug.report_issues": "Сообщить об ошибке",
   "cursors_extended.options.debug.open_wiki": "Открыть вики"
 }
