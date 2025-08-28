@@ -5,10 +5,11 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(EditBox.class)
+@Mixin(value = {EditBox.class, MultiLineEditBox.class})
 public abstract class EditBoxMixin extends AbstractWidget implements CursorProvider {
     protected EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);

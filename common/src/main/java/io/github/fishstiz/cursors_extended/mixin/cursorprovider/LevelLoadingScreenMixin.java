@@ -4,9 +4,10 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
+import net.minecraft.client.gui.screens.ProgressScreen;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(LevelLoadingScreen.class)
+@Mixin(value = {LevelLoadingScreen.class, ProgressScreen.class})
 public abstract class LevelLoadingScreenMixin implements CursorProvider {
     @Override
     public CursorType cursors_extended$cursorType(double mouseX, double mouseY) {

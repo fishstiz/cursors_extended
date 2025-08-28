@@ -10,6 +10,8 @@
     "GameRendererMixin",
     "MinecraftMixin",
     "NativeImageAccess",
+    "ScreenMixin",
+    "WindowAccess",
     "WindowMixin",
     "cursorprovider.AbstractButtonMixin",
     "cursorprovider.AbstractContainerScreenMixin",
@@ -21,10 +23,9 @@
     "cursorprovider.CreativeModeInventoryScreenMixin",
     "cursorprovider.EditBoxMixin",
     "cursorprovider.EnchantmentScreenMixin",
+    "cursorprovider.GenericMessageScreenMixin",
     "cursorprovider.LevelLoadingScreenMixin",
     "cursorprovider.LoomScreenMixin",
-    "cursorprovider.MultilineEditBoxMixin",
-    "cursorprovider.ProgressScreenMixin",
     "cursorprovider.ServerSelectionListMixin",
     "cursorprovider.StonecutterScreenMixin",
     "cursorprovider.TabButtonMixin",
@@ -38,9 +39,5 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "ScreenMixin",
-    "WindowAccess"
-  ]
+  }
 }
