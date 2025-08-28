@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import org.lwjgl.system.MemoryUtil;
 
 public class CursorTypesExt {
@@ -9,8 +10,9 @@ public class CursorTypesExt {
     public static final CursorType GRABBING_HOLD = asHold(GRABBING);
     public static final CursorType SHIFT = create("shift");
     public static final CursorType BUSY = create("busy");
-    public static final CursorType RESIZE_ALL_HOLD = asHold(CursorTypes.RESIZE_ALL);
     public static final CursorType RESIZE_EW_HOLD = asHold(CursorTypes.RESIZE_EW);
+    public static final CursorType RESIZE_NS_HOLD = asHold(CursorTypes.RESIZE_NS);
+    public static final CursorType RESIZE_ALL_HOLD = asHold(CursorTypes.RESIZE_ALL);
     public static final CursorType RESIZE_NWSE = create("resize_nwse");
     public static final CursorType RESIZE_NESW = create("resize_nesw");
 
@@ -26,7 +28,7 @@ public class CursorTypesExt {
     }
 
     public static boolean isHoldType(CursorType cursorType) {
-        return cursorType instanceof HoldType;
+        return cursorType instanceof HoldType && CursorsExtended.CONFIG.isHeldCursorsEnabled();
     }
 
     private static final class HoldType extends CursorType {

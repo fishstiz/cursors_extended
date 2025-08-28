@@ -20,8 +20,12 @@ import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip ADAPTIVE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.adapt.tooltip"));
+    private static final Component HOLD_CURSORS = Component.translatable("cursors_extended.options.adapt.hold");
+    private static final Tooltip HOLD_CURSORS_INFO = Tooltip.create(Component.translatable("cursors_extended.options.adapt.hold.tooltip"));
     private static final Component ITEM_SLOT = Component.translatable("cursors_extended.options.adapt.item_slot");
     private static final Component ITEM_GRAB = Component.translatable("cursors_extended.options.adapt.item_grab");
+    private static final Component SCROLLBAR_POINTER = scrollbarText(CursorTypes.POINTING_HAND);
+    private static final Component SCROLLBAR_RESIZE = scrollbarText(CursorTypes.RESIZE_NS);
     private static final Component CREATIVE_TABS = Component.translatable("cursors_extended.options.adapt.creative_tabs");
     private static final Component ENCHANTMENTS = Component.translatable("cursors_extended.options.adapt.enchantments");
     private static final Component STONECUTTER = Component.translatable("cursors_extended.options.adapt.stonecutter");
@@ -47,8 +51,11 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
 
         boolean adaptive = CursorManager.INSTANCE.isAdaptive();
         this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
+        this.addOption(CONFIG.isHeldCursorsEnabled(), CONFIG::setHeldCursorsEnabled, HOLD_CURSORS, HOLD_CURSORS_INFO, null, adaptive);
         this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypesExt.GRABBING, adaptive);
+        this.addOption(CONFIG.isPointerScrollbarEnabled(), CONFIG::setPointerScrollbarEnabled, SCROLLBAR_POINTER, CursorTypes.POINTING_HAND, adaptive);
+        this.addOption(CONFIG.isResizeScrollbarEnabled(), CONFIG::setResizeScrollbarEnabled, SCROLLBAR_RESIZE, CursorTypes.RESIZE_NS, adaptive);
         this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorTypes.POINTING_HAND, adaptive);
@@ -63,10 +70,16 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void addOption(boolean value, Consumer<Boolean> consumer, Component label, CursorType cursorType, boolean active) {
-        this.optionsList.addToggle(value && active, consumer, this.index(label), prefixCursor(cursorType), null, active);
+        this.addOption(value, consumer, label, null, cursorType, active);
+    }
+
+    private void addOption(boolean value, Consumer<Boolean> consumer, Component label, Tooltip tooltip, CursorType cursorType, boolean active) {
+        this.optionsList.addToggle(value && active, consumer, this.index(label), prefixCursor(cursorType), tooltip, active);
     }
 
     private OptionsListWidget.Prefix prefixCursor(CursorType cursorType) {
+        if (cursorType == null) return null;
+
         Cursor cursor = Objects.requireNonNull(CursorManager.INSTANCE.getCursor(cursorType));
 
         return (guiGraphics, font, x, y, height) -> {
@@ -108,5 +121,11 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.refreshCursors.run();
         this.refreshWidgets();
         this.repositionElements();
+    }
+
+    private static Component scrollbarText(CursorType cursorType) {
+        return Component.translatable("cursors_extended.options.adapt.scrollbar", Component.translatable(
+                "cursors_extended.options.cursor-type." + cursorType.toString()
+        ));
     }
 }

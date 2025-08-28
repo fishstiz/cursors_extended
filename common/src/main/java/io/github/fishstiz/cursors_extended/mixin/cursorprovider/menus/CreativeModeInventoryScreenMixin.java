@@ -31,6 +31,9 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
     @Shadow
     private static CreativeModeTab selectedTab;
 
+    @Shadow
+    protected abstract boolean insideScrollbar(double mouseX, double mouseY);
+
     protected CreativeModeInventoryScreenMixin(Component title) {
         super(title);
     }
@@ -47,8 +50,12 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
 
     @Inject(method = "renderBg", at = @At("RETURN"))
     private void forceDefaultOnScroll(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
-        if (selectedTab.canScroll() && this.scrolling && CursorTypeUtil.isLeftClickHeld()) {
-            CursorTickController.INSTANCE.setTickCursor(CursorTypes.ARROW);
+        if (selectedTab.canScroll()) {
+            if (this.scrolling && CursorTypeUtil.isLeftClickHeld() && CursorsExtended.CONFIG.isResizeScrollbarEnabled()) {
+                CursorTickController.INSTANCE.setTickCursor(CursorTypes.RESIZE_NS);
+            } else if (this.insideScrollbar(mouseX, mouseY) && CursorsExtended.CONFIG.isPointerScrollbarEnabled()) {
+                CursorTickController.INSTANCE.setTickCursor(CursorTypes.POINTING_HAND);
+            }
         }
     }
 

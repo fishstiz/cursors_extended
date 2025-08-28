@@ -49,8 +49,11 @@
 
   "cursors_extended.options.adapt": "Adaptive Cursor",
   "cursors_extended.options.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Arrow cursor.",
+  "cursors_extended.options.adapt.hold": "Allow holding of certain cursors",
+  "cursors_extended.options.adapt.hold.tooltip": "Some elements keep their cursor while the mouse button is held, even if the mouse moves away.",
   "cursors_extended.options.adapt.item_slot": "Inventory Item Slot",
   "cursors_extended.options.adapt.item_grab": "Inventory Item Grab",
+  "cursors_extended.options.adapt.scrollbar": "Scrollbar %1$s",
   "cursors_extended.options.adapt.creative_tabs": "Creative Inventory Tabs",
   "cursors_extended.options.adapt.enchantments": "Enchantment Buttons",
   "cursors_extended.options.adapt.stonecutter": "Stonecutter Recipe Buttons",
@@ -58,6 +61,7 @@
   "cursors_extended.options.adapt.advancements": "Advancements Tabs",
   "cursors_extended.options.adapt.world": "World Icon Play Button",
   "cursors_extended.options.adapt.server": "Server Icon Play Button",
+
   "cursors_extended.options.resource_pack.reset": "Reset Cursor Settings",
   "cursors_extended.options.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
 

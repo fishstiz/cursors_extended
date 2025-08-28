@@ -24,6 +24,9 @@ public class Config implements Serializable {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
+    private boolean pointerScrollbarEnabled = true;
+    private boolean resizeScrollbarEnabled = true;
+    private boolean heldCursorsEnabled = true;
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
     private boolean legacyMode = true;
@@ -180,6 +183,30 @@ public class Config implements Serializable {
 
     public void setLegacyMode(boolean legacyMode) {
         this.legacyMode = legacyMode;
+    }
+
+    public boolean isHeldCursorsEnabled() {
+        return heldCursorsEnabled;
+    }
+
+    public void setHeldCursorsEnabled(boolean heldCursorsEnabled) {
+        this.heldCursorsEnabled = heldCursorsEnabled;
+    }
+
+    public boolean isPointerScrollbarEnabled() {
+        return pointerScrollbarEnabled;
+    }
+
+    public void setPointerScrollbarEnabled(boolean pointerScrollbarEnabled) {
+        this.pointerScrollbarEnabled = pointerScrollbarEnabled;
+    }
+
+    public boolean isResizeScrollbarEnabled() {
+        return resizeScrollbarEnabled;
+    }
+
+    public void setResizeScrollbarEnabled(boolean resizeScrollbarEnabled) {
+        this.resizeScrollbarEnabled = resizeScrollbarEnabled;
     }
 
     public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {

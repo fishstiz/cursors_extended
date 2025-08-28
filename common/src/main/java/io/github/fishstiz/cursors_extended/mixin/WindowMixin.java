@@ -21,12 +21,7 @@ public class WindowMixin {
             return;
         }
 
-        if (CursorManager.INSTANCE.isRegistered(cursorType)) {
-            CursorTickController.INSTANCE.setFallbackTickCursor(cursorType);
-        } else {
-            CursorTickController.INSTANCE.setTickCursor(cursorType);
-        }
-        
+        CursorTickController.INSTANCE.setTickCursor(cursorType);
         this.currentCursor = CursorManager.INSTANCE.getAppliedCursor().getType();
     }
 }
