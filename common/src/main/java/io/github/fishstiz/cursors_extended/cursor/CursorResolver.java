@@ -25,7 +25,7 @@ public class CursorResolver {
     public void afterTick(Minecraft minecraft) {
         if (minecraft.screen == null && this.deferredCursorType == null) {
             this.setCurrentCursor(CursorTypeUtil.firstNonDefault(arrowOrDefault(minecraft), consumeTickCursors()));
-        } else if (this.deferredCursorType == null && nonScreenCursorVisible(minecraft)) {
+        } else if (this.deferredCursorType != null && nonScreenCursorVisible(minecraft)) {
             this.setCurrentCursor(CursorTypeUtil.firstNonDefault(arrowOrDefault(minecraft), this.deferredCursorType));
         }
     }
@@ -41,7 +41,7 @@ public class CursorResolver {
         CursorProviderInspector.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
     }
 
-    public void beforeApplyCursor(Minecraft minecraft, Screen screen, int mouseX, int mouseY) {
+    public void afterApplyCursor(Minecraft minecraft, Screen screen, int mouseX, int mouseY) {
         this.setCurrentCursor(resolve(minecraft, screen, mouseX, mouseY));
     }
 

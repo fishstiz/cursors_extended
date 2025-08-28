@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.AbstractEntry> {
@@ -45,9 +46,20 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
             @NotNull Consumer<Boolean> onToggle,
             @NotNull Component label,
             @Nullable Tooltip tooltip,
-            boolean active
+            BooleanSupplier active
     ) {
         this.addEntry(new ToggleEntry(value, defaultValue, onToggle, label, null, tooltip, active));
+    }
+
+    public void addToggle(
+            boolean value,
+            Boolean defaultValue,
+            @NotNull Consumer<Boolean> onToggle,
+            @NotNull Component label,
+            @Nullable Tooltip tooltip,
+            boolean active
+    ) {
+        this.addEntry(new ToggleEntry(value, defaultValue, onToggle, label, null, tooltip, () -> active));
     }
 
     public void addToggle(
@@ -84,11 +96,19 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         this.search = search.toLowerCase();
 
         if (!this.search.isEmpty()) {
+            AbstractEntry bestMatch = null;
             for (AbstractEntry entry : this.children()) {
-                if (entry.indexedLabel.contains(this.search)) {
-                    this.scrollToEntry(entry);
+                String label = entry.indexedLabel;
+                if (label.startsWith(this.search)) {
+                    bestMatch = entry;
                     break;
                 }
+                if (bestMatch == null && label.contains(this.search)) {
+                    bestMatch = entry;
+                }
+            }
+            if (bestMatch != null) {
+                this.scrollToEntry(bestMatch);
             }
         }
     }
@@ -223,6 +243,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         private final Boolean defaultValue;
         private final Consumer<Boolean> onToggle;
         private final @Nullable Prefix prefix;
+        private final BooleanSupplier active;
         protected boolean value;
 
         private ToggleEntry(
@@ -232,12 +253,13 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
                 @NotNull Component label,
                 @Nullable Prefix prefix,
                 @Nullable Tooltip tooltip,
-                boolean active
+                BooleanSupplier active
         ) {
             super(label);
 
             this.value = value;
             this.onToggle = onToggle;
+            this.active = active;
             this.button = new ButtonWidget(
                     this.getRight() - BUTTON_WIDTH,
                     this.getY(),
@@ -247,18 +269,18 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
                     this::onPress
             );
             this.button.setTooltip(tooltip);
-            this.button.active = active;
+            this.button.active = active.getAsBoolean();
+
             this.prefix = prefix;
             this.defaultValue = defaultValue;
 
             if (this.defaultValue != null) {
                 this.resetButton = new ButtonWidget(Component.empty(), btn -> {
                     this.value = this.defaultValue;
-                    this.updateResetButton();
                     this.updateMessage();
                     this.onToggle.accept(this.defaultValue);
                 }).withSize(Button.DEFAULT_HEIGHT).spriteOnly(UNDO_ICON);
-                this.resetButton.active = this.value != this.defaultValue;
+                this.resetButton.active = this.button.active && this.value != this.defaultValue;
                 this.addChild(this.resetButton);
             } else {
                 this.resetButton = null;
@@ -275,13 +297,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
                 @Nullable Tooltip tooltip,
                 boolean active
         ) {
-            this(value, null, onToggle, label, prefix, tooltip, active);
-        }
-
-        protected void updateResetButton() {
-            if (this.resetButton != null) {
-                this.resetButton.active = this.value != this.defaultValue;
-            }
+            this(value, null, onToggle, label, prefix, tooltip, () -> active);
         }
 
         protected void updateMessage() {
@@ -291,7 +307,6 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         protected void onPress(Button button) {
             this.value = !this.value;
             this.updateMessage();
-            this.updateResetButton();
             this.onToggle.accept(this.value);
         }
 
@@ -307,15 +322,17 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
             int startY = this.getY();
             int endX = this.button.getX() - OptionsListWidget.this.rowGap;
             int endY = this.getBottom();
-            int color = this.value ? LABEL_COLOR : DISABLED_COLOR;
+            int color = this.active.getAsBoolean() && this.value ? LABEL_COLOR : DISABLED_COLOR;
             DrawUtil.drawScrollableTextLeftAlign(guiGraphics, OptionsListWidget.this.font, this.label, startX, startY, endX, endY, color);
         }
 
         @Override
         public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            this.button.active = this.active.getAsBoolean();
             int right = this.getRight();
 
             if (this.resetButton != null) {
+                this.resetButton.active = this.button.active && this.value != this.defaultValue;
                 this.resetButton.setPosition(right - this.resetButton.getWidth(), this.getY());
                 right -= this.resetButton.getWidth() + OptionsListWidget.this.rowGap;
             }

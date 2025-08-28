@@ -1,6 +1,5 @@
 package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
 
-import io.github.fishstiz.cursors_extended.cursor.CursorTickController;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
@@ -21,7 +20,7 @@ public abstract class LoadingOverlayMixin {
     @Inject(method = "render", at = @At("TAIL"))
     private void setLoadingCursor(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (!reload.isDone()) {
-            CursorTickController.INSTANCE.setTickCursor(CursorTypesExt.BUSY);
+            guiGraphics.requestCursor(CursorTypesExt.BUSY);
         }
     }
 }

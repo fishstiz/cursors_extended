@@ -2,10 +2,11 @@ package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import io.github.fishstiz.cursors_extended.cursor.CursorTickController;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
@@ -24,12 +25,12 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreenMixin<M
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screens/inventory/MerchantScreen$TradeOfferButton;isHoveredOrFocused()Z"
     ))
-    private boolean setCursorOnHover(@Coerce Button instance, Operation<Boolean> original) {
+    private boolean setCursorOnHover(@Coerce Button instance, Operation<Boolean> original, @Local(argsOnly = true) GuiGraphics guiGraphics) {
         if (instance.isHovered()) {
             if (instance.isActive()) {
-                CursorTickController.INSTANCE.setTickCursor(CursorTypeUtil.canShift() ? CursorTypesExt.SHIFT : CursorTypes.POINTING_HAND);
+                guiGraphics.requestCursor(CursorTypeUtil.canShift() ? CursorTypesExt.SHIFT : CursorTypes.POINTING_HAND);
             } else {
-                CursorTickController.INSTANCE.setTickCursor(CursorTypes.NOT_ALLOWED);
+                guiGraphics.requestCursor(CursorTypes.NOT_ALLOWED);
             }
         }
 

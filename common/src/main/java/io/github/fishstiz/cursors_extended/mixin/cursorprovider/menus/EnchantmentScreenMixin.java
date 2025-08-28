@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.cursor.CursorTickController;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.network.chat.Component;
@@ -39,7 +38,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreenMixi
     private void setPointerOnHighlight(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation resourceLocation, int x, int y, int width, int height, Operation<Void> original) {
         original.call(instance, renderPipeline, resourceLocation, x, y, width, height);
         if (CursorsExtended.CONFIG.isEnchantmentsEnabled() && resourceLocation == ENCHANTMENT_SLOT_HIGHLIGHTED_SPRITE) {
-            CursorTickController.INSTANCE.setTickCursor(CursorTypes.POINTING_HAND);
+            instance.requestCursor(CursorTypes.POINTING_HAND);
         }
     }
 }

@@ -3,7 +3,6 @@ package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.cursor.CursorTickController;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.gui.GuiGraphics;
@@ -52,9 +51,9 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
     private void forceDefaultOnScroll(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
         if (selectedTab.canScroll()) {
             if (this.scrolling && CursorTypeUtil.isLeftClickHeld() && CursorsExtended.CONFIG.isResizeScrollbarEnabled()) {
-                CursorTickController.INSTANCE.setTickCursor(CursorTypes.RESIZE_NS);
+                guiGraphics.requestCursor(CursorTypes.RESIZE_NS);
             } else if (this.insideScrollbar(mouseX, mouseY) && CursorsExtended.CONFIG.isPointerScrollbarEnabled()) {
-                CursorTickController.INSTANCE.setTickCursor(CursorTypes.POINTING_HAND);
+                guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
             }
         }
     }
@@ -65,7 +64,7 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
             && creativeModeTab != selectedTab
             && cir.getReturnValue()
             && this.cursors_extended$cursorType(mouseX, mouseY) == CursorType.DEFAULT) {
-            CursorTickController.INSTANCE.setTickCursor(CursorTypes.POINTING_HAND);
+            guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
         }
     }
 }

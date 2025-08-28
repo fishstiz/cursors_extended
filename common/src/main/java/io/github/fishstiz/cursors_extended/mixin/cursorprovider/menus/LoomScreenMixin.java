@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.cursor.CursorTickController;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
@@ -36,7 +35,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreenMixin<LoomM
     @Inject(method = "renderBg", at = @At("RETURN"))
     private void forceDefaultOnScroll(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
         if (this.scrolling && CursorTypeUtil.isLeftClickHeld()) {
-            CursorTickController.INSTANCE.setTickCursor(CursorTypes.ARROW);
+            guiGraphics.requestCursor(CursorTypes.ARROW);
         }
     }
 
@@ -54,7 +53,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreenMixin<LoomM
     private void setPointerOnHighlight(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation resourceLocation, int x, int y, int width, int height, Operation<Void> original) {
         original.call(instance, renderPipeline, resourceLocation, x, y, width, height);
         if (CursorsExtended.CONFIG.isLoomPatternsEnabled() && resourceLocation == PATTERN_HIGHLIGHTED_SPRITE) {
-            CursorTickController.INSTANCE.setTickCursor(CursorTypes.POINTING_HAND);
+            instance.requestCursor(CursorTypes.POINTING_HAND);
         }
     }
 }

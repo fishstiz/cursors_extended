@@ -2,11 +2,13 @@ package io.github.fishstiz.cursors_extended.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
@@ -56,5 +58,20 @@ public class CursorTypeUtil {
             return widget.visible && (widget.isHovered() || widget.isMouseOver(mouseX, mouseY));
         }
         return guiEventListener.isMouseOver(mouseX, mouseY);
+    }
+
+    public static @Nullable CursorType mapGLFWCursors(int shape) {
+        return switch (shape) {
+            case GLFW.GLFW_POINTING_HAND_CURSOR -> CursorTypes.POINTING_HAND;
+            case GLFW.GLFW_IBEAM_CURSOR -> CursorTypes.IBEAM;
+            case GLFW.GLFW_CROSSHAIR_CURSOR -> CursorTypes.CROSSHAIR;
+            case GLFW.GLFW_RESIZE_EW_CURSOR -> CursorTypes.RESIZE_EW;
+            case GLFW.GLFW_RESIZE_NS_CURSOR -> CursorTypes.RESIZE_NS;
+            case GLFW.GLFW_RESIZE_NWSE_CURSOR -> CursorTypesExt.RESIZE_NWSE;
+            case GLFW.GLFW_RESIZE_NESW_CURSOR -> CursorTypesExt.RESIZE_NESW;
+            case GLFW.GLFW_RESIZE_ALL_CURSOR -> CursorTypes.RESIZE_ALL;
+            case GLFW.GLFW_NOT_ALLOWED_CURSOR -> CursorTypes.NOT_ALLOWED;
+            default -> null;
+        };
     }
 }

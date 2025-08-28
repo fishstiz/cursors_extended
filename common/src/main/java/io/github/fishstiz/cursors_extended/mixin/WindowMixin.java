@@ -22,6 +22,6 @@ public class WindowMixin {
         }
 
         CursorTickController.INSTANCE.setTickCursor(cursorType);
-        this.currentCursor = CursorManager.INSTANCE.getAppliedCursor().getType();
+        this.currentCursor = cursorType;
     }
 }
