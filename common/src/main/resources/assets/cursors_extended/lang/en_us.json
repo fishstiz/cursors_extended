@@ -1,6 +1,8 @@
 {
   "modmenu.descriptionTranslation.minecraft-cursor": "Configurable cursor for Minecraft.",
 
+  "cursors_extended.legacy.resource-pack": "Legacy Cursors",
+
   "cursors_extended.options": "Cursor Settings",
   "cursors_extended.options.enabled": "Enabled",
   "cursors_extended.options.scale": "Scale",
@@ -23,7 +25,7 @@
   "cursors_extended.options.cursor-type.default": "Default",
   "cursors_extended.options.cursor-type.pointing_hand": "Pointing Hand",
   "cursors_extended.options.cursor-type.grabbing": "Grabbing",
-  "cursors_extended.options.cursor-type.ibeam": "Text",
+  "cursors_extended.options.cursor-type.ibeam": "I-Beam",
   "cursors_extended.options.cursor-type.shift": "Shift",
   "cursors_extended.options.cursor-type.busy": "Busy",
   "cursors_extended.options.cursor-type.crosshair": "Crosshair",

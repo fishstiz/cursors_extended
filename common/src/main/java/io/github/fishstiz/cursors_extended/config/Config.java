@@ -37,12 +37,13 @@ public class Config implements Serializable {
         return cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
     }
 
-    public boolean hasSettings(Cursor cursor) {
-        return cursors.containsKey(cursor.getName());
+    public boolean isStale(Cursor cursor) {
+        CursorSettings settings = cursors.get(cursor.getName());
+        return settings == null || !settings.stale;
     }
 
-    public void clearSettings() {
-        cursors.clear();
+    public void markSettingsStale() {
+        cursors.values().forEach(settings -> settings.stale = true);
     }
 
     public @Nullable String getHash() {
@@ -184,6 +185,7 @@ public class Config implements Serializable {
     public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {
         protected boolean enabled = SettingsUtil.ENABLED;
         protected Boolean animated;
+        private transient boolean stale = false;
 
         CursorSettings() {
         }

@@ -23,7 +23,6 @@
     "cursorprovider.CreativeModeInventoryScreenMixin",
     "cursorprovider.EditBoxMixin",
     "cursorprovider.EnchantmentScreenMixin",
-    "cursorprovider.GenericMessageScreenMixin",
     "cursorprovider.LevelLoadingScreenMixin",
     "cursorprovider.LoomScreenMixin",
     "cursorprovider.ServerSelectionListMixin",

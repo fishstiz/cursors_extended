@@ -7,7 +7,10 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 
 public class CursorsExtendedFabric implements ClientModInitializer {
@@ -19,6 +22,14 @@ public class CursorsExtendedFabric implements ClientModInitializer {
                 .register((screen, guiGraphics, mouseX, mouseY, tickDelta) -> CursorListener.INSTANCE.afterRenderTooltip(
                         Minecraft.getInstance(), screen, guiGraphics, mouseX, mouseY
                 )));
+        FabricLoader.getInstance().getModContainer(CursorsExtended.MOD_ID).ifPresent(modContainer ->
+                ResourceManagerHelper.registerBuiltinResourcePack(
+                        CursorsExtended.loc("legacy"),
+                        modContainer,
+                        Component.translatable("cursors_extended.legacy.resource-pack"),
+                        ResourcePackActivationType.NORMAL
+                )
+        );
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CursorResourceReloadListener());
     }
 }

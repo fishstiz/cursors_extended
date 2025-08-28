@@ -3,7 +3,6 @@ package io.github.fishstiz.cursors_extended.resource;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,17 +39,11 @@ public class CursorResourceLoader {
     }
 
     public static void reload(ResourceManager manager) {
-        onReload();
         LOGGER.info("[cursors_extended] Loading cursors...");
         checkHash(manager);
         loadCursorTextures(manager);
         CONFIG.save();
         LOGGER.info("[cursors_extended] Loading cursors finished.");
-        Minecraft.getInstance().execute(CursorResourceLoader::onReload);
-    }
-
-    static void onReload() {
-        CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
     }
 
     private static void checkHash(ResourceManager manager) {
@@ -60,7 +52,7 @@ public class CursorResourceLoader {
                 LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
                 CONFIG.setHash(hash);
                 CONFIG.getGlobal().setActiveAll(false);
-                CONFIG.clearSettings();
+                CONFIG.markSettingsStale();
             }
         });
     }
@@ -68,7 +60,6 @@ public class CursorResourceLoader {
     private static Optional<String> getHash(List<Resource> resources) {
         if (resources.isEmpty()) return Optional.empty();
 
-        resources.sort(Comparator.comparing(Resource::sourcePackId));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         for (Resource resource : resources) {
             try (PackResources packs = resource.source()) {
@@ -129,7 +120,7 @@ public class CursorResourceLoader {
 
             try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
                 CursorMetadata metadata = loadMetadata(manager, location, cursorResource.get());
-                if (!CONFIG.hasSettings(cursor)) {
+                if (!CONFIG.isStale(cursor)) {
                     CONFIG.getOrCreateSettings(cursor).merge(metadata.getCursorSettings());
                 }
                 CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)), metadata);
