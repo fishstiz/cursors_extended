@@ -1,5 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.widget;
 
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,12 +41,23 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
 
     public void addToggle(
             boolean value,
+            Boolean defaultValue,
             @NotNull Consumer<Boolean> onToggle,
             @NotNull Component label,
             @Nullable Tooltip tooltip,
             boolean active
     ) {
-        this.addEntry(new ToggleEntry(value, onToggle, label, null, tooltip, active));
+        this.addEntry(new ToggleEntry(value, defaultValue, onToggle, label, null, tooltip, active));
+    }
+
+    public void addToggle(
+            boolean value,
+            @NotNull Consumer<Boolean> onToggle,
+            @NotNull Component label,
+            @Nullable Tooltip tooltip,
+            boolean active
+    ) {
+        this.addToggle(value, null, onToggle, label, tooltip, active);
     }
 
     public void addToggle(
@@ -201,16 +214,20 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     }
 
     private class ToggleEntry extends AbstractEntry {
+        protected static final ResourceLocation UNDO_ICON = CursorsExtended.loc("textures/gui/sprites/icon/arrow_u_turn_up_left.png");
         protected static final int BUTTON_WIDTH = 40;
         private static final int LABEL_COLOR = 0xFFFFFFFF; // white
         private static final int DISABLED_COLOR = 0xFFAAAAAA; // gray
         private final ButtonWidget button;
+        private final ButtonWidget resetButton;
+        private final Boolean defaultValue;
         private final Consumer<Boolean> onToggle;
         private final @Nullable Prefix prefix;
         protected boolean value;
 
         private ToggleEntry(
                 boolean value,
+                Boolean defaultValue,
                 @NotNull Consumer<Boolean> onToggle,
                 @NotNull Component label,
                 @Nullable Prefix prefix,
@@ -232,13 +249,49 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
             this.button.setTooltip(tooltip);
             this.button.active = active;
             this.prefix = prefix;
+            this.defaultValue = defaultValue;
+
+            if (this.defaultValue != null) {
+                this.resetButton = new ButtonWidget(Component.empty(), btn -> {
+                    this.value = this.defaultValue;
+                    this.updateResetButton();
+                    this.updateMessage();
+                    this.onToggle.accept(this.defaultValue);
+                }).withSize(Button.DEFAULT_HEIGHT).spriteOnly(UNDO_ICON);
+                this.resetButton.active = this.value != this.defaultValue;
+                this.addChild(this.resetButton);
+            } else {
+                this.resetButton = null;
+            }
 
             this.addChild(this.button);
         }
 
+        private ToggleEntry(
+                boolean value,
+                @NotNull Consumer<Boolean> onToggle,
+                @NotNull Component label,
+                @Nullable Prefix prefix,
+                @Nullable Tooltip tooltip,
+                boolean active
+        ) {
+            this(value, null, onToggle, label, prefix, tooltip, active);
+        }
+
+        protected void updateResetButton() {
+            if (this.resetButton != null) {
+                this.resetButton.active = this.value != this.defaultValue;
+            }
+        }
+
+        protected void updateMessage() {
+            this.button.setMessage(this.value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
+        }
+
         protected void onPress(Button button) {
             this.value = !this.value;
-            this.button.setMessage(this.value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
+            this.updateMessage();
+            this.updateResetButton();
             this.onToggle.accept(this.value);
         }
 
@@ -260,7 +313,14 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
 
         @Override
         public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
-            this.button.setPosition(this.getRight() - this.button.getWidth(), this.getY());
+            int right = this.getRight();
+
+            if (this.resetButton != null) {
+                this.resetButton.setPosition(right - this.resetButton.getWidth(), this.getY());
+                right -= this.resetButton.getWidth() + OptionsListWidget.this.rowGap;
+            }
+
+            this.button.setPosition(right - this.button.getWidth(), this.getY());
             this.renderLabel(guiGraphics);
             super.renderContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
         }

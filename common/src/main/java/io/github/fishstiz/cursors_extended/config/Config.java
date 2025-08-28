@@ -36,6 +36,10 @@ public class Config implements Serializable {
     Config() {
     }
 
+    public static Config defaults() {
+        return new Config();
+    }
+
     public CursorSettings getOrCreateSettings(Cursor cursor) {
         return cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
     }

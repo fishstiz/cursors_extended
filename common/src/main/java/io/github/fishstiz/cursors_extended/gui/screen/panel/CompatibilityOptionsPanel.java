@@ -1,5 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
+import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -26,8 +27,11 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     protected void initContents() {
         this.optionsList = new OptionsListWidget(this.getMinecraft(), this.getFont(), this.getSpacing());
 
+        final Config defaults = Config.defaults();
+
         this.optionsList.addToggle(
                 CONFIG.isAggressiveCursor(),
+                defaults.isAggressiveCursor(),
                 CONFIG::setAggressiveCursor,
                 this.index(AGGRESSIVE_TEXT),
                 AGGRESSIVE_INFO,
@@ -35,6 +39,7 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
         );
         this.optionsList.addToggle(
                 CursorManager.INSTANCE.isVirtual(),
+                defaults.isVirtualMode(),
                 value -> {
                     CursorManager.INSTANCE.toggleVirtual();
                     CONFIG.setVirtualMode(CursorManager.INSTANCE.isVirtual());
@@ -45,6 +50,7 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
         );
         this.optionsList.addToggle(
                 CONFIG.isLegacyMode(),
+                defaults.isLegacyMode(),
                 CONFIG::setLegacyMode,
                 this.index(LEGACY_MODE_TEXT),
                 LEGACY_MODE_INFO,
