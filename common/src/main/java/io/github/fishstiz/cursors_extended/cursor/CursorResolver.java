@@ -26,7 +26,7 @@ public class CursorResolver {
         if (minecraft.screen == null && this.deferredCursorType == null) {
             this.setCurrentCursor(CursorTypeUtil.firstNonDefault(arrowOrDefault(minecraft), consumeTickCursors()));
         } else if (this.deferredCursorType == null && nonScreenCursorVisible(minecraft)) {
-            this.setCurrentCursor(this.deferredCursorType);
+            this.setCurrentCursor(CursorTypeUtil.firstNonDefault(arrowOrDefault(minecraft), this.deferredCursorType));
         }
     }
 
