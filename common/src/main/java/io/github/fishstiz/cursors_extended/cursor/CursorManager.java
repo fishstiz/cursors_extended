@@ -8,6 +8,7 @@ import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.NotNull;
@@ -22,14 +23,21 @@ public final class CursorManager {
     private final Map<String, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>();
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
-    private @NotNull Cursor currentCursor = Cursor.createDummy();
-    private @NotNull CursorRenderer renderer = CursorsExtended.CONFIG.isVirtualMode() ? new CursorRenderer.Virtual() : new CursorRenderer.Native();
+    private @NotNull CursorRenderer renderer;
+    private Map<String, Cursor> dummies;
+    private Cursor currentCursor;
 
     private CursorManager() {
+        this.currentCursor = Cursor.createDummy();
+        this.renderer = CursorsExtended.CONFIG.isVirtualMode() ? new CursorRenderer.Virtual() : new CursorRenderer.Native();
     }
 
     public void registerType(CursorType cursorType) {
         this.cursors.put(cursorType.toString(), new Cursor(cursorType, this::onLoad));
+    }
+
+    public boolean isRegistered(CursorType cursorType) {
+        return this.cursors.containsKey(cursorType.toString());
     }
 
     public void loadCursor(Cursor cursor, NativeImage image, Config.CursorSettings settings, CursorMetadata metadata) throws IOException {
@@ -67,12 +75,17 @@ public final class CursorManager {
         Cursor override = getOverride();
         Cursor cursor = override != null ? override : this.cursors.get(type.toString());
 
+        if (cursor == null) {
+            handleCursorExternal(type);
+            return;
+        }
+
         if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != MemoryUtil.NULL) {
             handleCursorAnimation(animatedCursor);
             return;
         }
 
-        if (cursor == null || type != CursorType.DEFAULT && cursor.getId() == MemoryUtil.NULL || !cursor.isEnabled()) {
+        if (type != CursorType.DEFAULT && cursor.getId() == MemoryUtil.NULL || !cursor.isEnabled()) {
             cursor = getCursor(CursorType.DEFAULT);
         }
 
@@ -88,8 +101,26 @@ public final class CursorManager {
         updateCursor(currentFrameCursor.getId() != 0 ? currentFrameCursor : cursor);
     }
 
+    private void handleCursorExternal(CursorType cursorType) {
+        if (this.dummies == null) {
+            this.dummies = new Object2ObjectOpenHashMap<>();
+        }
+
+        Cursor cursor = this.dummies.get(cursorType.toString());
+        if (cursor == null) {
+            this.dummies.put(cursorType.toString(), Cursor.createDummy(cursorType));
+            CursorsExtended.LOGGER.info("[cursors_extended] Registered an external cursor: {}", cursorType);
+        }
+
+        this.currentCursor = this.dummies.get(cursorType.toString());
+        this.renderer.resetCursor();
+        cursorType.select(Minecraft.getInstance().getWindow());
+    }
+
     private void updateCursor(Cursor cursor) {
-        if (cursor == null || !CursorsExtended.CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId()) {
+        if (cursor == null ||
+            !this.isRegistered(currentCursor.getType()) ||
+            !CursorsExtended.CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId()) {
             return;
         }
 
@@ -98,7 +129,10 @@ public final class CursorManager {
     }
 
     public void reapplyCursor() {
-        this.renderer.setCursor(this.getAppliedCursor());
+        Cursor cursor = this.getAppliedCursor();
+        if (this.isRegistered(cursor.getType())) {
+            this.renderer.setCursor(cursor);
+        }
     }
 
     public void overrideCursor(CursorType type, int index) {
@@ -154,10 +188,6 @@ public final class CursorManager {
 
     public @Nullable Cursor getCursor(String type) {
         return cursors.get(type);
-    }
-
-    public long getCurrentId() {
-        return getAppliedCursor().getId();
     }
 
     public Collection<Cursor> getCursors() {

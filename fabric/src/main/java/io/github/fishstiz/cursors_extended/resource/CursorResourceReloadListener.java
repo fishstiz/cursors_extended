@@ -1,7 +1,5 @@
 package io.github.fishstiz.cursors_extended.resource;
 
-import com.mojang.blaze3d.platform.cursor.CursorType;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -22,13 +20,9 @@ public class CursorResourceReloadListener implements IdentifiableResourceReloadL
             PreparationBarrier preparationBarrier,
             Executor gameExecutor
     ) {
-        gameExecutor.execute(this::resetCursor);
+        gameExecutor.execute(CursorResourceLoader::reloadCursor);
         return CompletableFuture.runAsync(() -> CursorResourceLoader.reload(sharedState.resourceManager()), backgroundExecutor)
                 .thenCompose(preparationBarrier::wait)
-                .thenRunAsync(this::resetCursor, gameExecutor);
-    }
-
-    private void resetCursor() {
-        CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
+                .thenRunAsync(CursorResourceLoader::reloadCursor, gameExecutor);
     }
 }

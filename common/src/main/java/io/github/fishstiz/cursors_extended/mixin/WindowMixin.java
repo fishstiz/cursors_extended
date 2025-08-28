@@ -16,11 +16,17 @@ public class WindowMixin {
 
     @WrapMethod(method = "selectCursor")
     private void onSelectCursor(CursorType cursorType, Operation<Void> original) {
-        if (CursorManager.INSTANCE.isActive()) {
-            CursorTickController.INSTANCE.setFallbackTickCursor(cursorType);
-            this.currentCursor = CursorManager.INSTANCE.getAppliedCursor().getType();
-        } else {
+        if (!CursorManager.INSTANCE.isActive()) {
             original.call(cursorType);
+            return;
         }
+
+        if (CursorManager.INSTANCE.isRegistered(cursorType)) {
+            CursorTickController.INSTANCE.setFallbackTickCursor(cursorType);
+        } else {
+            CursorTickController.INSTANCE.setTickCursor(cursorType);
+        }
+        
+        this.currentCursor = CursorManager.INSTANCE.getAppliedCursor().getType();
     }
 }

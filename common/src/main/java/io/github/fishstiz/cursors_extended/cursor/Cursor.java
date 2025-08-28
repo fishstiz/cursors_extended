@@ -7,7 +7,6 @@ import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
-import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +52,7 @@ public class Cursor {
         try {
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
-            SettingsUtil.assertImageSize(imageWidth, imageHeight);
+            assertImageSize(imageWidth, imageHeight);
 
             NativeImage croppedImage = null;
             try {
@@ -260,7 +259,11 @@ public class Cursor {
         }
     }
 
+    static Cursor createDummy(CursorType type) {
+        return new Cursor(type, null);
+    }
+
     static Cursor createDummy() {
-        return new Cursor(CursorType.DEFAULT, null);
+        return createDummy(CursorType.DEFAULT);
     }
 }

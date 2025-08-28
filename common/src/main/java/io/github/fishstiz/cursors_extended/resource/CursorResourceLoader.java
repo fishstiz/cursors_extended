@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.resource;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
@@ -44,6 +45,12 @@ public class CursorResourceLoader {
         loadCursorTextures(manager);
         CONFIG.save();
         LOGGER.info("[cursors_extended] Loading cursors finished.");
+    }
+
+    static void reloadCursor() {
+        if (CursorManager.INSTANCE.isRegistered(CursorType.DEFAULT)) {
+            CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
+        }
     }
 
     private static void checkHash(ResourceManager manager) {

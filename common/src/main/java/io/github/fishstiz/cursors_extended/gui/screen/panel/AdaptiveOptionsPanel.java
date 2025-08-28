@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import net.minecraft.client.gui.components.Button;
@@ -48,7 +49,7 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         boolean adaptive = CursorManager.INSTANCE.isAdaptive();
         this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
         this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypes.RESIZE_ALL, adaptive);
+        this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypesExt.GRABBING, adaptive);
         this.addOption(CONFIG.isInactiveWidgetsEnabled(), CONFIG::setInactiveWidgetsEnabled, INACTIVE_WIDGETS, CursorTypes.NOT_ALLOWED, adaptive);
         this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorTypes.POINTING_HAND, adaptive);
