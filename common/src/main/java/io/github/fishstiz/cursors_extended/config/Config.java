@@ -30,6 +30,7 @@ public class Config implements Serializable {
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
     private boolean legacyMode = true;
+    private boolean showHotspotGuide = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Map<String, CursorSettings> cursors = new HashMap<>();
 
@@ -211,6 +212,14 @@ public class Config implements Serializable {
 
     public void setResizeScrollbarEnabled(boolean resizeScrollbarEnabled) {
         this.resizeScrollbarEnabled = resizeScrollbarEnabled;
+    }
+
+    public boolean isShowHotspotGuide() {
+        return showHotspotGuide;
+    }
+
+    public void setShowHotspotGuide(boolean showHotspotGuide) {
+        this.showHotspotGuide = showHotspotGuide;
     }
 
     public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {

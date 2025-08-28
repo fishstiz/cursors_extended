@@ -78,7 +78,7 @@ public class CursorPreviewWidget extends CursorWidget {
 
     @Override
     protected void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (this.isMouseOver(mouseX, mouseY)) {
+        if (this.isRenderRuler() && this.isMouseOver(mouseX, mouseY)) {
             guiGraphics.hLine(this.getX(), this.getRight() - 1, mouseY, RULER_COLOR);
             guiGraphics.vLine(mouseX, getY(), this.getBottom(), RULER_COLOR);
         }

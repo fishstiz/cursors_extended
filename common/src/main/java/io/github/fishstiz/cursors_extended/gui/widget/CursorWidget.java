@@ -19,6 +19,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     private static final int FOCUSED_BORDER_COLOR = 0xFFFFFFFF; // white
     private final ResourceLocation background128;
     private final Cursor cursor;
+    private boolean renderRuler = true;
 
     protected CursorWidget(
             int x,
@@ -67,9 +68,20 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         if (this.cursor.isLoaded()) {
             this.renderBackground(guiGraphics);
             this.renderCursor(guiGraphics, this.cursor);
-            this.renderRuler(guiGraphics, mouseX, mouseY);
+
+            if (this.isRenderRuler()) {
+                this.renderRuler(guiGraphics, mouseX, mouseY);
+            }
         }
         this.renderBorder(guiGraphics);
+    }
+
+    public void setRenderRuler(boolean renderRuler) {
+        this.renderRuler = renderRuler;
+    }
+
+    public boolean isRenderRuler() {
+        return renderRuler;
     }
 
     protected @NotNull Cursor getCursor() {

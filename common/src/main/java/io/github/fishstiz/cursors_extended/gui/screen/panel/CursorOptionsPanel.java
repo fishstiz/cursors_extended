@@ -134,7 +134,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
                     this.bindGlobalInfo(GLOBAL_YHOT_TOOLTIP, CursorsExtended.CONFIG.getGlobal().isYHotActive())
             );
             this.hotspotGuideToggler = this.optionsList.addOption(new ToggleWidget(
-                    true,
+                    CursorsExtended.CONFIG.isShowHotspotGuide(),
                     HOTSPOT_GUIDE_TEXT,
                     this::onToggleGuide
             ));
@@ -175,11 +175,13 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
                     row,
                     column
             );
+            this.hotspotWidget.setRenderRuler(CursorsExtended.CONFIG.isShowHotspotGuide());
             this.previewWidget = cursorWidgetsLayout.addChild(
                     new CursorPreviewWidget(this.cursor, this.getFont()),
                     ++row,
                     column
             );
+            this.previewWidget.setRenderRuler(CursorsExtended.CONFIG.isShowHotspotGuide());
         }
 
         return cursorWidgetsLayout;
@@ -268,7 +270,9 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onToggleGuide(boolean shown) {
-        Objects.requireNonNull(this.hotspotWidget).setRenderRuler(shown);
+        CursorsExtended.CONFIG.setShowHotspotGuide(shown);
+        this.hotspotWidget.setRenderRuler(shown);
+        this.previewWidget.setRenderRuler(shown);
     }
 
     private void restartAnimation() {
@@ -318,6 +322,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private void onHotspotWidgetMouseEvent(CursorHotspotWidget target, MouseEvent mouseEvent, int xhot, int yhot) {
         if (mouseEvent.clicked() || mouseEvent.dragged()) {
             target.setRenderRuler(true);
+            CursorsExtended.CONFIG.setShowHotspotGuide(true);
             if (this.hotspotGuideToggler != null) {
                 this.hotspotGuideToggler.setValue(true);
             }

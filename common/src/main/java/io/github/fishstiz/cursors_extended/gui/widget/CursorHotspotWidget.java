@@ -28,7 +28,6 @@ public class CursorHotspotWidget extends CursorWidget {
     private final SliderWidget yhotSlider;
     private final @Nullable MouseEventListener mouseEventListener;
     private final int maxHotspot;
-    private boolean renderRuler = true;
     private boolean dragging = false;
 
     public CursorHotspotWidget(
@@ -69,10 +68,6 @@ public class CursorHotspotWidget extends CursorWidget {
 
     @Override
     protected void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!this.renderRuler) {
-            return;
-        }
-
         boolean isGlobalX = this.global.isXHotActive();
         boolean isGlobalY = this.global.isYHotActive();
 
@@ -96,10 +91,6 @@ public class CursorHotspotWidget extends CursorWidget {
             guiGraphics.fill(xhotX1, this.getY(), xhotX2, this.getBottom(), colorX);
             guiGraphics.fill(this.getX(), yhotY1, this.getRight(), yhotY2, colorY);
         }
-    }
-
-    public void setRenderRuler(boolean renderRuler) {
-        this.renderRuler = renderRuler;
     }
 
     @Override
