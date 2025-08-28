@@ -42,7 +42,7 @@ public class Cursor {
     Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
         this.type = type;
         this.onLoad = onLoad;
-        this.location = CursorResourceLoader.getDirectory().withSuffix(type.toString() + IMG_TYPE);
+        this.location = CursorResourceLoader.getDirectory().withSuffix("/" + type.toString() + IMG_TYPE);
     }
 
     Cursor(Cursor cursor) {

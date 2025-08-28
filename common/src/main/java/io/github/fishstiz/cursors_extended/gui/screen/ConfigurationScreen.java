@@ -2,13 +2,13 @@ package io.github.fishstiz.cursors_extended.gui.screen;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.screen.panel.*;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+
+import static io.github.fishstiz.cursors_extended.resource.CursorResourceLoader.reload;
 
 public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final Component GLOBAL_TEXT = Component.translatable("cursors_extended.options.global");
@@ -71,16 +73,14 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
         this.getRefreshButton().active = false;
         CursorManager.INSTANCE.overrideCursor(CursorTypesExt.BUSY, BUSY_OVERRIDE);
-        this.refreshFuture = CompletableFuture.runAsync(() -> CursorResourceLoader.reload(Objects.requireNonNull(this.minecraft).getResourceManager()))
-                .thenRunAsync(
-                        () -> {
-                            this.addCursorItems();
-                            super.refreshItemsAndPanel();
-                            this.getRefreshButton().active = true;
-                            CursorManager.INSTANCE.removeOverride(BUSY_OVERRIDE);
-                        },
-                        this.minecraft
-                );
+        this.refreshFuture = CompletableFuture
+                .runAsync(() -> reload(Objects.requireNonNull(this.minecraft).getResourceManager()), Util.backgroundExecutor())
+                .thenRunAsync(() -> {
+                    this.addCursorItems();
+                    super.refreshItemsAndPanel();
+                    this.getRefreshButton().active = true;
+                    CursorManager.INSTANCE.removeOverride(BUSY_OVERRIDE);
+                }, this.minecraft);
     }
 
     private void addGlobalItems() {

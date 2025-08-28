@@ -31,7 +31,7 @@ import java.util.Optional;
 import static io.github.fishstiz.cursors_extended.CursorsExtended.*;
 
 public class CursorResourceLoader {
-    private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors/");
+    private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors");
 
     private CursorResourceLoader() {
     }
@@ -57,7 +57,7 @@ public class CursorResourceLoader {
     private static void checkHash(ResourceManager manager) {
         getHash(manager.getResourceStack(DIRECTORY)).ifPresent(hash -> {
             if (!Objects.equals(CONFIG.getHash(), hash)) {
-                LOGGER.info("[cursors-extended] Resource pack hash has changed, updating config...");
+                LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
                 CONFIG.setHash(hash);
                 CONFIG.getGlobal().setActiveAll(false);
                 CONFIG.clearSettings();
@@ -73,9 +73,11 @@ public class CursorResourceLoader {
         for (Resource resource : resources) {
             try (PackResources packs = resource.source()) {
                 packs.listResources(PackType.CLIENT_RESOURCES, MOD_ID, DIRECTORY.getPath(), (resourceLocation, ioSupplier) -> {
-                    try (InputStream in = ioSupplier.get()) {
-                        in.transferTo(out);
-                    } catch (IOException ignore) {
+                    if (resourceLocation.getPath().endsWith(CursorMetadata.FILE_TYPE)) {
+                        try (InputStream in = ioSupplier.get()) {
+                            in.transferTo(out);
+                        } catch (IOException ignore) {
+                        }
                     }
                 });
             }
@@ -142,8 +144,10 @@ public class CursorResourceLoader {
     }
 
     private static CursorMetadata loadMetadata(ResourceManager manager, ResourceLocation location, Resource cursorResource) {
-        return manager.getResource(location.withSuffix(CursorMetadata.FILE_TYPE))
+        return manager.getResourceStack(location.withSuffix(CursorMetadata.FILE_TYPE))
+                .stream()
                 .filter(metadata -> metadata.sourcePackId().equals(cursorResource.sourcePackId()))
+                .findFirst()
                 .map(metadata -> JsonLoader.fromResource(CursorMetadata.class, metadata, "Cursor Metadata at  " + location))
                 .orElse(new CursorMetadata());
     }
