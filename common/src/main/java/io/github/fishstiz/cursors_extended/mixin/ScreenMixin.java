@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.mixin;
 
-import io.github.fishstiz.cursors_extended.cursor.CursorListener;
+import io.github.fishstiz.cursors_extended.cursor.CursorResolver;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,7 +20,7 @@ public abstract class ScreenMixin {
     @Inject(method = "render", at = @At("RETURN"))
     private void afterScreenRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (this.minecraft != null) {
-            CursorListener.INSTANCE.afterScreenRender(this.minecraft, (Screen) (Object) this, guiGraphics, mouseX, mouseY);
+            CursorResolver.INSTANCE.afterRenderScreen(this.minecraft, (Screen) (Object) this, guiGraphics, mouseX, mouseY);
         }
     }
 }

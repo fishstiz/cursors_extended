@@ -150,7 +150,7 @@ public class CursorHotspotWidget extends CursorWidget {
             return CursorType.DEFAULT;
         }
         if (this.dragging) {
-            return CursorTypesExt.GRABBING_HOLD;
+            return CursorTypesExt.RESIZE_ALL_HOLD;
         }
         return CursorTypes.POINTING_HAND;
     }

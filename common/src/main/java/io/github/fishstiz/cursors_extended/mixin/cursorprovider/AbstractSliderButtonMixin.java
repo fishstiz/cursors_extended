@@ -2,7 +2,6 @@ package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
@@ -22,11 +21,11 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         if (this.isHovered()) {
             if (this.isActive()) {
                 if (this.isFocused() && (CursorTypeUtil.isLeftClickHeld())) {
-                    return CursorTypesExt.GRABBING_HOLD;
+                    return CursorTypesExt.RESIZE_EW_HOLD;
                 } else {
                     return CursorTypes.POINTING_HAND;
                 }
-            } else if (CursorsExtended.CONFIG.isInactiveWidgetsEnabled()) {
+            } else {
                 return CursorTypes.NOT_ALLOWED;
             }
         }

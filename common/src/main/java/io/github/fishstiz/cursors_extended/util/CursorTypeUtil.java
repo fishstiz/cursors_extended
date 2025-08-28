@@ -31,6 +31,13 @@ public class CursorTypeUtil {
         return GLFW.glfwGetMouseButton(WINDOW, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
 
+    public static boolean isHeld(CursorType lastCursorType) {
+        return CursorTypesExt.isHoldType(lastCursorType) &&
+               CursorManager.INSTANCE.isEnabled(lastCursorType) &&
+               CursorTypeUtil.nameEquals(CursorManager.INSTANCE.getAppliedCursor().getType(), lastCursorType) &&
+               CursorTypeUtil.isLeftClickHeld();
+    }
+
     public static boolean nonDefault(CursorType cursorType) {
         return cursorType != null && cursorType != CursorType.DEFAULT;
     }

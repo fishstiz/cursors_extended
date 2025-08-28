@@ -29,7 +29,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Component ADVANCEMENTS = Component.translatable("cursors_extended.options.adapt.advancements");
     private static final Component WORLD = Component.translatable("cursors_extended.options.adapt.world");
     private static final Component SERVER = Component.translatable("cursors_extended.options.adapt.server");
-    private static final Component INACTIVE_WIDGETS = Component.translatable("cursors_extended.options.adapt.inactive_widgets");
     private static final int CURSOR_SIZE_STEP = 8;
     private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
@@ -50,7 +49,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
         this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypesExt.GRABBING, adaptive);
-        this.addOption(CONFIG.isInactiveWidgetsEnabled(), CONFIG::setInactiveWidgetsEnabled, INACTIVE_WIDGETS, CursorTypes.NOT_ALLOWED, adaptive);
         this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorTypes.POINTING_HAND, adaptive);
         this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorTypes.POINTING_HAND, adaptive);

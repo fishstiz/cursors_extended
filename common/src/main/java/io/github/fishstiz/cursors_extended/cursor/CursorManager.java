@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.AnimationData;
 import io.github.fishstiz.cursors_extended.config.Config;
@@ -73,7 +74,7 @@ public final class CursorManager {
 
     public void setCurrentCursor(@NotNull CursorType type) {
         Cursor override = getOverride();
-        Cursor cursor = override != null ? override : this.cursors.get(type.toString());
+        Cursor cursor = override != null ? override : getCursor(type);
 
         if (cursor == null) {
             handleCursorExternal(type);
@@ -108,19 +109,21 @@ public final class CursorManager {
 
         Cursor cursor = this.dummies.get(cursorType.toString());
         if (cursor == null) {
-            this.dummies.put(cursorType.toString(), Cursor.createDummy(cursorType));
             CursorsExtended.LOGGER.info("[cursors_extended] Registered an external cursor: {}", cursorType);
+            cursor = this.dummies.computeIfAbsent(cursorType.toString(), name -> Cursor.loadOrCreateDummy(cursorType, this::onLoad));
         }
 
-        this.currentCursor = this.dummies.get(cursorType.toString());
-        this.renderer.resetCursor();
-        cursorType.select(Minecraft.getInstance().getWindow());
+        if (cursor.isLoaded()) {
+            updateCursor(cursor);
+        } else {
+            this.currentCursor = cursor;
+            this.renderer.resetCursor();
+            cursorType.select(Minecraft.getInstance().getWindow());
+        }
     }
 
     private void updateCursor(Cursor cursor) {
-        if (cursor == null ||
-            !this.isRegistered(currentCursor.getType()) ||
-            !CursorsExtended.CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId()) {
+        if (cursor == null || !CursorsExtended.CONFIG.isAggressiveCursor() && cursor.getId() == currentCursor.getId()) {
             return;
         }
 
@@ -151,7 +154,7 @@ public final class CursorManager {
     public @Nullable Cursor getOverride() {
         while (!overrides.isEmpty()) {
             Map.Entry<Integer, String> lastEntry = overrides.lastEntry();
-            Cursor cursor = this.cursors.get(lastEntry.getValue());
+            Cursor cursor = getCursor(lastEntry.getValue());
 
             if (cursor == null || cursor.getId() == 0) {
                 overrides.remove(lastEntry.getKey());
@@ -175,19 +178,22 @@ public final class CursorManager {
     }
 
     public boolean isEnabled(@NotNull CursorType type) {
-        return isEnabled(cursors.get(type.toString()));
+        return isEnabled(getCursor(type.toString()));
     }
 
     public boolean isEnabled(@Nullable Cursor cursor) {
         return cursor != null && cursor.isEnabled();
     }
 
-    public @Nullable Cursor getCursor(CursorType type) {
-        return cursors.get(type.toString());
+    public @Nullable Cursor getCursor(String type) {
+        if (CursorTypes.ARROW.toString().equals(type)) {
+            return cursors.get(CursorType.DEFAULT.toString());
+        }
+        return cursors.get(type);
     }
 
-    public @Nullable Cursor getCursor(String type) {
-        return cursors.get(type);
+    public @Nullable Cursor getCursor(CursorType type) {
+        return getCursor(type.toString());
     }
 
     public Collection<Cursor> getCursors() {

@@ -259,6 +259,12 @@ public class Cursor {
         }
     }
 
+    static Cursor loadOrCreateDummy(CursorType type, Consumer<Cursor> onLoad) {
+        Cursor cursor = new Cursor(type, onLoad);
+        CursorResourceLoader.loadCursorTexture(cursor);
+        return cursor;
+    }
+
     static Cursor createDummy(CursorType type) {
         return new Cursor(type, null);
     }

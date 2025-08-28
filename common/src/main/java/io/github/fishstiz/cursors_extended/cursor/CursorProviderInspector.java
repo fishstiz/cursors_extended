@@ -19,7 +19,7 @@ public class CursorProviderInspector {
      * Stops at the first hovered child, matching the default implementation of
      * {@link ContainerEventHandler#mouseClicked(double, double, int, boolean)}.
      */
-    public CursorType inspect(GuiEventListener element, double mouseX, double mouseY) {
+    CursorType inspect(GuiEventListener element, double mouseX, double mouseY) {
         if (CursorTypeUtil.isHovered(element, mouseX, mouseY)) {
             if (element instanceof ContainerEventHandler container) {
                 for (GuiEventListener child : container.children()) {

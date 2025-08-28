@@ -24,9 +24,9 @@ public class Config implements Serializable {
     private boolean advancementTabsEnabled = true;
     private boolean worldIconEnabled = true;
     private boolean serverIconEnabled = true;
-    private boolean inactiveWidgetsEnabled = true;
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
+    private boolean legacyMode = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Map<String, CursorSettings> cursors = new HashMap<>();
 
@@ -158,14 +158,6 @@ public class Config implements Serializable {
         this.serverIconEnabled = serverIconEnabled;
     }
 
-    public boolean isInactiveWidgetsEnabled() {
-        return inactiveWidgetsEnabled;
-    }
-
-    public void setInactiveWidgetsEnabled(boolean inactiveWidgetsEnabled) {
-        this.inactiveWidgetsEnabled = inactiveWidgetsEnabled;
-    }
-
     public boolean isAggressiveCursor() {
         return aggressiveCursor;
     }
@@ -180,6 +172,14 @@ public class Config implements Serializable {
 
     public void setVirtualMode(boolean virtualMode) {
         this.virtualMode = virtualMode;
+    }
+
+    public boolean isLegacyMode() {
+        return legacyMode;
+    }
+
+    public void setLegacyMode(boolean legacyMode) {
+        this.legacyMode = legacyMode;
     }
 
     public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {

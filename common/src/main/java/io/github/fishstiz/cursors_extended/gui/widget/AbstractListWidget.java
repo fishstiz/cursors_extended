@@ -70,7 +70,7 @@ public abstract class AbstractListWidget<E extends AbstractListWidget<E>.Entry> 
 
     @Override
     protected int contentHeight() {
-        return this.getItemCount() * this.defaultEntryHeight;
+        return this.getItemCount() * this.defaultEntryHeight - this.rowGap;
     }
 
     protected abstract class Entry extends ContainerObjectSelectionList.Entry<E> implements ElementView {
@@ -107,6 +107,14 @@ public abstract class AbstractListWidget<E extends AbstractListWidget<E>.Entry> 
         @Override
         public @NotNull ScreenRectangle getRectangle() {
             return ElementView.super.getRectangle();
+        }
+
+        @Override
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            return mouseX >= this.getX() &&
+                   mouseX <= this.getRight() &&
+                   mouseY >= this.getY() &&
+                   mouseY <= this.getBottom() + AbstractListWidget.this.rowGap;
         }
     }
 }

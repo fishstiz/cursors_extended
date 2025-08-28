@@ -2,18 +2,19 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.mixin.WindowAccess;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
-public class CursorListener {
-    public static final CursorListener INSTANCE = new CursorListener();
+public class CursorResolver {
+    public static final CursorResolver INSTANCE = new CursorResolver();
     private CursorType deferredCursorType = null;
     private CursorType lastCursorType;
 
-    private CursorListener() {
+    private CursorResolver() {
     }
 
     private void setCurrentCursor(CursorType cursorType) {
@@ -29,7 +30,7 @@ public class CursorListener {
         }
     }
 
-    public void afterScreenRender(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    public void afterRenderScreen(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (nonScreenCursorVisible(minecraft)) {
             CursorProviderInspector.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
             this.deferredCursorType = resolve(minecraft, screen, mouseX, mouseY);
@@ -38,36 +39,36 @@ public class CursorListener {
 
     public void afterRenderTooltip(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
         CursorProviderInspector.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
+    }
+
+    public void beforeApplyCursor(Minecraft minecraft, Screen screen, int mouseX, int mouseY) {
         this.setCurrentCursor(resolve(minecraft, screen, mouseX, mouseY));
     }
 
     private CursorType resolve(Minecraft minecraft, Screen screen, int mouseX, int mouseY) {
-        CursorType tickCursor = CursorTickController.INSTANCE.consumeTickCursor();
-        CursorType fallbackTickCursor = CursorTickController.INSTANCE.consumeFallbackTickCursor();
         if (!((WindowAccess) (Object) minecraft.getWindow()).cursors_extended$isAdaptive()) {
             return CursorTypes.ARROW;
+        }
+
+        CursorType tickCursor = CursorTickController.INSTANCE.consumeTickCursor();
+        CursorType fallbackTickCursor = CursorTickController.INSTANCE.consumeFallbackTickCursor();
+
+        if (CursorTypeUtil.isHeld(this.lastCursorType)) {
+            return this.lastCursorType;
         }
         if (CursorTypeUtil.nonDefault(tickCursor)) {
             return tickCursor;
         }
-        if (this.isGrabHeld()) {
-            return CursorTypesExt.GRABBING_HOLD;
-        }
-        CursorType inspected = CursorProviderInspector.INSTANCE.inspect(screen, mouseX, mouseY);
-        if (CursorTypeUtil.nonDefault(inspected)) {
-            return inspected;
+        if (CursorsExtended.CONFIG.isLegacyMode()) {
+            CursorType inspected = CursorProviderInspector.INSTANCE.inspect(screen, mouseX, mouseY);
+            if (CursorTypeUtil.nonDefault(inspected)) {
+                return inspected;
+            }
         }
         if (CursorTypeUtil.nonDefault(fallbackTickCursor)) {
             return fallbackTickCursor;
         }
         return CursorType.DEFAULT;
-    }
-
-    private boolean isGrabHeld() {
-        return this.lastCursorType == CursorTypesExt.GRABBING_HOLD &&
-               CursorManager.INSTANCE.isEnabled(CursorTypesExt.GRABBING_HOLD) &&
-               CursorTypeUtil.nameEquals(CursorManager.INSTANCE.getAppliedCursor().getType(), CursorTypesExt.GRABBING_HOLD) &&
-               CursorTypeUtil.isLeftClickHeld();
     }
 
     private static CursorType consumeTickCursors() {

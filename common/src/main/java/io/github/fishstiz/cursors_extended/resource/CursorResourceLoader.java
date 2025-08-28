@@ -114,6 +114,10 @@ public class CursorResourceLoader {
         }
     }
 
+    public static void loadCursorTexture(Cursor cursor) {
+        loadCursorTexture(Minecraft.getInstance().getResourceManager(), cursor);
+    }
+
     public static boolean loadCursorTexture(ResourceManager manager, Cursor cursor) {
         ResourceLocation location = cursor.getLocation();
         Optional<Resource> cursorResource = manager.getResource(location);

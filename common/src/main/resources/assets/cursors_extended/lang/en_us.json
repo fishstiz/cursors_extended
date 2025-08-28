@@ -1,7 +1,7 @@
 {
   "modmenu.descriptionTranslation.minecraft-cursor": "Configurable cursor for Minecraft.",
 
-  "cursors_extended.legacy.resource-pack": "Legacy Cursors",
+  "cursors_extended.resource-pack.legacy": "Legacy Cursors",
 
   "cursors_extended.options": "Cursor Settings",
   "cursors_extended.options.enabled": "Enabled",
@@ -48,7 +48,7 @@
   "cursors_extended.options.global.deferred_loading.fail": "Failed to load cursor '%1$s'",
 
   "cursors_extended.options.adapt": "Adaptive Cursor",
-  "cursors_extended.options.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Default cursor.",
+  "cursors_extended.options.adapt.tooltip": "Simply updates the enabled setting on all cursors except for the Arrow cursor.",
   "cursors_extended.options.adapt.item_slot": "Inventory Item Slot",
   "cursors_extended.options.adapt.item_grab": "Inventory Item Grab",
   "cursors_extended.options.adapt.creative_tabs": "Creative Inventory Tabs",
@@ -58,24 +58,19 @@
   "cursors_extended.options.adapt.advancements": "Advancements Tabs",
   "cursors_extended.options.adapt.world": "World Icon Play Button",
   "cursors_extended.options.adapt.server": "Server Icon Play Button",
-  "cursors_extended.options.adapt.inactive_widgets": "Disabled Widgets",
-
   "cursors_extended.options.resource_pack.reset": "Reset Cursor Settings",
   "cursors_extended.options.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
 
-  "cursors_extended.options.compat": "Mod Compatibility",
-  "cursors_extended.options.compat.remap_cursors": "Remap System Cursors (GLFW)",
-  "cursors_extended.options.compat.remap_cursors.info": "Remaps system cursors to the equivalent Minecraft Cursor.\n\nWARNING: Disabling may cause compatibility issues with certain mods.",
-  "cursors_extended.options.compat.remap_cursors.info_unavailable": "Remapping system cursors is unsupported if GLFW is loaded early.",
-  "cursors_extended.options.compat.remap_cursors.empty": "No detected cursors to remap.",
+  "cursors_extended.options.compat": "Compatibility",
   "cursors_extended.options.compat.aggressive_cursor": "Aggressive cursor updates",
-  "cursors_extended.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.\n\nDisabled by default.",
+  "cursors_extended.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.",
   "cursors_extended.options.compat.virtual_mode": "Virtual Mode",
-  "cursors_extended.options.compat.virtual_mode.info": "Renders the cursor manually instead of using GLFW.\n\nWARNING: May fix some issues but also cause others.",
+  "cursors_extended.options.compat.virtual_mode.info": "Renders the cursor directly in-game instead of letting the operating system handle it.",
+  "cursors_extended.options.compat.legacy_mode": "Legacy Cursor Mode",
+  "cursors_extended.options.compat.legacy_mode.info": "Detects the hovered element by traversing the GUI hierarchy and enables additional cursor mappings beyond vanilla.",
 
   "cursors_extended.options.debug": "Debug",
   "cursors_extended.options.debug.inspect": "Inspect Element",
-  "cursors_extended.options.debug.cache.clear": "Clear Cache: %1$s",
   "cursors_extended.options.debug.report_issues": "Report Issues",
   "cursors_extended.options.debug.open_wiki": "Open Wiki"
 }

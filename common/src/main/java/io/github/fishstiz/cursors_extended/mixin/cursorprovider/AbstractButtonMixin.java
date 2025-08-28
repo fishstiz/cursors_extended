@@ -2,7 +2,6 @@ package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -21,7 +20,7 @@ public abstract class AbstractButtonMixin extends AbstractWidget implements Curs
         if (this.isHovered()) {
             if (this.isActive()) {
                 return CursorTypes.POINTING_HAND;
-            } else if (CursorsExtended.CONFIG.isInactiveWidgetsEnabled()) {
+            } else {
                 return CursorTypes.NOT_ALLOWED;
             }
         }

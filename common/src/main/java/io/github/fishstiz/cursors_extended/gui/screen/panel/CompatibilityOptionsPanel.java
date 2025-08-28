@@ -14,6 +14,8 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip AGGRESSIVE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.aggressive_cursor.info"));
     private static final Component VIRTUAL_TEXT = Component.translatable("cursors_extended.options.compat.virtual_mode");
     private static final Tooltip VIRTUAL_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.virtual_mode.info"));
+    private static final Component LEGACY_MODE_TEXT = Component.translatable("cursors_extended.options.compat.legacy_mode");
+    private static final Tooltip LEGACY_MODE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.legacy_mode.info"));
     private OptionsListWidget optionsList;
 
     public CompatibilityOptionsPanel(Component title) {
@@ -39,6 +41,13 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 },
                 this.index(VIRTUAL_TEXT),
                 VIRTUAL_INFO,
+                true
+        );
+        this.optionsList.addToggle(
+                CONFIG.isLegacyMode(),
+                CONFIG::setLegacyMode,
+                this.index(LEGACY_MODE_TEXT),
+                LEGACY_MODE_INFO,
                 true
         );
 

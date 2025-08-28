@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.gui.widget.AbstractListWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
@@ -741,6 +742,10 @@ public abstract class CatalogBrowserScreen extends Screen {
             int endY = startY + this.font.lineHeight;
 
             DrawUtil.drawScrollableTextLeftAlign(guiGraphics, this.font, this.getMessage(), startX, startY, endX, endY, TEXT_COLOR);
+
+            if (this.isHovered()) {
+                guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
+            }
         }
 
         @Override
