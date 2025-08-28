@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
-import io.github.fishstiz.cursors_extended.mixin.cursorprovider.access.OnlineServerEntryAccessor;
+import io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access.OnlineServerEntryAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;

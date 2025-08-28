@@ -1,11 +1,11 @@
-package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
+package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.mixin.cursorprovider.access.RecipeAlternativesWidgetAccessor;
-import io.github.fishstiz.cursors_extended.mixin.cursorprovider.access.RecipeBookResultsAccessor;
-import io.github.fishstiz.cursors_extended.mixin.cursorprovider.access.RecipeBookWidgetAccessor;
+import io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access.RecipeAlternativesWidgetAccessor;
+import io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access.RecipeBookResultsAccessor;
+import io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access.RecipeBookWidgetAccessor;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StateSwitchingButton;

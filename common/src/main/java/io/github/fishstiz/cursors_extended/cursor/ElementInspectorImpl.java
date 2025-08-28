@@ -24,8 +24,8 @@ class ElementInspectorImpl implements ElementInspector {
     private final Component deepestLabel = Component.literal("D: ").withColor(0xFF00FF00); // green
     private final Component inspectedLabel = Component.literal("I: ").withColor(0xFFFF0000); // red
     private final Component virtualModeLabel = Component.literal("Virtual Mode: ").withStyle(ChatFormatting.GOLD);
-    private GuiEventListener processed;
-    private String inspected;
+    private ScreenRectangle inspectedBounds;
+    private String inspectedElement;
     private boolean enabled = true;
 
     @Override
@@ -36,15 +36,16 @@ class ElementInspectorImpl implements ElementInspector {
     @Override
     public void destroy() {
         this.enabled = false;
-        this.processed = null;
-        this.inspected = null;
+        this.inspectedBounds = null;
+        this.inspectedElement = null;
     }
 
     @Override
-    public boolean setInspected(GuiEventListener processed, boolean cached) {
-        this.processed = processed;
-        this.inspected = getClassName(processed);
-        return true;
+    public void setInspected(GuiEventListener inspected, double mouseX, double mouseY) {
+        if (CursorTypeUtil.isHovered(inspected, mouseX, mouseY)) {
+            this.inspectedBounds = getBounds(inspected);
+            this.inspectedElement = getClassName(inspected);
+        }
     }
 
     @Override
@@ -67,11 +68,10 @@ class ElementInspectorImpl implements ElementInspector {
     }
 
     private void renderInspected(Minecraft minecraft, ScreenRectangle container, GuiGraphics guiGraphics) {
-        if (processed != null) {
-            Component label = inspectedLabel.copy().append(inspected);
-            ScreenRectangle bounds = getBounds(processed);
-            int index = bounds.top() != container.top() ? 0 : 1;
-            this.renderInfo(minecraft, guiGraphics, bounds, label, Position.TOP_LEFT, index, true);
+        if (inspectedBounds != null) {
+            Component label = inspectedLabel.copy().append(inspectedElement);
+            int index = this.inspectedBounds.top() != container.top() ? 0 : 1;
+            this.renderInfo(minecraft, guiGraphics, this.inspectedBounds, label, Position.TOP_LEFT, index, true);
         }
     }
 
@@ -98,7 +98,8 @@ class ElementInspectorImpl implements ElementInspector {
 
         Matrix3x2fStack matrix3x2fStack = guiGraphics.pose().pushMatrix();
         guiGraphics.nextStratum();
-        if (outline) DrawUtil.renderOutline(guiGraphics, bounds.left(), bounds.top(), bounds.width(), bounds.height(), color);
+        if (outline)
+            DrawUtil.renderOutline(guiGraphics, bounds.left(), bounds.top(), bounds.width(), bounds.height(), color);
         matrix3x2fStack.translate(TEXT_SCALE, TEXT_SCALE);
         matrix3x2fStack.scale(TEXT_SCALE, TEXT_SCALE);
         guiGraphics.drawString(minecraft.font, label, textX, textY, color);

@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.mixin.cursorprovider.access;
+package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access;
 
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;

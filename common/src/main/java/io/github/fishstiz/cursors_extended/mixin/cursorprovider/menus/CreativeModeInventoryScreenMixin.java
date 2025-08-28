@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
+package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;

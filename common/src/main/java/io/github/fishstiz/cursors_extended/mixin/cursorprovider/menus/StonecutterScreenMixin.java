@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
+package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screens.ProgressScreen;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(value = {LevelLoadingScreen.class, ProgressScreen.class, GenericMessageScreen.class})
-public abstract class LevelLoadingScreenMixin implements CursorProvider {
+public abstract class LoadingScreenMixin implements CursorProvider {
     @Override
     public CursorType cursors_extended$cursorType(double mouseX, double mouseY) {
         return CursorTypesExt.BUSY;

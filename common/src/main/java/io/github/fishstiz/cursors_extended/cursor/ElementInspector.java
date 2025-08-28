@@ -13,8 +13,7 @@ public interface ElementInspector {
     default void destroy() {
     }
 
-    default boolean setInspected(GuiEventListener processed, boolean cached) {
-        return false;
+    default void setInspected(GuiEventListener processed, double mouseX, double mouseY) {
     }
 
     default void render(Minecraft minecraft, @NotNull Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {

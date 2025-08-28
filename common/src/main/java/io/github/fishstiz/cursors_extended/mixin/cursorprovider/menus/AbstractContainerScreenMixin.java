@@ -1,8 +1,8 @@
-package io.github.fishstiz.cursors_extended.mixin.cursorprovider;
+package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import io.github.fishstiz.cursors_extended.cursor.CursorProviderContainer;
+import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.*;
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMenu> extends Screen implements CursorProviderContainer {
+public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMenu> extends Screen implements CursorProvider {
     @Shadow
     @Final
     protected T menu;
@@ -31,9 +31,6 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     @Override
     public CursorType cursors_extended$cursorType(double mouseX, double mouseY) {
-        CursorType cursorType = CursorProviderContainer.super.cursors_extended$cursorType(mouseX, mouseY);
-        if (CursorTypeUtil.nonDefault(cursorType)) return cursorType;
-
         if (menu.getCarried().isEmpty() &&
             hoveredSlot != null &&
             hoveredSlot.hasItem() &&
