@@ -131,7 +131,7 @@ public class CursorResourceLoader {
 
             try (InputStream cursorStream = cursorResource.get().open(); NativeImage image = NativeImage.read(cursorStream)) {
                 CursorMetadata metadata = loadMetadata(manager, location, cursorResource.get());
-                if (!CONFIG.isStale(cursor)) {
+                if (CONFIG.isStale(cursor)) {
                     CONFIG.getOrCreateSettings(cursor).merge(metadata.getCursorSettings());
                 }
                 CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)), metadata);

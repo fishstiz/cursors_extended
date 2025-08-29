@@ -43,5 +43,6 @@
   },
   "suggests": {
     "modmenu": "*"
-  }
+  },
+  "accessWidener": "${mod_id}.accesswidener"
 }
