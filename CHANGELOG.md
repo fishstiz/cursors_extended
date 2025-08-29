@@ -1,13 +1,23 @@
-- Added **Refresh Button** to Configuration Screen to quickly reload cursor textures without reloading all resources.
-- Added **Virtual Mode** option under **Mod Compatibility** to toggle virtual cursor mode. Support for this will be
-  limited.
-  It is only intended to work around issues you may have with native cursor mode and could introduce other issues.
-  Results may vary.
-- Reduced false positives on adaptive cursor computation with overlapping elements.
-- Made option **Remap System Cursors** always available to toggle unless disabled by another mod (Fabric) or unavailable
-  by default (Forge/NeoForge).
+Snapshot 25w35a introduced new cursor shapes. While this does not invalidate the features of this mod, it warranted
+significant breaking changes.
 
-#### NeoForge
-- Added compatibility with **owo-lib**. Cursors from owo-lib will be remapped to the Minecraft Cursor equivalents.
-  Can be toggled with the **Remap System Cursors** option under **Mod Compatibility**.
-  Fixes ([#38](https://github.com/fishstiz/minecraft-cursor/issues/38))
+- Renamed from Minecraft Cursor to [**Cursors Extended**](https://github.com/fishstiz/cursors_extended) (official rename
+  on stable release)
+- Updated the resource pack structure. Sample provided below.
+- Updated built-in cursor textures.
+- Added built-in resource pack for legacy textures.
+- Added **Legacy Cursor Mode** under compatibility to enable the old cursor detection and other cursor mappings (enabled
+  by default).
+- Added Adaptive Option to toggle Scrollbar Pointing Hand cursor and Resize NS cursor.
+- Added Ukrainian Translation. ([#39](https://github.com/fishstiz/minecraft-cursor/pull/39) by StarmanMine142)
+- Removed a bunch of options.
+- Removed the Java API as it's no longer needed, and discontinued the experimental JSON API due to no demand.
+- Added new way to create cursor textures when **Cursors Extended** is loaded without the need for a Java
+  API: https://github.com/fishstiz/cursors_extended/blob/master/README.md#-adding-compatibility
+
+Now that cursor types are official, hopefully more mods consider compatibility and use the vanilla methods.
+
+Creating documentation for Resource Packs soon, but it's mostly the same, just create and move files
+around: https://github.com/fishstiz/cursors_extended/tree/master/common/src/main/resources/resourcepacks/legacy
+
+Report any issues here: https://github.com/fishstiz/cursors_extended
