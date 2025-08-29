@@ -1,77 +1,50 @@
-# Minecraft Cursor
+# Cursors Extended
 
-Replaces the boring old default system cursor with Minecraft-themed cursors.
+Replaces the boring old default system cursors with Minecraft-themed cursors.
+
+<img width="32" height="32" alt="default" src="https://github.com/user-attachments/assets/44f5a884-92a1-4e4b-a028-c645e6075845" />
+<img width="32" height="32" alt="pointing_hand" src="https://github.com/user-attachments/assets/a2d150db-55c3-4a90-aaef-daffb07d84de" />
+<img width="32" height="32" alt="grabbing" src="https://github.com/user-attachments/assets/91b2b145-028a-498d-8807-07c47da2492c" />
+<img width="32" height="32" alt="ibeam" src="https://github.com/user-attachments/assets/f0cd2de5-64b2-4d97-9c6a-896782bf2ac2" />
+<img width="32" height="32" alt="shift" src="https://github.com/user-attachments/assets/bfe3faf3-a8b0-4106-a586-ebe9106efe9c" />
+<img width="32" height="32" alt="busy" src="https://github.com/user-attachments/assets/279f3e17-d417-46a0-981e-d06459daad83" />
+<img width="32" height="32" alt="not_allowed" src="https://github.com/user-attachments/assets/b409ae2a-f559-4880-8d37-3cf0eacfec84" />
+<img width="32" height="32" alt="crosshair" src="https://github.com/user-attachments/assets/b11e9b70-2fb5-4b24-b636-966b882601e2" />
+<img width="40" height="40" alt="resize_all" src="https://github.com/user-attachments/assets/3298d914-ab62-4e9e-992d-c195d2f1ec98" />
+<img width="40" height="40" alt="resize_ew" src="https://github.com/user-attachments/assets/6d913c1d-cbef-44a3-bb3b-840126df333a" />
+<img width="40" height="40" alt="resize_ns" src="https://github.com/user-attachments/assets/ef98d600-9090-4ee8-9bf0-d64ebe0faedf" />
+<img width="40" height="40" alt="resize_nwse" src="https://github.com/user-attachments/assets/785e3721-11c3-4d5f-b97b-2ee473a1ae28" />
+<img width="40" height="40" alt="resize_nesw" src="https://github.com/user-attachments/assets/546dde7a-7aff-4d26-a8d5-46889b96e620" />
+
+<br>
+
+Once called [Minecraft Cursor](https://github.com/fishstiz/minecraft-cursor).
+Snapshot 25w35a of Minecraft introduced new cursor shapes, prompting major breaking changes for the mod.
 
 ## 📌 Requirements
-- Minecraft 1.20.1 or 1.21.1+
+
+- Minecraft >25w35a
 - When on Fabric: Fabric API
 
-## ✨ Adaptive Cursor
-![default](https://github.com/user-attachments/assets/6c632b54-e284-47a0-8634-f4ba1ef03f29)
-![pointer](https://github.com/user-attachments/assets/83a41d81-5a0b-4399-8d70-61ca421117c0)
-![grabbing](https://github.com/user-attachments/assets/bdcd6392-a8bb-40af-b2fa-10a465363545)
-![text](https://github.com/user-attachments/assets/049fc447-6f3f-4c7a-a0a2-b87d0348c593)
-![shift](https://github.com/user-attachments/assets/27f97a5c-be91-45c9-ad5d-91a5e162fb50)
-![busy](https://github.com/user-attachments/assets/2b4e338a-7068-4998-8f79-e7ccfc3a97fa)
-![not_allowed](https://github.com/user-attachments/assets/793d74bc-ecef-43eb-93fc-19b9fbdc1360)
+## ✨ Features
 
-- The cursor adapts to native or derived Minecraft elements and certain other actions.
-- Toggle from the **Adaptive Cursor** options or toggle each cursor manually.
+- Custom & animated textures for each cursor shape through resource packs.
+- Configurable custom textures. Allows for toggling cursors, and changing the hotspot and scale.
+    - Navigable from **Mouse Settings... > Cursor Settings...** or from Mod Menu (if installed)
+- Additional cursor shapes and mappings with **Legacy Mode** and **Adaptive Cursor**.
 
-## 🔧 Configure Cursors
-- Configure from **Mod Menu** (if installed on Fabric)
-- Configure from **Options** > **Controls** > **Mouse Settings**... > **Cursor Settings**...
-- Each cursor can be toggled on or off, with the **Default** cursor used when disabled.
+![cursors_extended](https://github.com/user-attachments/assets/79d6643d-7997-4902-aed5-840e28a7826b)
 
-<p>
-<img alt="settings" src="https://github.com/user-attachments/assets/ca706fc9-c000-4e3a-9328-6b55e1d42bd1" width="49%"/>
-<img alt="animated" src="https://github.com/user-attachments/assets/fce2331c-80fb-4f8e-86fe-532bf5af4454" width="49%"/>
-<img alt="global" src="https://github.com/user-attachments/assets/1e7dbbd4-9766-4b3c-ab73-b0b758e2a4ef" width="49%"/>
-<img alt="adaptive" src="https://github.com/user-attachments/assets/5fe61aca-2d00-4e3f-a1e4-cff5b7125aa1" width="49%"/>
-</p>
+## 🎨 Creating Resource Packs
 
-## 🎨 Resource Pack Support
+- Sample Resource
+  Pack: https://github.com/fishstiz/cursors_extended/tree/master/common/src/main/resources/resourcepacks/legacy
 
-With the use of resource packs, you can create custom cursors, even animate them, and define the settings of each one.
+## 🔗 Adding Compatibility
 
-Visit the Minecraft Cursor Wiki for more details: https://fishstiz.github.io/minecraft-cursor-wiki/resource-pack/getting-started
-
-Here's just one example: 
-<a href="https://modrinth.com/resourcepack/bedrock-style-cursors" target="_blank">
-  <img src="https://cdn.modrinth.com/data/dUA5FyFq/images/28f9504fa044c59491a1555494b3e579eec186a1.png" width="100%" />
-</a>
-
-## 🚀 Java API
-The Minecraft Cursor mod provides an API for mod developers to:
-- Create new cursors.
-- Map elements with cursor type functions.
-  - or declare the cursor type within the element itself.
-- Directly change the cursor, bypassing the element-based system.
-
-Can be an optional dependency. See a simple implementation [here](https://github.com/fishstiz/packed_packs/blob/master/src/main/java/io/github/fishstiz/packed_packs/compat/minecraftcursor/PackedPacksMinecraftCursor.java#L8).
-
-Visit the Minecraft Cursor Wiki for more details: https://fishstiz.github.io/minecraft-cursor-wiki/java-api/introduction
-
-## 🔗 Mod Compatibility
-
-Mods that shift the sizes and positions of certain GUIs may lead to unexpected cursor switching.
-Adaptive cursor can be disabled on affected GUIs from the **Adaptive Cursor** options.
-
-The list of registered vanilla widgets with an associated cursor are found [here](https://fishstiz.github.io/minecraft-cursor-wiki/resource-pack/getting-started#all-cursors). More on the [source code](https://github.com/fishstiz/minecraft-cursor/blob/master/common/src/main/java/io/github/fishstiz/minecraftcursor/impl/MinecraftCursorInitializerImpl.java#L35).
-
-To check if an element is detected, **Inspect Element** can be toggled from the **Debug Options**. More info on how an element is detected (and how to make it detectable) on the [wiki](https://fishstiz.github.io/minecraft-cursor-wiki/java-api/introduction#the-parentelement-hierarchy).
-
-### Fabric Only Compatibility Features
-
-Note that some mods are unknowingly conflicting with **Minecraft Cursor** due to the libraries they are embedding/depending on (most notably with ImGui). These features work around that:
-- When another mod sets a custom cursor through GLFW, the adaptive cursor will be disabled to let it do its thing.
-- Standard system cursors from GLFW will be remapped to their Minecraft Cursor equivalents.
-
-This is not supported by **Forge** and **NeoForge**, and even if they were, the early loading screen will break these features. 
-
-Likewise, Fabric mods that initialize GLFW early, such as some early loading screen mods, will also disable these features.
-
----
-<sup>
-NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
-</sup>
+- Mods can use **`CursorType`** (vanilla class) to create custom cursors. When submitted to `GuiGraphics`/`DrawContext`,
+  Cursors Extended will try to load a texture matching the cursor's name. If none is found, it falls back to the
+  cursor's `#select` method.
+- You can also create other **standard cursors** using `CursorType#createStandardCursor`, if it's not already provided.
+  They'll automatically be registered to Cursors Extended.
+- As long as you use `CursorType`s and use it conventionally within Minecraft, it should be compatible.
