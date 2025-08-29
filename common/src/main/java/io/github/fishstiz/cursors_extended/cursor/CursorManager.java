@@ -2,11 +2,11 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.AnimationData;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
+import io.github.fishstiz.cursors_extended.util.Alias;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -21,7 +21,11 @@ import java.util.*;
 
 public final class CursorManager {
     public static final CursorManager INSTANCE = new CursorManager();
-    private final Map<String, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>();
+    private static final int TYPE_COUNT = 13;
+    private static final float LOAD_FACTOR = 0.75F;
+    private static final int CAPACITY = (int) Math.ceil(TYPE_COUNT / LOAD_FACTOR);
+    private final Map<Alias<String>.Key, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>(CAPACITY, LOAD_FACTOR);
+    private final Alias<String> aliases = new Alias<>(CAPACITY, LOAD_FACTOR);
     private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
     private @NotNull CursorRenderer renderer;
@@ -33,16 +37,24 @@ public final class CursorManager {
         this.renderer = CursorsExtended.CONFIG.isVirtualMode() ? new CursorRenderer.Virtual() : new CursorRenderer.Native();
     }
 
-    public void registerType(CursorType cursorType) {
-        this.cursors.put(cursorType.toString(), new Cursor(cursorType, this::onLoad));
+    public void registerType(CursorType type) {
+        this.cursors.put(this.aliases.addKey(type.toString()), new Cursor(type, this::onLoad));
+    }
+
+    public void registerAlias(String original, String alias) {
+        this.aliases.addAlias(original, alias);
+    }
+
+    public void registerAlias(CursorType type, CursorType alias) {
+        this.registerAlias(type.toString(), alias.toString());
     }
 
     public boolean isRegistered(CursorType cursorType) {
-        return this.cursors.containsKey(cursorType.toString());
+        return this.cursors.containsKey(this.aliases.lookup(cursorType.toString()));
     }
 
     public void loadCursor(Cursor cursor, NativeImage image, Config.CursorSettings settings, CursorMetadata metadata) throws IOException {
-        if (!cursors.containsKey(cursor.getName())) {
+        if (!isRegistered(cursor.getType())) {
             throw new IllegalStateException("Attempting to load an unregistered cursor: " + cursor.getName());
         }
 
@@ -53,7 +65,7 @@ public final class CursorManager {
             cursor = animated
                     ? new AnimatedCursor(cursor.getType(), this::onLoad)
                     : new Cursor(cursor.getType(), this::onLoad);
-            cursors.put(cursor.getName(), cursor);
+            cursors.put(aliases.lookup(cursor.getName()), cursor);
         }
 
         if (cursor instanceof AnimatedCursor animatedCursor) {
@@ -186,10 +198,7 @@ public final class CursorManager {
     }
 
     public @Nullable Cursor getCursor(String type) {
-        if (CursorTypes.ARROW.toString().equals(type)) {
-            return cursors.get(CursorType.DEFAULT.toString());
-        }
-        return cursors.get(type);
+        return this.cursors.get(this.aliases.lookup(type));
     }
 
     public @Nullable Cursor getCursor(CursorType type) {
