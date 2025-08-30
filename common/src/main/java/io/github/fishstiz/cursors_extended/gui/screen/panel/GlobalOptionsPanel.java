@@ -278,6 +278,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             this.renderTestButton(guiGraphics, mouseX, mouseY, partialTick);
             this.renderRuler(guiGraphics, mouseX, mouseY);
             this.renderBorder(guiGraphics);
+
+            if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
         }
 
         @Override
