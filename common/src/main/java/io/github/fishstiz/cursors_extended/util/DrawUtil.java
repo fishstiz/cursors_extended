@@ -61,12 +61,13 @@ public class DrawUtil {
             int y,
             int width,
             int height,
-            float cellSize,
+            float cellWidth,
+            float cellHeight,
             ResourceLocation checkerboard,
             int textureSize
     ) {
-        float drawWidth = textureSize * cellSize;
-        float drawHeight = textureSize * cellSize;
+        float drawWidth = textureSize * cellWidth;
+        float drawHeight = textureSize * cellHeight;
 
         float clippedWidth = Math.min(drawWidth, width);
         float clippedHeight = Math.min(drawHeight, height);

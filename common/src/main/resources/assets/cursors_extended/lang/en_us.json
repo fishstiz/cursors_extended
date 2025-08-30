@@ -15,6 +15,7 @@
   "cursors_extended.options.animate-reset": "Restart Animation",
   "cursors_extended.options.reset-defaults": "Reset to Defaults",
   "cursors_extended.options.preview": "Preview",
+  "cursors_extended.options.image_too_large": "Image too large!",
 
   "cursors_extended.options.search": "Search",
   "cursors_extended.options.search.clear": "Clear Search",

@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.datafixers.util.Pair;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
@@ -53,7 +54,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     @Override
     protected void initContents() {
         this.recycleCursors();
-        final int maxHotspot = SettingsUtil.getMaxHotspot(CursorManager.INSTANCE.getCursors());
+        final Pair<Integer, Integer> maxHotspot = getMaxHotspots();
 
         this.previewWidget = new GlobalPreviewWidget(
                 this.currentCursor,
@@ -82,7 +83,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 new SliderWidget(
                         CONFIG.getGlobal().getXHot(),
                         SettingsUtil.HOT_MIN,
-                        maxHotspot,
+                        maxHotspot.getFirst(),
                         SettingsUtil.HOT_STEP,
                         this::onChangeXHot,
                         this.index(XHOT_TEXT),
@@ -98,7 +99,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 new SliderWidget(
                         CONFIG.getGlobal().getYHot(),
                         SettingsUtil.HOT_MIN,
-                        maxHotspot,
+                        maxHotspot.getSecond(),
                         SettingsUtil.HOT_STEP,
                         this::onChangeYHot,
                         this.index(YHOT_TEXT),
@@ -261,6 +262,26 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         return Objects.requireNonNull(CursorManager.INSTANCE.getCursor(CursorType.DEFAULT));
     }
 
+    private static Pair<Integer, Integer> getMaxHotspots() {
+        int currentMaxX = -1;
+        int currentMaxY = -1;
+
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            if (cursor.isLoaded()) {
+                int maxXHot = SettingsUtil.getMaxXHot(cursor);
+                if (maxXHot > currentMaxX) {
+                    currentMaxX = maxXHot;
+                }
+
+                int maxYHot = SettingsUtil.getMaxYHot(cursor);
+                if (maxYHot > currentMaxY) {
+                    currentMaxY = maxYHot;
+                }
+            }
+        }
+        return new Pair<>(currentMaxX != -1 ? currentMaxX : 0, currentMaxY != -1 ? currentMaxY : 0);
+    }
+
     private static class GlobalPreviewWidget extends CursorPreviewWidget {
         private static final float CELL_DIVISOR = 32;
         private @NotNull Cursor cursor;
@@ -283,8 +304,18 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         }
 
         @Override
-        protected float getCellSize() {
+        protected float getCellWidth() {
             return this.getWidth() / CELL_DIVISOR;
+        }
+
+        @Override
+        protected float getCellHeight() {
+            return this.getCellWidth();
+        }
+
+        @Override
+        protected boolean isOverflowing() {
+            return false;
         }
 
         public void setCursor(@NotNull Cursor cursor) {

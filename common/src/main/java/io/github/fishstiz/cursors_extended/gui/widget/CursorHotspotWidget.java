@@ -9,8 +9,11 @@ import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,16 +21,19 @@ import org.jetbrains.annotations.Nullable;
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 public class CursorHotspotWidget extends CursorWidget {
-    private static final ResourceLocation BACKGROUND_64 = CursorsExtended.loc("textures/gui/background_128.png");
+    private static final ResourceLocation BACKGROUND_128 = CursorsExtended.loc("textures/gui/background_128.png");
     private static final int BACKGROUND_DISABLED = 0xAF000000; // 70% black
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
+    private static final Component OVERFLOW_TEXT = Component.translatable("cursors_extended.options.image_too_large");
+    private static final int OVERFLOW_COLOR = 0xFFFFFFFF; // white
     private final Config.GlobalSettings global = CONFIG.getGlobal();
     private final CursorAnimationHelper animationHelper;
     private final SliderWidget xhotSlider;
     private final SliderWidget yhotSlider;
     private final @Nullable MouseEventListener mouseEventListener;
-    private final int maxHotspot;
+    private final int maxXHot;
+    private final int maxYHot;
     private boolean dragging = false;
 
     public CursorHotspotWidget(
@@ -37,20 +43,31 @@ public class CursorHotspotWidget extends CursorWidget {
             @NotNull SliderWidget yhotSlider,
             @Nullable MouseEventListener mouseEventListener
     ) {
-        super(CommonComponents.EMPTY, cursor, BACKGROUND_64);
+        super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
 
         this.animationHelper = animationHelper;
         this.xhotSlider = xhotSlider;
         this.yhotSlider = yhotSlider;
         this.mouseEventListener = mouseEventListener;
-        this.maxHotspot = SettingsUtil.getMaxHotspot(cursor);
+        this.maxXHot = SettingsUtil.getMaxXHot(cursor);
+        this.maxYHot = SettingsUtil.getMaxYHot(cursor);
     }
 
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.active = this.xhotSlider.isActive() || this.yhotSlider.isActive();
+        this.active = !this.isOverflowing() && (this.xhotSlider.isActive() || this.yhotSlider.isActive());
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
+
+        if (this.isHovered()) {
+            if (this.isOverflowing()) {
+                Font font = Minecraft.getInstance().font;
+                int textX = this.getX() + (this.getWidth() / 2 - font.width(OVERFLOW_TEXT) / 2);
+                int textY = this.getY() + (this.getHeight() / 2 - font.lineHeight / 2);
+                guiGraphics.drawString(font, OVERFLOW_TEXT, textX, textY, OVERFLOW_COLOR);
+            }
+
+            guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
+        }
     }
 
     @Override
@@ -69,20 +86,24 @@ public class CursorHotspotWidget extends CursorWidget {
 
     @Override
     protected void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (this.isOverflowing()) return;
+
         boolean isGlobalX = this.global.isXHotActive();
         boolean isGlobalY = this.global.isYHotActive();
 
         int colorX = isGlobalX ? OVERRIDE_RULER_COLOR : RULER_COLOR;
         int colorY = isGlobalY ? OVERRIDE_RULER_COLOR : RULER_COLOR;
 
-        int xhot = this.clampHotspot(isGlobalX ? this.global.getXHot() : (int) this.xhotSlider.getMappedValue());
-        int yhot = this.clampHotspot(isGlobalY ? this.global.getYHot() : (int) this.yhotSlider.getMappedValue());
+        int xhot = this.clampHotspot(isGlobalX ? this.global.getXHot() : (int) this.xhotSlider.getMappedValue(), this.maxXHot);
+        int yhot = this.clampHotspot(isGlobalY ? this.global.getYHot() : (int) this.yhotSlider.getMappedValue(), this.maxYHot);
 
-        float rulerSize = this.getCellSize();
-        int xhotX1 = (int) ((getX() + xhot * rulerSize) - (rulerSize > 1 || xhot != this.maxHotspot ? 0 : 1));
-        int xhotX2 = (int) ((getX() + xhot * rulerSize) + (xhot > 0 ? rulerSize : Math.max(rulerSize, 2)));
-        int yhotY1 = (int) ((getY() + yhot * rulerSize) - (rulerSize > 1 || yhot != this.maxHotspot ? 0 : 1));
-        int yhotY2 = (int) ((getY() + yhot * rulerSize) + (yhot > 0 ? rulerSize : Math.max(rulerSize, 2)));
+        float rulerWidth = this.getCellWidth();
+        float rulerHeight = this.getCellHeight();
+
+        int xhotX1 = (int) ((getX() + xhot * rulerWidth) - (rulerWidth > 1 || xhot != this.maxXHot ? 0 : 1));
+        int xhotX2 = (int) ((getX() + xhot * rulerWidth) + (xhot > 0 ? rulerWidth : Math.max(rulerWidth, 2)));
+        int yhotY1 = (int) ((getY() + yhot * rulerHeight) - (rulerHeight > 1 || yhot != this.maxYHot ? 0 : 1));
+        int yhotY2 = (int) ((getY() + yhot * rulerHeight) + (yhot > 0 ? rulerHeight : Math.max(rulerHeight, 2)));
 
 
         if ((isGlobalX && !isGlobalY) || (isGlobalX == isGlobalY)) {
@@ -117,9 +138,8 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     public void setHotspots(MouseEvent mouseEvent, double mouseX, double mouseY) {
-        float cellSize = this.getCellSize();
-        int xhot = this.clampHotspot((int) ((mouseX - this.getX()) / cellSize));
-        int yhot = this.clampHotspot((int) ((mouseY - this.getY()) / cellSize));
+        int xhot = this.clampHotspot((int) ((mouseX - this.getX()) / this.getCellWidth()), this.maxXHot);
+        int yhot = this.clampHotspot((int) ((mouseY - this.getY()) / this.getCellHeight()), this.maxYHot);
 
         if (this.xhotSlider.isActive()) {
             this.xhotSlider.applyMappedValue(xhot);
@@ -132,8 +152,8 @@ public class CursorHotspotWidget extends CursorWidget {
         }
     }
 
-    private int clampHotspot(int hotspot) {
-        return SettingsUtil.clamp(hotspot, SettingsUtil.HOT_MIN, this.maxHotspot);
+    private int clampHotspot(int hotspot, int max) {
+        return SettingsUtil.clamp(hotspot, SettingsUtil.HOT_MIN, max);
     }
 
     @Override
@@ -144,7 +164,7 @@ public class CursorHotspotWidget extends CursorWidget {
         if (this.dragging) {
             return CursorTypesExt.RESIZE_ALL_HOLD;
         }
-        return CursorTypes.POINTING_HAND;
+        return CursorTypes.CROSSHAIR;
     }
 
     public interface MouseEventListener {

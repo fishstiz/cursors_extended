@@ -40,6 +40,15 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
+    protected void renderBackground(@NotNull GuiGraphics guiGraphics) {
+        super.renderBackground(guiGraphics);
+
+        if (this.isOverflowing()) {
+            guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), BACKGROUND_DISABLED);
+        }
+    }
+
+    @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Cursor cursor = this.getCursor();
 
@@ -100,6 +109,16 @@ public class CursorPreviewWidget extends CursorWidget {
                && mouseY >= (double) this.getY()
                && mouseX < (double) this.getRight()
                && mouseY < (double) this.getBottom();
+    }
+
+    @Override
+    protected float getCellWidth() {
+        return this.getHeight() != this.getWidth() ? Math.max(super.getCellHeight(), super.getCellWidth()) : super.getCellWidth();
+    }
+
+    @Override
+    protected float getCellHeight() {
+        return this.getHeight() != this.getWidth() ? Math.max(super.getCellHeight(), super.getCellWidth()) : super.getCellHeight();
     }
 
     @Override

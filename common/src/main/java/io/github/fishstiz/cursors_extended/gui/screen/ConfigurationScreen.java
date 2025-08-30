@@ -72,7 +72,11 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
         this.getRefreshButton().active = false;
         this.refreshFuture = CompletableFuture
                 .runAsync(() -> reload(Objects.requireNonNull(this.minecraft).getResourceManager()), Util.backgroundExecutor())
-                .thenRunAsync(() -> {
+                .whenCompleteAsync((result, error) -> {
+                    if (error != null) {
+                        CursorsExtended.LOGGER.error("[cursors_extended] An error occurred while refreshing cursors. {}", error.getMessage());
+                    }
+
                     this.addCursorItems();
                     super.refreshItemsAndPanel();
                     this.getRefreshButton().active = true;

@@ -114,9 +114,9 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             this.guiScaleButton = this.optionsList.addOption(new ButtonWidget(GUI_SCALE_TEXT, this::setGuiScale));
             this.xhotSlider = this.optionsList.addOption(
                     new SliderWidget(
-                            sanitizeHotspot(this.settings.getXHot(), this.cursor),
+                            sanitizeXHot(this.settings.getXHot(), this.cursor),
                             HOT_MIN,
-                            getMaxHotspot(this.cursor),
+                            getMaxXHot(this.cursor),
                             HOT_STEP,
                             this::onChangeXHot,
                             XHOT_TEXT,
@@ -126,9 +126,9 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             );
             this.yhotSlider = this.optionsList.addOption(
                     new SliderWidget(
-                            sanitizeHotspot(this.settings.getYHot(), this.cursor),
+                            sanitizeYHot(this.settings.getYHot(), this.cursor),
                             HOT_MIN,
-                            getMaxHotspot(this.cursor),
+                            getMaxYHot(this.cursor),
                             HOT_STEP,
                             this::onChangeYHot,
                             YHOT_TEXT,

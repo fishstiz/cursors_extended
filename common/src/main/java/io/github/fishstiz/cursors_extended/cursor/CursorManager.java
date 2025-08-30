@@ -3,7 +3,6 @@ package io.github.fishstiz.cursors_extended.cursor;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.config.AnimationData;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.util.Alias;
@@ -56,7 +55,7 @@ public final class CursorManager {
             throw new IllegalStateException("Attempting to load an unregistered cursor: " + cursor.getName());
         }
 
-        AnimationData animationData = metadata.getAnimation();
+        CursorMetadata.Animation animationData = metadata.getAnimation();
         boolean animated = animationData != null;
         if (animated != (cursor instanceof AnimatedCursor)) {
             cursor.destroy();

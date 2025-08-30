@@ -42,10 +42,13 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
         private ResourceLocation textureLocation;
         private int textureWidth;
         private int textureHeight;
+        private int spriteWidth;
+        private int spriteHeight;
+        private double drawWidth;
+        private double drawHeight;
         private int vOffset;
         private double xhot;
         private double yhot;
-        private double size;
 
         Virtual() {
         }
@@ -55,12 +58,15 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
             this.textureLocation = cursor.getLocation();
             this.textureWidth = cursor.getTextureWidth();
             this.textureHeight = cursor.getTextureHeight();
-            this.vOffset = this.textureWidth * cursor.getTextureIndex();
+            this.spriteWidth = cursor.getSpriteWidth();
+            this.spriteHeight = cursor.getSpriteHeight();
+            this.vOffset = cursor.getSpriteHeight() * cursor.getSpriteIndex();
 
             double scale = SettingsUtil.getAutoScale(cursor.getScale());
             this.xhot = cursor.getXHot() * scale;
             this.yhot = cursor.getYHot() * scale;
-            this.size = this.textureWidth * scale;
+            this.drawWidth = this.spriteWidth * scale;
+            this.drawHeight = this.spriteHeight * scale;
         }
 
         @Override
@@ -73,7 +79,8 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
         public void render(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
             if (!minecraft.mouseHandler.isMouseGrabbed() && this.textureLocation != null) {
                 int guiScale = minecraft.getWindow().getGuiScale();
-                int scaledSize = (int) Math.round(this.size / guiScale);
+                int scaledWidth = (int) Math.round(this.drawWidth / guiScale);
+                int scaledHeight = (int) Math.round(this.drawHeight / guiScale);
                 int x = mouseX - (int) Math.round(this.xhot / guiScale);
                 int y = mouseY - (int) Math.round(this.yhot / guiScale);
 
@@ -85,8 +92,8 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
                         this.textureLocation,
                         x, y,
                         0, this.vOffset,
-                        scaledSize, scaledSize,
-                        this.textureWidth, this.textureWidth,
+                        scaledWidth, scaledHeight,
+                        this.spriteWidth, this.spriteHeight,
                         this.textureWidth, this.textureHeight
                 );
             }

@@ -21,17 +21,24 @@ public class CursorAnimationHelper {
 
     public void drawSprite(GuiGraphics guiGraphics, Cursor cursor, int x, int y, int size) {
         if (cursor.isLoaded()) {
-            int cursorSize = cursor.getTextureWidth();
             float spriteIndex = cursor instanceof AnimatedCursor animatedCursor ? this.getCurrentSpriteIndex(animatedCursor) : 0;
+
+            int spriteWidth = cursor.getSpriteWidth();
+            int spriteHeight = cursor.getSpriteHeight();
+
+            float scale = (float) size / Math.max(spriteWidth, spriteHeight);
+            int drawWidth = Math.round(spriteWidth * scale);
+            int drawHeight = Math.round(spriteHeight * scale);
 
             guiGraphics.blit(
                     RenderPipelines.GUI_TEXTURED,
                     cursor.getLocation(),
                     x, y,
-                    0, cursorSize * spriteIndex,
-                    size, size,
-                    cursorSize, cursorSize,
-                    cursor.getTextureWidth(), cursor.getTextureHeight()
+                    0, (int) (spriteHeight * spriteIndex),
+                    drawWidth, drawHeight,
+                    spriteWidth, spriteHeight,
+                    cursor.getTextureWidth(),
+                    cursor.getTextureHeight()
             );
         }
     }
@@ -41,9 +48,9 @@ public class CursorAnimationHelper {
 
         if (!cursor.isAnimated() || !cursor.isEnabled()) {
             state.reset();
-            return cursor.getFallbackFrame().cursor().getTextureIndex();
+            return cursor.getFallbackFrame().cursor().getSpriteIndex();
         }
 
-        return cursor.nextFrame(state).cursor().getTextureIndex();
+        return cursor.nextFrame(state).cursor().getSpriteIndex();
     }
 }

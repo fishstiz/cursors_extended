@@ -235,11 +235,11 @@ public class Config implements Serializable {
         }
 
         public void setXHot(@NotNull Cursor cursor, int xhot) {
-            this.xhot = sanitizeHotspot(xhot, cursor);
+            this.xhot = sanitizeXHot(xhot, cursor);
         }
 
         public void setYHot(@NotNull Cursor cursor, int yhot) {
-            this.yhot = sanitizeHotspot(yhot, cursor);
+            this.yhot = sanitizeYHot(yhot, cursor);
         }
 
         public void setEnabled(boolean enabled) {
@@ -262,8 +262,8 @@ public class Config implements Serializable {
             // other settings should not enable the cursor back on.
             if (this.enabled) this.enabled = settings.enabled;
             this.scale = sanitizeScale(settings.scale);
-            this.xhot = sanitizeHotspot(settings.xhot, IMAGE_SIZE_MAX);
-            this.yhot = sanitizeHotspot(settings.yhot, IMAGE_SIZE_MAX);
+            this.xhot = sanitizeHotspot(settings.xhot, Integer.MAX_VALUE);
+            this.yhot = sanitizeHotspot(settings.yhot, Integer.MAX_VALUE);
             this.animated = settings.animated;
         }
 
@@ -323,12 +323,12 @@ public class Config implements Serializable {
         }
 
         public void setXHot(int xhot) {
-            this.xhot = SettingsUtil.sanitizeGlobalHotspot(xhot);
+            this.xhot = Math.max(0, xhot);
         }
 
         @Override
         public int getXHot() {
-            return SettingsUtil.sanitizeGlobalHotspot(this.xhot);
+            return Math.max(0, this.xhot);
         }
 
         public void setYHot(double yhot) {
@@ -336,12 +336,12 @@ public class Config implements Serializable {
         }
 
         public void setYHot(int yhot) {
-            this.yhot = SettingsUtil.sanitizeGlobalHotspot(yhot);
+            this.yhot = Math.max(0, yhot);
         }
 
         @Override
         public int getYHot() {
-            return SettingsUtil.sanitizeGlobalHotspot(this.yhot);
+            return Math.max(0, this.yhot);
         }
 
         @Override

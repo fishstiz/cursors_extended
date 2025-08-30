@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import static io.github.fishstiz.cursors_extended.util.SettingsUtil.IMAGE_SIZE_GUI_MAX;
+
 public abstract class CursorWidget extends AbstractWidget implements CursorProvider {
     public static final int DEFAULT_HEIGHT = 32;
     public static final int DEFAULT_WIDTH = 32;
@@ -46,16 +48,19 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     protected abstract void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY);
 
     protected void renderBackground(@NotNull GuiGraphics guiGraphics) {
-        DrawUtil.drawCheckerboard(
-                guiGraphics,
-                this.getX(),
-                this.getY(),
-                this.getWidth(),
-                this.getHeight(),
-                this.getCellSize(),
-                this.background128,
-                BACKGROUND_SIZE
-        );
+        if (!this.isOverflowing()) {
+            DrawUtil.drawCheckerboard(
+                    guiGraphics,
+                    this.getX(),
+                    this.getY(),
+                    this.getWidth(),
+                    this.getHeight(),
+                    this.getCellWidth(),
+                    this.getCellHeight(),
+                    this.background128,
+                    BACKGROUND_SIZE
+            );
+        }
     }
 
     protected void renderBorder(@NotNull GuiGraphics guiGraphics) {
@@ -88,21 +93,31 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         return this.cursor;
     }
 
-    protected float getCellSize() {
+    protected float getCellWidth() {
         Cursor currentCursor = this.getCursor();
-        return currentCursor.isLoaded()
-                ? (float) getWidth() / this.getCursor().getTextureWidth()
-                : 0;
+        if (!currentCursor.isLoaded()) return 0;
+
+        int spriteWidth = cursor.getSpriteWidth();
+        int spriteHeight = cursor.getSpriteHeight();
+        float scale = (float) this.getWidth() / Math.max(spriteWidth, spriteHeight);
+        int drawWidth = Math.round(spriteWidth * scale);
+        return (float) drawWidth / spriteWidth;
     }
 
-    @Override
-    public int getRight() {
-        return this.getX() + this.getWidth(); // for pre 1.21
+    protected float getCellHeight() {
+        Cursor currentCursor = this.getCursor();
+        if (!currentCursor.isLoaded()) return 0;
+
+        int spriteWidth = cursor.getSpriteWidth();
+        int spriteHeight = cursor.getSpriteHeight();
+        float scale = (float) this.getHeight() / Math.max(spriteWidth, spriteHeight);
+        int drawHeight = Math.round(spriteHeight * scale);
+        return (float) drawHeight / spriteHeight;
     }
 
-    @Override
-    public int getBottom() {
-        return this.getY() + this.getHeight(); // for pre 1.21
+    protected boolean isOverflowing() {
+        Cursor currentCursor = this.getCursor();
+        return !currentCursor.isLoaded() || (currentCursor.getSpriteWidth() > IMAGE_SIZE_GUI_MAX || currentCursor.getSpriteHeight() > IMAGE_SIZE_GUI_MAX);
     }
 
     @Override

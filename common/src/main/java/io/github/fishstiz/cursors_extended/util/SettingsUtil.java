@@ -9,13 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Objects;
 
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
-    public static final int IMAGE_SIZE_MAX = 128;
-    public static final int IMAGE_SIZE_STEP = 8;
+    public static final int IMAGE_SIZE_GUI_MAX = 128;
     public static final double SCALE_AUTO_PREFERRED = 0;
     public static final double SCALE_AUTO_THRESHOLD_MAX = 0.49;
     public static final double SCALE = 1.0;
@@ -26,18 +24,14 @@ public class SettingsUtil {
     public static final int Y_HOT = 0;
     public static final int HOT_MIN = 0;
     public static final int HOT_STEP = 1;
-    public static final int GLOBAL_HOT_MAX = IMAGE_SIZE_MAX - 1;
     public static final boolean ENABLED = true;
 
     private SettingsUtil() {
     }
 
     public static void assertImageSize(int imageWidth, int imageHeight) throws IOException {
-        if (imageWidth < IMAGE_SIZE_MIN || imageWidth > IMAGE_SIZE_MAX || imageWidth % IMAGE_SIZE_STEP != 0) {
-            throw new IOException("Unsupported image width: " + imageWidth);
-        }
-        if (imageHeight % imageWidth != 0) {
-            throw new IOException("Image height must be divisible by width: " + imageHeight + " % " + imageWidth);
+        if (imageWidth < IMAGE_SIZE_MIN || imageHeight < IMAGE_SIZE_MIN) {
+            throw new IOException("Image width/height cannot be less than " + IMAGE_SIZE_MIN);
         }
     }
 
@@ -64,20 +58,16 @@ public class SettingsUtil {
         return (double) Math.round(mappedScale * 100) / 100;
     }
 
-    public static int sanitizeHotspot(int hotspot, int imageWidth) {
-        return clamp(hotspot, HOT_MIN, imageWidth - 1);
+    public static int sanitizeHotspot(int hotspot, int imageSize) {
+        return clamp(hotspot, HOT_MIN, imageSize - 1);
     }
 
-    public static int sanitizeHotspot(int hotspot, @NotNull Cursor cursor) {
-        return sanitizeHotspot(hotspot, cursor.isLoaded() ? cursor.getTextureWidth() : IMAGE_SIZE_MAX);
+    public static int sanitizeXHot(int xhot, @NotNull Cursor cursor) {
+        return sanitizeHotspot(xhot, cursor.isLoaded() ? cursor.getSpriteWidth() : 0);
     }
 
-    public static int sanitizeHotspot(double hotspot, @NotNull Cursor cursor) {
-        return sanitizeHotspot((int) hotspot, cursor);
-    }
-
-    public static int sanitizeGlobalHotspot(int hotspot) {
-        return clamp(hotspot, HOT_MIN, GLOBAL_HOT_MAX);
+    public static int sanitizeYHot(int yhot, @NotNull Cursor cursor) {
+        return sanitizeHotspot(yhot, cursor.isLoaded() ? cursor.getSpriteHeight() : 0);
     }
 
     public static double clamp(double value, double min, double max) {
@@ -88,24 +78,18 @@ public class SettingsUtil {
         return Math.max(min, Math.min(max, value));
     }
 
-    public static int getMaxHotspot(Cursor cursor) {
+    public static int getMaxXHot(Cursor cursor) {
         if (cursor != null && cursor.isLoaded()) {
-            return cursor.getTextureWidth() - 1;
+            return cursor.getSpriteWidth() - 1;
         }
-        return GLOBAL_HOT_MAX;
+        return 0;
     }
 
-    public static int getMaxHotspot(Collection<Cursor> cursors) {
-        int max = -1;
-        for (Cursor cursor : cursors) {
-            if (cursor.isLoaded()) {
-                int maxHotspot = getMaxHotspot(cursor);
-                if (maxHotspot > max) {
-                    max = maxHotspot;
-                }
-            }
+    public static int getMaxYHot(Cursor cursor) {
+        if (cursor != null && cursor.isLoaded()) {
+            return cursor.getSpriteHeight() - 1;
         }
-        return max != -1 ? max : GLOBAL_HOT_MAX;
+        return 0;
     }
 
     public static boolean equalSettings(@Nullable Config.CursorSettings a, @Nullable Config.CursorSettings b, boolean excludeGlobal) {
@@ -129,5 +113,9 @@ public class SettingsUtil {
             return equal;
         }
         return false;
+    }
+
+    public static <T> T getOrDefault(@Nullable T value, T defaultValue) {
+        return value != null ? value : defaultValue;
     }
 }

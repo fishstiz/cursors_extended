@@ -54,26 +54,13 @@ public class Cursor {
             int imageHeight = image.getHeight();
             assertImageSize(imageWidth, imageHeight);
 
-            NativeImage croppedImage = null;
-            try {
-                if (imageHeight > imageWidth) {
-                    // noinspection SuspiciousNameCombination
-                    croppedImage = NativeImageUtil.cropImage(image, 0, 0, imageWidth, imageWidth);
-                }
+            this.base64Image = NativeImageUtil.toBase64String(image);
+            this.enabled = settings.isEnabled();
+            this.textureWidth = imageWidth;
+            this.textureHeight = imageHeight;
+            this.metadata = metadata;
 
-                NativeImage validImage = croppedImage != null ? croppedImage : image;
-                this.base64Image = NativeImageUtil.toBase64String(validImage);
-                this.enabled = settings.isEnabled();
-                this.textureWidth = imageWidth;
-                this.textureHeight = imageHeight;
-                this.metadata = metadata;
-
-                create(validImage, settings.getScale(), settings.getXHot(), settings.getYHot());
-            } finally {
-                if (croppedImage != null) {
-                    croppedImage.close();
-                }
-            }
+            create(image, settings.getScale(), settings.getXHot(), settings.getYHot());
         } catch (Exception e) {
             this.destroy();
             throw e;
@@ -95,7 +82,7 @@ public class Cursor {
     private void create(NativeImage image, double scale, int xhot, int yhot) {
         scale = sanitizeScale(scale);
         xhot = sanitizeHotspot(xhot, image.getWidth());
-        yhot = sanitizeHotspot(yhot, image.getWidth());
+        yhot = sanitizeHotspot(yhot, image.getHeight());
 
         long previousId = this.id;
         ByteBuffer pixels = null;
@@ -239,21 +226,29 @@ public class Cursor {
         return this.loaded && this.id != MemoryUtil.NULL;
     }
 
-    public int getTextureIndex() {
+    public int getSpriteWidth() {
+        return this.getTextureWidth();
+    }
+
+    public int getSpriteHeight() {
+        return this.getTextureHeight();
+    }
+
+    public int getSpriteIndex() {
         return 0;
     }
 
-    public int getTextureWidth() throws IllegalStateException {
+    public int getTextureWidth() {
         assertLoaded();
         return textureWidth;
     }
 
-    public int getTextureHeight() throws IllegalStateException {
+    public int getTextureHeight() {
         assertLoaded();
         return textureHeight;
     }
 
-    private void assertLoaded() {
+    protected void assertLoaded() {
         if (!this.isLoaded()) {
             throw new IllegalStateException("Cursor has not been loaded");
         }
