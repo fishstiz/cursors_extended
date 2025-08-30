@@ -338,6 +338,18 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         return Tooltip.create(Component.translatable("cursors_extended.options.global.inactive.tooltip", option));
     }
 
+    @Override
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        if (this.hotspotWidget != null) {
+            CursorType cursorType = this.hotspotWidget.cursors_extended$cursorType(mouseX, mouseY);
+            if (cursorType != CursorType.DEFAULT) {
+                guiGraphics.requestCursor(cursorType);
+            }
+        }
+    }
+
     private static class OptionsList extends AbstractListWidget<OptionsList.Entry> implements Layout {
         private static final int BACKGROUND_PADDING_Y = 2;
         private final ElementSlidingBackground hoveredBackground = new ElementSlidingBackground(0x26FFFFFF); // 15% white

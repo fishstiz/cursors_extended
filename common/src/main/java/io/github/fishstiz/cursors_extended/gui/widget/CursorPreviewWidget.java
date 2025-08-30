@@ -20,6 +20,7 @@ public class CursorPreviewWidget extends CursorWidget {
     private static final int PREVIEW_TEXT_COLOR = 0x7FFFFFFF; // 50% white
     private static final int RULER_COLOR = 0xFF00FF00; // green
     private static final int BACKGROUND_DISABLED = 0x7F000000; // 50% black
+    private static final int BACKGROUND_OVERFLOW = 0xFF6A6A6A; // gray
     private static final int DEFAULT_BUTTON_SIZE = 20;
     private final @Nullable Button button;
     private final Font font;
@@ -44,7 +45,7 @@ public class CursorPreviewWidget extends CursorWidget {
         super.renderBackground(guiGraphics);
 
         if (this.isOverflowing()) {
-            guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), BACKGROUND_DISABLED);
+            guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), BACKGROUND_OVERFLOW);
         }
     }
 

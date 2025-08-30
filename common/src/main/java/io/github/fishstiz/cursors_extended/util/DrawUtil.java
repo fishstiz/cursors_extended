@@ -1,5 +1,6 @@
 package io.github.fishstiz.cursors_extended.util;
 
+import io.github.fishstiz.cursors_extended.platform.Services;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -7,6 +8,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3x2f;
 
 public class DrawUtil {
     private DrawUtil() {
@@ -94,5 +96,11 @@ public class DrawUtil {
         guiGraphics.fill(x, y + height - 1, x + width, y + height, color);
         guiGraphics.fill(x, y + 1, x + 1, y + height - 1, color);
         guiGraphics.fill(x + width - 1, y + 1, x + width, y + height - 1, color);
+    }
+
+    public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
+        Services.PLATFORM.getGuiRenderState(guiGraphics).submitGuiElement(
+                new GuiColoredRectRenderState(new Matrix3x2f(guiGraphics.pose()), minX, minY, maxX, maxY, color)
+        );
     }
 }
