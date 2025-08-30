@@ -1,12 +1,13 @@
 package io.github.fishstiz.cursors_extended.mixin;
 
-import io.github.fishstiz.cursors_extended.cursor.CursorResolver;
+import io.github.fishstiz.cursors_extended.cursor.CursorProviderInspector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,8 +20,13 @@ public abstract class ScreenMixin {
 
     @Inject(method = "render", at = @At("RETURN"))
     private void afterScreenRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        if (this.minecraft != null) {
-            CursorResolver.INSTANCE.afterRenderScreen(this.minecraft, (Screen) (Object) this, guiGraphics, mouseX, mouseY);
+        if (cursors_extended$nonScreenCursorVisible(minecraft)) {
+            CursorProviderInspector.INSTANCE.renderInspector(this.minecraft, (Screen) (Object) this, guiGraphics, mouseX, mouseY);
         }
+    }
+
+    @Unique
+    private static boolean cursors_extended$nonScreenCursorVisible(Minecraft minecraft) {
+        return minecraft != null && minecraft.screen == null && !minecraft.mouseHandler.isMouseGrabbed();
     }
 }

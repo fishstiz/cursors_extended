@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.AnimatedCursor;
@@ -36,10 +37,10 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static final Component RESET_TEXT = Component.translatable("cursors_extended.options.resource_pack.reset");
     private static final Tooltip RESET_INFO = Tooltip.create(Component.translatable("cursors_extended.options.resource_pack.reset.tooltip"));
     private static final int PREVIEW_BUTTON_SIZE = 20;
-    private static final int SCALE_OVERRIDE = -20;
     private final Runnable refreshCursors;
     private @NotNull Iterator<Cursor> cursors = cursorIterator();
     private @NotNull Cursor currentCursor = getDefaultCursor();
+    private CursorType holdCursorType = CursorTypesExt.asHold(currentCursor.getType());
     private OptionsListWidget optionList;
     private GlobalPreviewWidget previewWidget;
 
@@ -170,9 +171,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             } else if (target.getPrefix().equals(YHOT_TEXT) && CONFIG.getGlobal().isYHotActive()) {
                 CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setYHot(CONFIG.getGlobal().getYHot()));
             }
-            removeScaleOverride();
-        } else if (mouseEvent.clicked() && target.getPrefix().equals(SCALE_TEXT) && CursorManager.INSTANCE.isEnabled(this.currentCursor)) {
-            CursorManager.INSTANCE.overrideCursor(this.currentCursor.getType(), SCALE_OVERRIDE);
+        } else if ((mouseEvent.clicked() || mouseEvent.dragged()) && target.getPrefix().equals(SCALE_TEXT) && CursorManager.INSTANCE.isEnabled(this.holdCursorType)) {
+            this.getMinecraft().getWindow().selectCursor(this.holdCursorType);
         }
     }
 
@@ -186,6 +186,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             this.cursors = cursorIterator();
         }
         this.currentCursor = this.cursors.hasNext() ? this.cursors.next() : getDefaultCursor();
+        this.holdCursorType = CursorTypesExt.asHold(this.currentCursor.getType());
 
         if (this.previewWidget != null) {
             this.previewWidget.setCursor(this.currentCursor);
@@ -211,11 +212,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         this.refreshCursors.run();
         this.refreshWidgets();
         this.repositionElements();
-    }
-
-    @Override
-    protected void removed() {
-        removeScaleOverride();
     }
 
     @Override
@@ -263,10 +259,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     private static @NotNull Cursor getDefaultCursor() {
         return Objects.requireNonNull(CursorManager.INSTANCE.getCursor(CursorType.DEFAULT));
-    }
-
-    public static void removeScaleOverride() {
-        CursorManager.INSTANCE.removeOverride(SCALE_OVERRIDE);
     }
 
     private static class GlobalPreviewWidget extends CursorPreviewWidget {

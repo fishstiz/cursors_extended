@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,7 +25,6 @@ public final class CursorManager {
     private static final int CAPACITY = (int) Math.ceil(TYPE_COUNT / LOAD_FACTOR);
     private final Map<Alias<String>.Key, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>(CAPACITY, LOAD_FACTOR);
     private final Alias<String> aliases = new Alias<>(CAPACITY, LOAD_FACTOR);
-    private final TreeMap<Integer, String> overrides = new TreeMap<>();
     private final AnimationState animationState = new AnimationState();
     private @NotNull CursorRenderer renderer;
     private Map<String, Cursor> dummies;
@@ -85,20 +83,19 @@ public final class CursorManager {
     }
 
     public void setCurrentCursor(@NotNull CursorType type) {
-        Cursor override = getOverride();
-        Cursor cursor = override != null ? override : getCursor(type);
+        Cursor cursor = getCursor(type);
 
         if (cursor == null) {
             handleCursorExternal(type);
             return;
         }
 
-        if (cursor instanceof AnimatedCursor animatedCursor && cursor.getId() != MemoryUtil.NULL) {
+        if (cursor instanceof AnimatedCursor animatedCursor && cursor.isEnabled()) {
             handleCursorAnimation(animatedCursor);
             return;
         }
 
-        if (type != CursorType.DEFAULT && cursor.getId() == MemoryUtil.NULL || !cursor.isEnabled()) {
+        if (type != CursorType.DEFAULT && !cursor.isEnabled()) {
             cursor = getCursor(CursorType.DEFAULT);
         }
 
@@ -150,43 +147,12 @@ public final class CursorManager {
         }
     }
 
-    public void overrideCursor(CursorType type, int index) {
-        Cursor cursor = getCursor(type);
-        if (cursor != null && cursor.isEnabled()) {
-            overrides.put(index, type.toString());
-        } else {
-            overrides.remove(index);
-        }
-    }
-
-    public void removeOverride(int index) {
-        overrides.remove(index);
-    }
-
-    public @Nullable Cursor getOverride() {
-        while (!overrides.isEmpty()) {
-            Map.Entry<Integer, String> lastEntry = overrides.lastEntry();
-            Cursor cursor = getCursor(lastEntry.getValue());
-
-            if (cursor == null || cursor.getId() == 0) {
-                overrides.remove(lastEntry.getKey());
-            } else {
-                return cursor;
-            }
-        }
-
-        return null;
-    }
-
     public @NotNull Cursor getAppliedCursor() {
-        Cursor override = getOverride();
-        Cursor cursor = override != null ? override : currentCursor;
-
-        if (cursor instanceof AnimatedCursor animatedCursor) {
+        if (this.currentCursor instanceof AnimatedCursor animatedCursor) {
             return animatedCursor.getFrame(animationState.getCurrentFrame()).cursor();
         }
 
-        return cursor;
+        return this.currentCursor;
     }
 
     public boolean isEnabled(@NotNull CursorType type) {

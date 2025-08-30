@@ -14,7 +14,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
@@ -49,7 +48,7 @@ class ElementInspectorImpl implements ElementInspector {
     }
 
     @Override
-    public void render(Minecraft minecraft, @NotNull Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void render(Minecraft minecraft, @Nullable Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         if (this.enabled) {
             ScreenRectangle screenRectangle = getBounds(screen);
             renderScreenName(minecraft, screen, screenRectangle, guiGraphics);

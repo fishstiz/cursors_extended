@@ -28,21 +28,4 @@ public abstract class GameRendererMixin {
     ) {
         CursorManager.INSTANCE.renderCursor(minecraft, guiGraphics, mouseX, mouseY);
     }
-
-    @Inject(method = "render", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;applyCursor(Lcom/mojang/blaze3d/platform/Window;)V",
-            shift = At.Shift.AFTER
-    ))
-    private void resolveCursor(
-            DeltaTracker deltaTracker,
-            boolean renderLevel,
-            CallbackInfo ci,
-            @Local(ordinal = 0) int mouseX,
-            @Local(ordinal = 1) int mouseY
-    ) {
-        if (minecraft.screen != null) {
-            CursorResolver.INSTANCE.afterApplyCursor(minecraft, minecraft.screen, mouseX, mouseY);
-        }
-    }
 }

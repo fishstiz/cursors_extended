@@ -50,6 +50,7 @@ public class CursorHotspotWidget extends CursorWidget {
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.active = this.xhotSlider.isActive() || this.yhotSlider.isActive();
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
     }
 
     @Override

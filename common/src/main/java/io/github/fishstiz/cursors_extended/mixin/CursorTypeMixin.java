@@ -6,7 +6,6 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
-import io.github.fishstiz.cursors_extended.cursor.CursorTickController;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -22,7 +21,7 @@ public abstract class CursorTypeMixin {
     private void onSelect(long window, long cursor, Operation<Void> original) {
         CursorType cursorType = (CursorType) (Object) this;
         if (CursorManager.INSTANCE.isRegistered(cursorType) && CursorManager.INSTANCE.isActive()) {
-            CursorTickController.INSTANCE.setFallbackTickCursor(cursorType);
+            CursorManager.INSTANCE.setCurrentCursor(cursorType);
         } else {
             original.call(window, cursor);
         }

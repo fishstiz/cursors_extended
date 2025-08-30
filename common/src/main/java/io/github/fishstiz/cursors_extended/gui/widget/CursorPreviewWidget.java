@@ -56,6 +56,7 @@ public class CursorPreviewWidget extends CursorWidget {
         }
 
         this.renderBorder(guiGraphics);
+        if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
     }
 
     protected void renderPreviewText(@NotNull GuiGraphics guiGraphics) {

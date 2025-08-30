@@ -1,5 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
@@ -40,12 +42,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip GLOBAL_XHOT_TOOLTIP = createGlobalTooltip(XHOT_TEXT);
     private static final Tooltip GLOBAL_YHOT_TOOLTIP = createGlobalTooltip(YHOT_TEXT);
     private static final int CELL_SIZE_STEP = 32;
-    private static final int SCALE_CURSOR_OVERRIDE = -20;
     private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
     private final CatalogItem globalOptions;
     private final @NotNull Config.CursorSettings settings;
     private final @NotNull Cursor cursor;
+    private final @NotNull CursorType holdCursorType;
     private GridLayout layout;
     private OptionsList optionsList;
     private ToggleWidget enableToggler;
@@ -71,6 +73,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         this.globalOptions = globalOptions;
         this.settings = CursorsExtended.CONFIG.getOrCreateSettings(cursor);
         this.cursor = cursor;
+        this.holdCursorType = CursorTypesExt.asHold(cursor.getType());
     }
 
     @Override
@@ -312,10 +315,8 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onScaleMouseEvent(SliderWidget target, MouseEvent mouseEvent, double mappedValue) {
-        if (mouseEvent.clicked() && CursorManager.INSTANCE.isEnabled(this.cursor)) {
-            CursorManager.INSTANCE.overrideCursor(this.cursor.getType(), SCALE_CURSOR_OVERRIDE);
-        } else if (mouseEvent.released()) {
-            removeScaleOverride();
+        if ((mouseEvent.clicked() || mouseEvent.dragged()) && CursorManager.INSTANCE.isEnabled(this.holdCursorType)) {
+            this.getMinecraft().getWindow().selectCursor(this.holdCursorType);
         }
     }
 
@@ -327,15 +328,6 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
                 this.hotspotGuideToggler.setValue(true);
             }
         }
-    }
-
-    @Override
-    protected void removed() {
-        removeScaleOverride();
-    }
-
-    public static void removeScaleOverride() {
-        CursorManager.INSTANCE.removeOverride(SCALE_CURSOR_OVERRIDE);
     }
 
     private static int clampCell(int cell) {

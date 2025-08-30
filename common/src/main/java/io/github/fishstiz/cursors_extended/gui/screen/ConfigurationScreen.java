@@ -33,7 +33,6 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final int SIDEBAR_WIDTH = 140;
     private static final int MAX_CONTENT_WIDTH = 128 * 2 + SPACING;
     private static final int LIST_CURSOR_SIZE = 16;
-    private static final int BUSY_OVERRIDE = -10;
     private static final CatalogItem GLOBAL_CATEGORY = new CatalogItem("global", GLOBAL_TEXT);
     private static final CatalogItem CURSORS_CATEGORY = new CatalogItem("cursors", CURSORS_TEXT);
     private final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
@@ -46,7 +45,6 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
     @Override
     public void onClose() {
-        CursorManager.INSTANCE.removeOverride(BUSY_OVERRIDE);
         CursorsExtended.CONFIG.save();
         super.onClose();
     }
@@ -72,14 +70,12 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
         }
 
         this.getRefreshButton().active = false;
-        CursorManager.INSTANCE.overrideCursor(CursorTypesExt.BUSY, BUSY_OVERRIDE);
         this.refreshFuture = CompletableFuture
                 .runAsync(() -> reload(Objects.requireNonNull(this.minecraft).getResourceManager()), Util.backgroundExecutor())
                 .thenRunAsync(() -> {
                     this.addCursorItems();
                     super.refreshItemsAndPanel();
                     this.getRefreshButton().active = true;
-                    CursorManager.INSTANCE.removeOverride(BUSY_OVERRIDE);
                 }, this.minecraft);
     }
 
@@ -112,6 +108,15 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
     private void addDebugItems() {
         this.addCategoryOnly(new CatalogItem("debug", DEBUG_TEXT), new DebugOptionsPanel(DEBUG_TEXT));
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        if (this.refreshFuture != null && !this.refreshFuture.isDone()) {
+            guiGraphics.requestCursor(CursorTypesExt.BUSY);
+        }
     }
 
     private int renderListCursor(GuiGraphics guiGraphics, Font font, CatalogItem item, LayoutElement bounds, int spacing, int mouseX, int mouseY, float partialTick) {
