@@ -72,7 +72,7 @@
   "cursors_extended.options.compat.virtual_mode": "Virtual Mode",
   "cursors_extended.options.compat.virtual_mode.info": "Renders the cursor directly in-game instead of letting the operating system handle it.",
   "cursors_extended.options.compat.legacy_mode": "Legacy Cursor Mode",
-  "cursors_extended.options.compat.legacy_mode.info": "Detects the hovered element by traversing the GUI hierarchy and enables additional cursor mappings beyond vanilla.\n\nOther legacy cursor mappings may have to be disabled in the Adaptive Cursor options.",
+  "cursors_extended.options.compat.legacy_mode.info": "Detects the hovered element by traversing the GUI hierarchy and enables additional cursor mappings beyond vanilla.\n\nOther legacy cursor mappings can be toggled in the Adaptive Cursor options.",
 
   "cursors_extended.options.debug": "Debug",
   "cursors_extended.options.debug.inspect": "Inspect Element",
