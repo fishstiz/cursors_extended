@@ -47,7 +47,7 @@ public class Config implements Serializable {
 
     public boolean isStale(Cursor cursor) {
         CursorSettings settings = cursors.get(cursor.getName());
-        return settings == null || !settings.stale;
+        return settings == null || settings.stale;
     }
 
     public void markSettingsStale() {
