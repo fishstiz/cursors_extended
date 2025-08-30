@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +53,7 @@ public class ElementSlidingBackground {
         }
     }
 
-    public void render(@NotNull GuiGraphics guiGraphics, @Nullable ElementView element, float partialTick) {
+    public void render(@NotNull GuiGraphics guiGraphics, @Nullable LayoutElement element, float partialTick) {
         if (element == null) {
             this.reset();
             return;

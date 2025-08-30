@@ -2,8 +2,6 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.client.gui.navigation.ScreenRectangle;
-import org.jetbrains.annotations.NotNull;
 
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.clamp;
 
@@ -73,7 +71,7 @@ public abstract class AbstractListWidget<E extends AbstractListWidget<E>.Entry> 
         return this.getItemCount() * this.defaultEntryHeight - this.rowGap;
     }
 
-    protected abstract class Entry extends ContainerObjectSelectionList.Entry<E> implements ElementView {
+    protected abstract class Entry extends ContainerObjectSelectionList.Entry<E> {
         private final int index;
 
         protected Entry(int index) {
@@ -104,9 +102,12 @@ public abstract class AbstractListWidget<E extends AbstractListWidget<E>.Entry> 
             return AbstractListWidget.this.defaultEntryHeight - AbstractListWidget.this.rowGap;
         }
 
-        @Override
-        public @NotNull ScreenRectangle getRectangle() {
-            return ElementView.super.getRectangle();
+        public int getRight() {
+            return this.getX() + this.getWidth();
+        }
+
+        public int getBottom() {
+            return this.getY() + this.getHeight();
         }
 
         @Override

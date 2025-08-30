@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.gui.widget.AbstractListWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
-import io.github.fishstiz.cursors_extended.gui.widget.ElementView;
 import io.github.fishstiz.cursors_extended.gui.widget.ElementSlidingBackground;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.Minecraft;
@@ -15,9 +14,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -611,7 +612,7 @@ public abstract class CatalogBrowserScreen extends Screen {
             super.setSelected(selected);
         }
 
-        private abstract class AbstractItemEntry extends AbstractListWidget<AbstractItemEntry>.Entry implements ElementView {
+        private abstract class AbstractItemEntry extends AbstractListWidget<AbstractItemEntry>.Entry {
             protected final Font font;
             protected final CatalogItem item;
             protected final ItemButton button;
@@ -754,7 +755,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
     }
 
-    public abstract static class ContentPanel extends AbstractContainerEventHandler implements Renderable, NarratableEntry, ElementView {
+    public abstract static class ContentPanel extends AbstractContainerEventHandler implements Renderable, NarratableEntry, LayoutElement {
         private final List<Component> indexed = new ArrayList<>();
         private final List<GuiEventListener> children = new ArrayList<>();
         private final List<Renderable> renderables = new ArrayList<>();
@@ -886,16 +887,13 @@ public abstract class CatalogBrowserScreen extends Screen {
             return this.children;
         }
 
-        private void setPosition(int x, int y) {
-            this.setX(x);
-            this.setY(y);
-        }
-
-        private void setX(int x) {
+        @Override
+        public void setX(int x) {
             this.x = x;
         }
 
-        private void setY(int y) {
+        @Override
+        public void setY(int y) {
             this.y = y;
         }
 
@@ -927,6 +925,14 @@ public abstract class CatalogBrowserScreen extends Screen {
             return this.height;
         }
 
+        public int getRight() {
+            return this.getX() + this.getWidth();
+        }
+
+        public int getBottom() {
+            return this.getY() + this.getHeight();
+        }
+
         public int getSpacing() {
             return this.spacing;
         }
@@ -937,6 +943,20 @@ public abstract class CatalogBrowserScreen extends Screen {
 
         public int getHeaderWidth() {
             return this.headerWidth;
+        }
+
+        @Override
+        public @NotNull ScreenRectangle getRectangle() {
+            return LayoutElement.super.getRectangle();
+        }
+
+        @Override
+        public void visitWidgets(Consumer<AbstractWidget> consumer) {
+            for (var child : this.children) {
+                if (child instanceof AbstractWidget widget) {
+                    consumer.accept(widget);
+                }
+            }
         }
 
         @Override

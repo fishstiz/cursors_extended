@@ -10,7 +10,6 @@
     "MinecraftMixin",
     "NativeImageAccess",
     "ScreenMixin",
-    "WindowAccess",
     "WindowMixin",
     "cursorprovider.AbstractButtonMixin",
     "cursorprovider.AbstractScrollAreaMixin",
