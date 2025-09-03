@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CursorType.class)
 public abstract class CursorTypeMixin {
-    @WrapOperation(method = "select", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwSetCursor(JJ)V"))
+    @WrapOperation(method = "select", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwSetCursor(JJ)V", remap = false))
     private void onSelect(long window, long cursor, Operation<Void> original) {
         CursorType cursorType = (CursorType) (Object) this;
         if (CursorManager.INSTANCE.isRegistered(cursorType) && CursorManager.INSTANCE.isActive()) {
