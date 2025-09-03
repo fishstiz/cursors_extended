@@ -20,6 +20,9 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -306,32 +309,32 @@ public abstract class CatalogBrowserScreen extends Screen {
     }
 
     @Override
-    public boolean charTyped(char codePoint, int modifiers) {
-        if (super.charTyped(codePoint, modifiers)) {
+    public boolean charTyped(CharacterEvent charEvent) {
+        if (super.charTyped(charEvent)) {
             return true;
         }
         if (this.autoFocusSearch()
-            && codePoint != InputConstants.KEY_SPACE
+            && charEvent.codepoint() != InputConstants.KEY_SPACE
             && this.searchField != null
             && !this.searchField.isFocused()) {
             this.focusPath(this.searchField);
-            return this.searchField.charTyped(codePoint, modifiers);
+            return this.searchField.charTyped(charEvent);
         }
         return false;
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (super.keyPressed(keyEvent)) {
             return true;
         }
         if (this.autoFocusSearch()
-            && keyCode == InputConstants.KEY_BACKSPACE
+            && keyEvent.key() == InputConstants.KEY_BACKSPACE
             && this.searchField != null
             && !this.searchField.isFocused()
             && !this.searchField.getValue().isEmpty()) {
             this.focusPath(this.searchField);
-            return this.searchField.keyPressed(keyCode, scanCode, modifiers);
+            return this.searchField.keyPressed(keyEvent);
         }
         return false;
     }
@@ -722,8 +725,8 @@ public abstract class CatalogBrowserScreen extends Screen {
             this.onClick = Objects.requireNonNull(onClick);
         }
 
-        @Override
-        public void onPress() {
+      @Override
+        public void onPress(InputWithModifiers inputWithModifiers) {
             this.onClick.accept(this);
         }
 

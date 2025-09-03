@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
@@ -15,7 +16,9 @@ public class CursorTypeUtil {
     private CursorTypeUtil() {
     }
 
-    public static final long WINDOW = Minecraft.getInstance().getWindow().getWindow();
+    public static final Window WINDOW = Minecraft.getInstance().getWindow();
+
+    public static final long HANDLE = WINDOW.handle();
 
     public static boolean nameEquals(CursorType a, CursorType b) {
         return Objects.equals(a.toString(), b.toString());
@@ -28,7 +31,7 @@ public class CursorTypeUtil {
     }
 
     public static boolean isLeftClickHeld() {
-        return GLFW.glfwGetMouseButton(WINDOW, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetMouseButton(HANDLE, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
 
     public static boolean isHeld(CursorType lastCursorType) {

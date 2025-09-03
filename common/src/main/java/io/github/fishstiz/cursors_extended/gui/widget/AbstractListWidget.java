@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.clamp;
 
 public abstract class AbstractListWidget<E extends AbstractListWidget<E>.Entry> extends ContainerObjectSelectionList<E> {
-    public static final int Y_OFFSET = -4;
     protected final int rowGap;
 
     protected AbstractListWidget(Minecraft minecraft, int width, int y, int height, int itemHeight) {

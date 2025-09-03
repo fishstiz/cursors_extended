@@ -24,12 +24,12 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
 
         @Override
         public void setCursor(@NotNull Cursor cursor) {
-            glfwSetCursor(CursorTypeUtil.WINDOW, cursor.getId());
+            glfwSetCursor(CursorTypeUtil.HANDLE, cursor.getId());
         }
 
         @Override
         public void resetCursor() {
-            glfwSetCursor(CursorTypeUtil.WINDOW, MemoryUtil.NULL);
+            glfwSetCursor(CursorTypeUtil.HANDLE, MemoryUtil.NULL);
         }
 
         @Override
@@ -71,7 +71,7 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
 
         @Override
         public void resetCursor() {
-            glfwSetInputMode(CursorTypeUtil.WINDOW, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetInputMode(CursorTypeUtil.HANDLE, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             this.textureLocation = null;
         }
 
@@ -84,7 +84,7 @@ sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Vi
                 int x = mouseX - (int) Math.round(this.xhot / guiScale);
                 int y = mouseY - (int) Math.round(this.yhot / guiScale);
 
-                glfwSetInputMode(CursorTypeUtil.WINDOW, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+                glfwSetInputMode(CursorTypeUtil.HANDLE, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
                 guiGraphics.nextStratum();
                 guiGraphics.blit(

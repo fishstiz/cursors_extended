@@ -1,6 +1,8 @@
 package io.github.fishstiz.cursors_extended.gui.widget;
 
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +24,7 @@ public class ToggleWidget extends Button {
             @NotNull Component prefix,
             @NotNull BiConsumer<ToggleWidget, Boolean> listener
     ) {
-        super(x, y, width, height, prefix, Button::onPress, DEFAULT_NARRATION);
+        super(x, y, width, height, prefix, btn -> {}, DEFAULT_NARRATION);
 
         this.listener = listener;
         this.prefix = prefix;
@@ -39,7 +41,7 @@ public class ToggleWidget extends Button {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(InputWithModifiers inputWithModifiers) {
         this.value = !this.value;
         this.listener.accept(this, this.value);
         this.updateMessage();
@@ -55,7 +57,7 @@ public class ToggleWidget extends Button {
     }
 
     @Override
-    public void onRelease(double mouseX, double mouseY) {
+    public void onRelease(MouseButtonEvent mouseButtonEvent) {
         this.setFocused(false);
     }
 }

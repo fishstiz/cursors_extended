@@ -7,6 +7,7 @@ import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -96,9 +97,9 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button, boolean doubleClicked) {
-        if (this.button != null && this.button.isMouseOver(mouseX, mouseY)) {
-            this.button.mouseClicked(mouseX, mouseY, button, doubleClicked);
+    public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean doubleClicked) {
+        if (this.button != null && this.button.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y())) {
+            this.button.mouseClicked(mouseButtonEvent, doubleClicked);
         }
         return false;
     }

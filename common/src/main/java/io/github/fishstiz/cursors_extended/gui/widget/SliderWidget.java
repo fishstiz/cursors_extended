@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
@@ -108,20 +109,20 @@ public class SliderWidget extends AbstractSliderButton {
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY, boolean doubleClick) {
-        super.onClick(mouseX, mouseY, doubleClick);
+    public void onClick(MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
+        super.onClick(mouseButtonEvent, doubleClick);
         this.sendMouseEvent(MouseEvent.CLICK);
     }
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        super.onDrag(mouseX, mouseY, dragX, dragY);
+    protected void onDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
+        super.onDrag(mouseButtonEvent, dragX, dragY);
         this.sendMouseEvent(MouseEvent.DRAG);
     }
 
     @Override
-    public void onRelease(double mouseX, double mouseY) {
-        super.onRelease(mouseX, mouseY);
+    public void onRelease(MouseButtonEvent mouseButtonEvent) {
+        super.onRelease(mouseButtonEvent);
         this.setFocused(false);
         this.sendMouseEvent(MouseEvent.RELEASE);
     }

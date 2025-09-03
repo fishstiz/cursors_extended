@@ -44,7 +44,11 @@ public class SettingsUtil {
     }
 
     public static double getAutoScale(double scale) {
-        return isAutoScale(scale) ? Minecraft.getInstance().options.guiScale().get() : scale;
+        if (isAutoScale(scale)) {
+            int guiScale = Minecraft.getInstance().options.guiScale().get();
+            return guiScale != 0 ? guiScale : CursorTypeUtil.WINDOW.getGuiScale();
+        }
+        return scale;
     }
 
     public static double sanitizeScale(double scale) {

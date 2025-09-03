@@ -11,6 +11,7 @@ import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -110,23 +111,23 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY, boolean doubleClick) {
+    public void onClick(MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
         this.dragging = true;
-        this.setHotspots(MouseEvent.CLICK, mouseX, mouseY);
+        this.setHotspots(MouseEvent.CLICK, mouseButtonEvent.x(), mouseButtonEvent.y());
     }
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
+    protected void onDrag(MouseButtonEvent mouseButtonEvent, double deltaX, double deltaY) {
         if (this.dragging) {
-            this.setHotspots(MouseEvent.DRAG, mouseX, mouseY);
+            this.setHotspots(MouseEvent.DRAG, mouseButtonEvent.x(), mouseButtonEvent.y());
         }
     }
 
     @Override
-    public void onRelease(double mouseX, double mouseY) {
+    public void onRelease(MouseButtonEvent mouseButtonEvent) {
         if (this.dragging) {
             this.dragging = false;
-            this.setHotspots(MouseEvent.RELEASE, mouseX, mouseY);
+            this.setHotspots(MouseEvent.RELEASE, mouseButtonEvent.x(), mouseButtonEvent.y());
             this.setFocused(false);
         }
     }
