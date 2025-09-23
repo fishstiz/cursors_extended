@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import static io.github.fishstiz.cursors_extended.resource.CursorResourceLoader.reload;
+import static io.github.fishstiz.cursors_extended.resource.CursorResourceReloader.reload;
 
 public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final Component GLOBAL_TEXT = Component.translatable("cursors_extended.options.global");

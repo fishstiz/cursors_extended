@@ -3,7 +3,7 @@ package io.github.fishstiz.cursors_extended.cursor;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
+import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
@@ -41,7 +41,7 @@ public class Cursor {
     Cursor(CursorType type, @Nullable Consumer<Cursor> onLoad) {
         this.type = type;
         this.onLoad = onLoad;
-        this.location = CursorResourceLoader.getDirectory().withSuffix("/" + type.toString() + IMG_TYPE);
+        this.location = CursorResourceReloader.getDirectory().withSuffix("/" + type.toString() + IMG_TYPE);
     }
 
     Cursor(Cursor cursor) {
@@ -256,7 +256,7 @@ public class Cursor {
 
     static Cursor loadOrCreateDummy(CursorType type, Consumer<Cursor> onLoad) {
         Cursor cursor = new Cursor(type, onLoad);
-        CursorResourceLoader.loadCursorTexture(cursor);
+        CursorResourceReloader.loadCursorTexture(cursor);
         return cursor;
     }
 

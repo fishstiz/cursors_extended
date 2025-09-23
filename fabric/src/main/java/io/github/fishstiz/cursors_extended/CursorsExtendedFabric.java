@@ -1,12 +1,13 @@
 package io.github.fishstiz.cursors_extended;
 
 import io.github.fishstiz.cursors_extended.cursor.CursorProviderInspector;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceReloadListener;
+import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -22,7 +23,6 @@ public class CursorsExtendedFabric implements ClientModInitializer {
             ScreenEvents.remove(currentScreen).register(screen -> CursorProviderInspector.INSTANCE.setVisibleScreen(null));
             ScreenEvents.afterRender(currentScreen).register((screen, guiGraphics, mouseX, mouseY, tickDelta) ->
                     CursorProviderInspector.INSTANCE.renderInspector(Minecraft.getInstance(), screen, guiGraphics, mouseX, mouseY));
-
         });
 
         FabricLoader.getInstance().getModContainer(CursorsExtended.MOD_ID).ifPresent(modContainer ->
@@ -34,6 +34,6 @@ public class CursorsExtendedFabric implements ClientModInitializer {
                 )
         );
 
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new CursorResourceReloadListener());
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(CursorResourceReloader.getDirectory(), new CursorResourceReloader());
     }
 }

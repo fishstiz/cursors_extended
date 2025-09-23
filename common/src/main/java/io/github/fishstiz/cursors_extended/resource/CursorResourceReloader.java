@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
@@ -26,17 +27,30 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.*;
 
-public class CursorResourceLoader {
+public class CursorResourceReloader implements PreparableReloadListener {
     private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors");
-
-    private CursorResourceLoader() {
-    }
 
     public static ResourceLocation getDirectory() {
         return DIRECTORY;
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Void> reload(
+            SharedState sharedState,
+            Executor backgroundExecutor,
+            PreparationBarrier preparationBarrier,
+            Executor gameExecutor
+    ) {
+        gameExecutor.execute(CursorResourceReloader::resetCursor);
+
+        return CompletableFuture.runAsync(() -> reload(sharedState.resourceManager()), backgroundExecutor)
+                .thenCompose(preparationBarrier::wait)
+                .thenRunAsync(CursorResourceReloader::resetCursor, gameExecutor);
     }
 
     public static void reload(ResourceManager manager) {
@@ -47,7 +61,7 @@ public class CursorResourceLoader {
         LOGGER.info("[cursors_extended] Loading cursors finished.");
     }
 
-    static void reloadCursor() {
+    static void resetCursor() {
         if (CursorManager.INSTANCE.isRegistered(CursorType.DEFAULT)) {
             CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
         }

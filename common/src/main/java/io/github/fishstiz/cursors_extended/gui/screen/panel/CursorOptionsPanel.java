@@ -2,7 +2,7 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
+import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
@@ -301,12 +301,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
     private void refreshDefaultsButton() {
         if (this.resetToDefaultsButton != null) {
-            this.resetToDefaultsButton.active = !CursorResourceLoader.isResourceSetting(this.cursor, this.settings);
+            this.resetToDefaultsButton.active = !CursorResourceReloader.isResourceSetting(this.cursor, this.settings);
         }
     }
 
     private void resetToDefaults() {
-        if (CursorResourceLoader.retoreActiveResourceSettings(Objects.requireNonNull(this.cursor))) {
+        if (CursorResourceReloader.retoreActiveResourceSettings(Objects.requireNonNull(this.cursor))) {
             this.refreshCursors.run();
             if (this.enableToggler != null) {
                 this.setFocused(this.enableToggler);

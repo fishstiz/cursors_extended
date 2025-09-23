@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
-import io.github.fishstiz.cursors_extended.resource.CursorResourceLoader;
+import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogBrowserScreen;
 import net.minecraft.client.gui.components.StringWidget;
@@ -51,7 +51,7 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
         if (deferredCursor.isLoaded()) {
             throw new IllegalStateException("Cursor is already loaded");
         }
-        if (CursorResourceLoader.loadCursorTexture(this.getMinecraft().getResourceManager(), deferredCursor)) {
+        if (CursorResourceReloader.loadCursorTexture(this.getMinecraft().getResourceManager(), deferredCursor)) {
             return true;
         }
         this.getMinecraft().getToastManager().addToast(SystemToast.multiline(
