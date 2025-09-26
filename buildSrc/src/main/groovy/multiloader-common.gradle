@@ -18,32 +18,9 @@ repositories {
                 maven {
                     name = 'ParchmentMC'
                     url = 'https://maven.parchmentmc.org/'
-                },
-                maven {
-                    name = "NeoForge"
-                    url = 'https://maven.neoforged.net/releases'
                 }
         )
         filter { includeGroup('org.parchmentmc.data') }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = 'Fabric'
-                url = uri('https://maven.fabricmc.net')
-            }
-        }
-        filter {
-            includeGroup('net.fabricmc')
-            includeGroup('fabric-loom')
-        }
-    }
-}
-
-sourceSets {
-    testmod {
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
     }
 }
 
@@ -91,21 +68,11 @@ processResources { delegate ->
     configureResourceExpansion(delegate)
 }
 
-processTestmodResources { delegate ->
-    configureResourceExpansion(delegate)
-}
-
 configurations {
     commonJava {
         canBeResolved = true
     }
     commonResources {
-        canBeResolved = true
-    }
-    testmodJava {
-        canBeResolved = true
-    }
-    testmodResources {
         canBeResolved = true
     }
 }
@@ -115,19 +82,9 @@ tasks.named('compileJava', JavaCompile) {
     source(configurations.commonJava)
 }
 
-tasks.named('compileTestmodJava', JavaCompile) {
-    dependsOn(configurations.testmodJava)
-    source(configurations.testmodJava)
-}
-
 processResources {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
-}
-
-processTestmodResources {
-    dependsOn(configurations.testmodResources)
-    from(configurations.testmodResources)
 }
 
 tasks.named('sourcesJar', Jar) {

@@ -4,15 +4,11 @@ plugins {
 }
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        filter {
-            includeGroup "maven.modrinth"
+    maven {
+        name = "Maven for PR #2639" // https://github.com/neoforged/NeoForge/pull/2639
+        url = uri("https://prmaven.neoforged.net/NeoForge/pr2639")
+        content {
+            includeModule("net.neoforged", "neoforge")
         }
     }
 }
@@ -28,33 +24,12 @@ neoForge {
         minecraftVersion = parchment_minecraft
         mappingsVersion = parchment_version
     }
-    mods {
-        "${mod_id}" {
-            sourceSet sourceSets.main
-            sourceSet project(":commonApi").sourceSets.main
-        }
-        testmod {
-            sourceSet sourceSets.testmod
-        }
-    }
+
     runs {
         client {
             client()
             gameDirectory = project.file('run/client')
             setIdeName("NeoForge Client (${project.path})")
-            loadedMods = [mods."${mod_id}"]
-        }
-        testmodClient {
-            client()
-            gameDirectory = project.file('run/testmod')
-            setIdeName("NeoForge Client Test (${project.path})")
-            sourceSet = sourceSets.testmod
         }
     }
-}
-
-dependencies {
-    jarJar(api project(":commonApi"))
-
-    compileOnly "maven.modrinth:owo-lib:$owo_version"
 }

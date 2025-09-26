@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 public class JsonLoader {
     private static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(CursorMetadata.Animation.Frame.class, new CursorMetadata.Animation.FrameDeserializer())
+            .registerTypeAdapter(CursorMetadata.Animation.Frame.class, new CursorMetadata.Animation.Frame.Deserializer())
             .registerTypeAdapter(AnimationMode.class, new AnimationMode.Deserializer())
             .setPrettyPrinting()
             .create();

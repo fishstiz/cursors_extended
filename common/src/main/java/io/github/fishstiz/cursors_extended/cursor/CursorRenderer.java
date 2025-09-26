@@ -11,17 +11,14 @@ import org.lwjgl.system.MemoryUtil;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-sealed interface CursorRenderer permits CursorRenderer.Native, CursorRenderer.Virtual {
+sealed interface CursorRenderer {
     void setCursor(@NotNull Cursor cursor);
 
     void resetCursor();
 
     void render(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY);
 
-    final class Native implements CursorRenderer {
-        Native() {
-        }
-
+    record Native() implements CursorRenderer {
         @Override
         public void setCursor(@NotNull Cursor cursor) {
             glfwSetCursor(CursorTypeUtil.HANDLE, cursor.getId());

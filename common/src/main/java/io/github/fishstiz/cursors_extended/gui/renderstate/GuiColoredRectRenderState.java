@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.util;
+package io.github.fishstiz.cursors_extended.gui.renderstate;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;

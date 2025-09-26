@@ -1,7 +1,8 @@
-package io.github.fishstiz.cursors_extended.cursor;
+package io.github.fishstiz.cursors_extended.cursor.inspector;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CursorProviderInspector {
     public static final CursorProviderInspector INSTANCE = new CursorProviderInspector();
-    private ElementInspector inspector = ElementInspector.NO_OP;
+    private InspectorDebugRenderer debugRenderer = InspectorDebugRenderer.NO_OP;
     private @Nullable Screen visibleScreen;
 
     private CursorProviderInspector() {
@@ -36,7 +37,7 @@ public class CursorProviderInspector {
      * to determine the appropriate cursor type at the given mouse position.
      * <p>
      * Stops at the first hovered child, matching the default implementation of
-     * {@link ContainerEventHandler#mouseClicked(double, double, int, boolean)}.
+     * {@link ContainerEventHandler#mouseClicked}.
      */
     public CursorType inspect(GuiEventListener element, double mouseX, double mouseY) {
         if (CursorTypeUtil.isHovered(element, mouseX, mouseY)) {
@@ -49,11 +50,11 @@ public class CursorProviderInspector {
                 }
             }
             if (element instanceof CursorProvider provider) {
-                inspector.setInspected(element, mouseX, mouseY);
+                debugRenderer.setInspected(element, mouseX, mouseY);
                 return provider.cursors_extended$cursorType(mouseX, mouseY);
             }
         }
-        inspector.setInspected(element, mouseX, mouseY);
+        debugRenderer.setInspected(element, mouseX, mouseY);
         return CursorType.DEFAULT;
     }
 
@@ -68,16 +69,16 @@ public class CursorProviderInspector {
         return screen != null ? screen : this.visibleScreen;
     }
 
-    public ElementInspector getInspector() {
-        return inspector;
+    public void toggleDebugger() {
+        debugRenderer.destroy();
+        debugRenderer = this.debugRenderer == InspectorDebugRenderer.NO_OP ? new InspectorDebugRendererImpl() : InspectorDebugRenderer.NO_OP;
     }
 
-    public void toggleInspector() {
-        inspector.destroy();
-        inspector = this.inspector == ElementInspector.NO_OP ? new ElementInspectorImpl() : ElementInspector.NO_OP;
+    public void renderDebugger(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        this.debugRenderer.render(minecraft, screen, guiGraphics, mouseX, mouseY);
     }
 
-    public void renderInspector(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        CursorProviderInspector.INSTANCE.getInspector().render(minecraft, screen, guiGraphics, mouseX, mouseY);
+    public boolean isDebugging() {
+        return this.debugRenderer.isActive();
     }
 }

@@ -1,16 +1,13 @@
 package io.github.fishstiz.cursors_extended.platform;
 
-import io.github.fishstiz.cursors_extended.api.MinecraftCursorInitializer;
+import io.github.fishstiz.cursors_extended.platform.services.GuiGraphicsHelper;
 import io.github.fishstiz.cursors_extended.platform.services.PlatformHelper;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.stream.StreamSupport;
 
-public class NeoforgePlatformHelper implements PlatformHelper {
+public class NeoForgePlatformHelper implements PlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLLoader.isProduction();
@@ -22,7 +19,7 @@ public class NeoforgePlatformHelper implements PlatformHelper {
     }
 
     @Override
-    public List<MinecraftCursorInitializer> getEntrypoints() {
-        return StreamSupport.stream(ServiceLoader.load(MinecraftCursorInitializer.class).spliterator(), false).toList();
+    public GuiGraphicsHelper guiGraphicsHelper() {
+        return NeoForgeGuiGraphicsHelper.INSTANCE;
     }
 }

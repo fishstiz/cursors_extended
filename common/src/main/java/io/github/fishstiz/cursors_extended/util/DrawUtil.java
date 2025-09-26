@@ -1,5 +1,6 @@
 package io.github.fishstiz.cursors_extended.util;
 
+import io.github.fishstiz.cursors_extended.gui.renderstate.GuiColoredRectRenderState;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -99,7 +100,8 @@ public class DrawUtil {
     }
 
     public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
-        Services.PLATFORM.getGuiRenderState(guiGraphics).submitGuiElement(
+        Services.PLATFORM.guiGraphicsHelper().submitGuiElementRenderState(
+                guiGraphics,
                 new GuiColoredRectRenderState(new Matrix3x2f(guiGraphics.pose()), minX, minY, maxX, maxY, color)
         );
     }

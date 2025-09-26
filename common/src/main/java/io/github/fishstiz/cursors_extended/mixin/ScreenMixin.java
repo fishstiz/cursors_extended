@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.mixin;
 
-import io.github.fishstiz.cursors_extended.cursor.CursorProviderInspector;
+import io.github.fishstiz.cursors_extended.cursor.inspector.CursorProviderInspector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -21,7 +21,7 @@ public abstract class ScreenMixin {
     @Inject(method = "render", at = @At("RETURN"))
     private void afterScreenRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (cursors_extended$nonScreenCursorVisible(minecraft)) {
-            CursorProviderInspector.INSTANCE.renderInspector(this.minecraft, (Screen) (Object) this, guiGraphics, mouseX, mouseY);
+            CursorProviderInspector.INSTANCE.renderDebugger(this.minecraft, (Screen) (Object) this, guiGraphics, mouseX, mouseY);
         }
     }
 

@@ -69,20 +69,20 @@ public final class CursorMetadata implements Serializable {
                 this.time = this.time > 0 ? this.time : Math.max(animation.getFrametime(), MIN_TIME);
                 return this.time;
             }
-        }
 
-        public static class FrameDeserializer implements JsonDeserializer<Animation.Frame> {
-            @Override
-            public Animation.Frame deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
-                    return new Animation.Frame(json.getAsInt(), 0);
-                } else if (json.isJsonObject()) {
-                    JsonObject obj = json.getAsJsonObject();
-                    int index = obj.has("index") ? obj.get("index").getAsInt() : 0;
-                    int time = obj.has("time") ? obj.get("time").getAsInt() : 0;
-                    return new Animation.Frame(index, time);
+            public record Deserializer() implements JsonDeserializer<Animation.Frame> {
+                @Override
+                public Animation.Frame deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                    if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
+                        return new Animation.Frame(json.getAsInt(), 0);
+                    } else if (json.isJsonObject()) {
+                        JsonObject obj = json.getAsJsonObject();
+                        int index = obj.has("index") ? obj.get("index").getAsInt() : 0;
+                        int time = obj.has("time") ? obj.get("time").getAsInt() : 0;
+                        return new Animation.Frame(index, time);
+                    }
+                    throw new JsonParseException("Invalid Frame format");
                 }
-                throw new JsonParseException("Invalid Frame format");
             }
         }
     }

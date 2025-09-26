@@ -8,6 +8,4 @@ dependencies {
 
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
-    testmodJava project(path: ':common', configuration: 'testmodJava')
-    testmodResources project(path: ':common', configuration: 'testmodResources')
 }

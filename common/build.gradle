@@ -1,26 +1,24 @@
 plugins {
     id 'multiloader-common'
-//    id 'net.neoforged.moddev'
     id 'fabric-loom'
 }
 
-//neoForge {
-//    neoFormVersion = neo_form_version
-//    // Automatically enable AccessTransformers if the file exists
-//    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-//    if (at.exists()) {
-//        accessTransformers.from(at.absolutePath)
-//    }
-//
-//    parchment {
-//        minecraftVersion = parchment_minecraft
-//        mappingsVersion = parchment_version
-//    }
-//}
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Fabric'
+                url = uri('https://maven.fabricmc.net')
+            }
+        }
+        filter {
+            includeGroup('net.fabricmc')
+            includeGroup('fabric-loom')
+        }
+    }
+}
 
 dependencies {
-//    compileOnlyApi project(":commonApi")
-
     minecraft "com.mojang:minecraft:${minecraft_version}"
 
     mappings loom.layered() {
@@ -44,6 +42,4 @@ loom {
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
-    testmodJava sourceSets.testmod.java.sourceDirectories.singleFile
-    testmodResources sourceSets.testmod.resources.sourceDirectories.singleFile
 }

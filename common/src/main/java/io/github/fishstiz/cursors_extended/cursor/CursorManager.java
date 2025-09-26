@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
-import io.github.fishstiz.cursors_extended.util.Alias;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -17,16 +16,16 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-public final class CursorManager {
+public class CursorManager {
     public static final CursorManager INSTANCE = new CursorManager();
     private static final int TYPE_COUNT = 13;
     private static final float LOAD_FACTOR = 0.75F;
     private static final int CAPACITY = (int) Math.ceil(TYPE_COUNT / LOAD_FACTOR);
-    private final Map<Alias<String>.Key, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>(CAPACITY, LOAD_FACTOR);
-    private final Alias<String> aliases = new Alias<>(CAPACITY, LOAD_FACTOR);
+    private final Map<AliasMap.Key, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>(CAPACITY, LOAD_FACTOR);
+    private final AliasMap aliases = new AliasMap(CAPACITY, LOAD_FACTOR);
     private final AnimationState animationState = new AnimationState();
-    private @NotNull CursorRenderer renderer;
     private Map<String, Cursor> dummies;
+    private CursorRenderer renderer;
     private Cursor currentCursor;
 
     private CursorManager() {
@@ -204,5 +203,29 @@ public final class CursorManager {
 
     public void renderCursor(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
         this.renderer.render(minecraft, guiGraphics, mouseX, mouseY);
+    }
+
+    private record AliasMap(Map<String, Key> aliases) {
+        private AliasMap(int initialCapacity, float loadFactor) {
+            this(new Object2ObjectOpenHashMap<>(initialCapacity, loadFactor));
+        }
+
+        private Key addKey(String alias) {
+            return this.aliases.computeIfAbsent(alias, Key::new);
+        }
+
+        /**
+         * Retroactively add keys in case a mod creates a standard cursor before it's registered.
+         */
+        private void addAlias(String original, String alias) {
+            this.aliases.putIfAbsent(alias, this.aliases.computeIfAbsent(original, Key::new));
+        }
+
+        private Key lookup(String alias) {
+            return this.aliases.get(alias);
+        }
+
+        private record Key(String id) {
+        }
     }
 }

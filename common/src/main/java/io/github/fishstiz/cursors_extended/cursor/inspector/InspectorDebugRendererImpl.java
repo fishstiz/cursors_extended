@@ -1,5 +1,6 @@
-package io.github.fishstiz.cursors_extended.cursor;
+package io.github.fishstiz.cursors_extended.cursor.inspector;
 
+import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
@@ -17,7 +18,7 @@ import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
-class ElementInspectorImpl implements ElementInspector {
+final class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     private static final float TEXT_SCALE = 0.75f;
     private final Component screenLabel = Component.literal("S: ").withColor(0xFF339BFF); // blue
     private final Component deepestLabel = Component.literal("D: ").withColor(0xFF00FF00); // green
@@ -25,16 +26,16 @@ class ElementInspectorImpl implements ElementInspector {
     private final Component virtualModeLabel = Component.literal("Virtual Mode: ").withStyle(ChatFormatting.GOLD);
     private ScreenRectangle inspectedBounds;
     private String inspectedElement;
-    private boolean enabled = true;
+    private boolean active = true;
 
     @Override
-    public boolean isInspecting() {
-        return this.enabled;
+    public boolean isActive() {
+        return this.active;
     }
 
     @Override
     public void destroy() {
-        this.enabled = false;
+        this.active = false;
         this.inspectedBounds = null;
         this.inspectedElement = null;
     }
@@ -49,7 +50,7 @@ class ElementInspectorImpl implements ElementInspector {
 
     @Override
     public void render(Minecraft minecraft, @Nullable Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        if (this.enabled) {
+        if (this.active) {
             ScreenRectangle screenRectangle = getBounds(screen);
             renderScreenName(minecraft, screen, screenRectangle, guiGraphics);
             renderInspected(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);

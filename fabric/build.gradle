@@ -11,9 +11,6 @@ repositories {
 }
 
 dependencies {
-//    api project(path: ":fabricApi", configuration: "namedElements")
-//    include project(path: ":fabricApi")
-
     minecraft "com.mojang:minecraft:${minecraft_version}"
 
     mappings loom.layered() {
@@ -38,28 +35,12 @@ loom {
         accessWidenerPath.set(aw)
     }
 
-    mods {
-        "minecraft-cursor" {
-            sourceSet sourceSets.main
-        }
-        testmod {
-            sourceSet sourceSets.testmod
-        }
-    }
-
     runs {
         client {
             client()
             setConfigName('Fabric Client')
             ideConfigGenerated(true)
             runDir('run/client')
-        }
-        testmodClient {
-            client()
-            setConfigName('Fabric Client Test')
-            ideConfigGenerated(true)
-            runDir('run/testmod')
-            source sourceSets.testmod
         }
     }
 }
