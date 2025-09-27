@@ -1,6 +1,6 @@
-- Relaxed restrictions on cursor textures: minimum size is `8x8`.
-    - No longer capped, forced to be square, or divisible by eight.
-    - Animated cursors must still use the same sprite size across frames.
-- Added `width` and `height` option for animated cursors.
-- Auto-scale now depends on the GUI Scale in options instead of the current scale of the window.
+- New wiki: https://fishstiz.github.io/cursors_extended-wiki/resource-pack/getting-started
+  - Includes tool to convert resource packs using v3 format to v4.
+- Default textures are now shown as an optional resource pack.
+- Added built-in resource pack for auto-scaling default textures.
+- Fixed inconsistent resource pack change detection.
 - Full 4.0.0 Changelog here: https://github.com/fishstiz/cursors_extended/issues/1

@@ -34,7 +34,7 @@ if (secretsFile.exists()) {
 
 publishMods {
     changelog = file("CHANGELOG.md").text
-    type = ALPHA
+    type = BETA
 
     def fabricOptions = publishOptions {
         displayName = "${mod_name} for Fabric v${mod_version}"
@@ -54,7 +54,7 @@ publishMods {
     def githubOptions = githubOptions {
         accessToken = secrets.getProperty("GITHUB_TOKEN")
         repository = "fishstiz/minecraft-cursor"
-        commitish = "mc/${minecraft_version}"
+        commitish = "mc/1.21.9"
         tagName = "v${mod_version}"
         displayName = "${mod_name} v${mod_version}"
 
@@ -77,7 +77,7 @@ publishMods {
     def curseforgeOptions = curseforgeOptions {
         accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
         projectId = "1184736"
-        minecraftVersions.add(minecraft_version)
+        minecraftVersions.add("1.21.9-snapshot")
     }
 
     github("github") {
