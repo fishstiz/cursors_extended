@@ -1,0 +1,12 @@
+{
+  "cursor": {
+    "scale": 0,
+    "xhot": 0,
+    "yhot": 2
+  },
+  "animation": {
+    "frametime": 1,
+    "width": 9,
+    "height": 10
+  }
+}

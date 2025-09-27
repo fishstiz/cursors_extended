@@ -1,6 +1,8 @@
 {
   "modmenu.descriptionTranslation.cursors_extended": "Configurable cursor for Minecraft.",
 
+  "cursors_extended.resource-pack.default": "Cursors Extended",
+  "cursors_extended.resource-pack.default.auto": "Cursors Extended (Auto)",
   "cursors_extended.resource-pack.legacy": "Legacy Cursors",
 
   "cursors_extended.options": "Cursor Settings",

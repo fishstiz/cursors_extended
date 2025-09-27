@@ -140,7 +140,7 @@ public class CursorManager {
 
     public void reapplyCursor() {
         Cursor cursor = this.getAppliedCursor();
-        if (this.isRegistered(cursor.getType())) {
+        if (cursor.isLoaded() && this.isRegistered(cursor.getType())) {
             this.renderer.setCursor(cursor);
         }
     }

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,10 +56,16 @@ public class CursorResourceReloader implements PreparableReloadListener {
 
     public static void reload(ResourceManager manager) {
         LOGGER.info("[cursors_extended] Loading cursors...");
-        checkHash(manager);
-        loadCursorTextures(manager);
+        if (checkHash(manager)) {
+            loadCursorTextures(manager);
+            LOGGER.info("[cursors_extended] Loading cursors finished.");
+        } else {
+            CursorManager.INSTANCE.getCursors().forEach(cursor -> {
+                cursor.destroy();
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(cursor.getLocation()));
+            });
+        }
         CONFIG.save();
-        LOGGER.info("[cursors_extended] Loading cursors finished.");
     }
 
     static void resetCursor() {
@@ -67,15 +74,22 @@ public class CursorResourceReloader implements PreparableReloadListener {
         }
     }
 
-    private static void checkHash(ResourceManager manager) {
-        getHash(manager.getResourceStack(DIRECTORY)).ifPresent(hash -> {
-            if (!Objects.equals(CONFIG.getHash(), hash)) {
-                LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
-                CONFIG.setHash(hash);
-                CONFIG.getGlobal().setActiveAll(false);
-                CONFIG.markSettingsStale();
-            }
-        });
+    private static boolean checkHash(ResourceManager manager) {
+        return getHash(manager.getResourceStack(DIRECTORY))
+                .map(hash -> {
+                    if (!Objects.equals(CONFIG.getHash(), hash)) {
+                        LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
+                        CONFIG.setHash(hash);
+                        CONFIG.getGlobal().setActiveAll(false);
+                        CONFIG.markSettingsStale();
+                    }
+                    return true;
+                })
+                .orElseGet(() -> {
+                    LOGGER.info("[cursors_extended] No resource pack detected.");
+                    CONFIG.setHash("");
+                    return false;
+                });
     }
 
     private static Optional<String> getHash(List<Resource> resources) {
@@ -84,6 +98,7 @@ public class CursorResourceReloader implements PreparableReloadListener {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         for (Resource resource : resources) {
             try (PackResources packs = resource.source()) {
+                out.write(resource.sourcePackId().getBytes(StandardCharsets.UTF_8));
                 packs.listResources(PackType.CLIENT_RESOURCES, MOD_ID, DIRECTORY.getPath(), (resourceLocation, ioSupplier) -> {
                     if (resourceLocation.getPath().endsWith(CursorMetadata.FILE_TYPE)) {
                         try (InputStream in = ioSupplier.get()) {
@@ -92,7 +107,12 @@ public class CursorResourceReloader implements PreparableReloadListener {
                         }
                     }
                 });
+            } catch (IOException ignore) {
             }
+        }
+
+        if (out.size() == 0) {
+            return Optional.empty();
         }
 
         HashCode hash = Hashing.murmur3_32_fixed().hashBytes(out.toByteArray());

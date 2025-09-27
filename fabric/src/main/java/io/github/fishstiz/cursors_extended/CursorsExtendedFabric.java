@@ -18,14 +18,26 @@ public class CursorsExtendedFabric implements ClientModInitializer {
     public void onInitializeClient() {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> CursorsExtended.init());
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(CursorResourceReloader.getDirectory(), new CursorResourceReloader());
-        FabricLoader.getInstance().getModContainer(CursorsExtended.MOD_ID).ifPresent(modContainer ->
-                ResourceManagerHelper.registerBuiltinResourcePack(
-                        BuiltinCursorResourcePack.LEGACY.getLocation(),
-                        modContainer,
-                        BuiltinCursorResourcePack.LEGACY.getDisplayName(),
-                        ResourcePackActivationType.NORMAL
-                )
-        );
+        FabricLoader.getInstance().getModContainer(CursorsExtended.MOD_ID).ifPresent(modContainer -> {
+            ResourceManagerHelper.registerBuiltinResourcePack(
+                    BuiltinCursorResourcePack.DEFAULT.getLocation(),
+                    modContainer,
+                    BuiltinCursorResourcePack.DEFAULT.getDisplayName(),
+                    ResourcePackActivationType.DEFAULT_ENABLED
+            );
+            ResourceManagerHelper.registerBuiltinResourcePack(
+                    BuiltinCursorResourcePack.DEFAULT_AUTO.getLocation(),
+                    modContainer,
+                    BuiltinCursorResourcePack.DEFAULT_AUTO.getDisplayName(),
+                    ResourcePackActivationType.NORMAL
+            );
+            ResourceManagerHelper.registerBuiltinResourcePack(
+                    BuiltinCursorResourcePack.LEGACY.getLocation(),
+                    modContainer,
+                    BuiltinCursorResourcePack.LEGACY.getDisplayName(),
+                    ResourcePackActivationType.NORMAL
+            );
+        });
         ScreenEvents.AFTER_INIT.register((client, currentScreen, width, height) -> {
             CursorProviderInspector.INSTANCE.setVisibleScreen(currentScreen);
             ScreenEvents.remove(currentScreen).register(screen -> CursorProviderInspector.INSTANCE.setVisibleScreen(null));

@@ -1,0 +1,8 @@
+{
+  "pack": {
+    "description": "Default textures",
+    "pack_format": 67,
+    "min_format": 67,
+    "max_format": 5000
+  }
+}

@@ -5,6 +5,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public enum BuiltinCursorResourcePack {
+    DEFAULT(CursorsExtended.loc("default"), Component.translatable("cursors_extended.resource-pack.default")),
+    DEFAULT_AUTO(CursorsExtended.loc("default_auto"), Component.translatable("cursors_extended.resource-pack.default.auto")),
     LEGACY(CursorsExtended.loc("legacy"), Component.translatable("cursors_extended.resource-pack.legacy"));
 
     private final ResourceLocation location;
