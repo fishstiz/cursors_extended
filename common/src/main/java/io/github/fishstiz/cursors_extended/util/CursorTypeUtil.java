@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.util;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import net.minecraft.client.Minecraft;
@@ -52,6 +53,10 @@ public class CursorTypeUtil {
             }
         }
         return CursorType.DEFAULT;
+    }
+
+    public static CursorType arrowIfDefault(CursorType cursorType) {
+        return nameEquals(cursorType, CursorType.DEFAULT) ? CursorTypes.ARROW : cursorType;
     }
 
     public static boolean isHovered(GuiEventListener guiEventListener, double mouseX, double mouseY) {

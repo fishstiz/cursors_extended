@@ -23,10 +23,6 @@ public class CursorTypesExt {
         return new CursorType(name, MemoryUtil.NULL);
     }
 
-    public static CursorType asHold(CursorType cursorType) {
-        return new HoldType(cursorType);
-    }
-
     public static boolean isHoldType(CursorType cursorType) {
         return cursorType instanceof HoldType && CursorsExtended.CONFIG.isHeldCursorsEnabled();
     }

@@ -2,7 +2,6 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.datafixers.util.Pair;
-import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.AnimatedCursor;
@@ -12,6 +11,7 @@ import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.CursorPreviewWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.SliderWidget;
+import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,9 +41,9 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private final Runnable refreshCursors;
     private @NotNull Iterator<Cursor> cursors = cursorIterator();
     private @NotNull Cursor currentCursor = getDefaultCursor();
-    private CursorType holdCursorType = CursorTypesExt.asHold(currentCursor.getType());
     private OptionsListWidget optionList;
     private GlobalPreviewWidget previewWidget;
+    private boolean scaling = false;
 
     public GlobalOptionsPanel(Runnable refreshCursors) {
         super(TITLE);
@@ -164,6 +164,10 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onSliderMouseEvent(SliderWidget target, MouseEvent mouseEvent, double scale) {
+        if (target.getPrefix().equals(SCALE_TEXT)) {
+            this.scaling = (mouseEvent.clicked() || mouseEvent.dragged()) && CursorManager.INSTANCE.isEnabled(this.currentCursor);
+        }
+
         if (mouseEvent.released()) {
             if (target.getPrefix().equals(SCALE_TEXT) && CONFIG.getGlobal().isScaleActive()) {
                 CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setScale(CONFIG.getGlobal().getScale()));
@@ -172,8 +176,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             } else if (target.getPrefix().equals(YHOT_TEXT) && CONFIG.getGlobal().isYHotActive()) {
                 CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setYHot(CONFIG.getGlobal().getYHot()));
             }
-        } else if ((mouseEvent.clicked() || mouseEvent.dragged()) && target.getPrefix().equals(SCALE_TEXT) && CursorManager.INSTANCE.isEnabled(this.holdCursorType)) {
-            this.getMinecraft().getWindow().selectCursor(this.holdCursorType);
         }
     }
 
@@ -187,7 +189,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             this.cursors = cursorIterator();
         }
         this.currentCursor = this.cursors.hasNext() ? this.cursors.next() : getDefaultCursor();
-        this.holdCursorType = CursorTypesExt.asHold(this.currentCursor.getType());
 
         if (this.previewWidget != null) {
             this.previewWidget.setCursor(this.currentCursor);
@@ -280,6 +281,15 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             }
         }
         return new Pair<>(currentMaxX != -1 ? currentMaxX : 0, currentMaxY != -1 ? currentMaxY : 0);
+    }
+
+    @Override
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        if (this.scaling) {
+            guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.currentCursor.getType()));
+        }
     }
 
     private static class GlobalPreviewWidget extends CursorPreviewWidget {

@@ -1,7 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
-import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
@@ -12,6 +11,7 @@ import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogItem;
 import io.github.fishstiz.cursors_extended.gui.widget.*;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
+import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,9 +45,8 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
     private final CatalogItem globalOptions;
-    private final @NotNull Config.CursorSettings settings;
-    private final @NotNull Cursor cursor;
-    private final @NotNull CursorType holdCursorType;
+    private final Config.CursorSettings settings;
+    private final Cursor cursor;
     private GridLayout layout;
     private OptionsList optionsList;
     private ToggleWidget enableToggler;
@@ -59,6 +58,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private CursorHotspotWidget hotspotWidget;
     private CursorPreviewWidget previewWidget;
     private ToggleWidget hotspotGuideToggler;
+    private boolean scaling = false;
 
     public CursorOptionsPanel(
             CursorAnimationHelper animationHelper,
@@ -73,7 +73,6 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         this.globalOptions = globalOptions;
         this.settings = CursorsExtended.CONFIG.getOrCreateSettings(cursor);
         this.cursor = cursor;
-        this.holdCursorType = CursorTypesExt.asHold(cursor.getType());
     }
 
     @Override
@@ -315,9 +314,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onScaleMouseEvent(SliderWidget target, MouseEvent mouseEvent, double mappedValue) {
-        if ((mouseEvent.clicked() || mouseEvent.dragged()) && CursorManager.INSTANCE.isEnabled(this.holdCursorType)) {
-            this.getMinecraft().getWindow().selectCursor(this.holdCursorType);
-        }
+        this.scaling = (mouseEvent.clicked() || mouseEvent.dragged()) && CursorManager.INSTANCE.isEnabled(this.cursor);
     }
 
     private void onHotspotWidgetMouseEvent(CursorHotspotWidget target, MouseEvent mouseEvent, int xhot, int yhot) {
@@ -342,7 +339,9 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        if (this.hotspotWidget != null) {
+        if (this.scaling) {
+            guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.cursor.getType()));
+        } else if (this.hotspotWidget != null) {
             CursorType cursorType = this.hotspotWidget.cursors_extended$cursorType(mouseX, mouseY);
             if (cursorType != CursorType.DEFAULT) {
                 guiGraphics.requestCursor(cursorType);
