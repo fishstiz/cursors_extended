@@ -5,12 +5,10 @@ import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
-import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
@@ -19,7 +17,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,6 +37,12 @@ public class CursorResourceReloader implements PreparableReloadListener {
         return DIRECTORY;
     }
 
+    private static void onResourceReload() {
+        if (CursorManager.INSTANCE.isRegistered(CursorType.DEFAULT)) {
+            Minecraft.getInstance().getWindow().selectCursor(CursorType.DEFAULT);
+        }
+    }
+
     @Override
     public @NotNull CompletableFuture<Void> reload(
             SharedState sharedState,
@@ -47,14 +50,18 @@ public class CursorResourceReloader implements PreparableReloadListener {
             PreparationBarrier preparationBarrier,
             Executor gameExecutor
     ) {
-        gameExecutor.execute(CursorResourceReloader::resetCursor);
+        gameExecutor.execute(CursorResourceReloader::onResourceReload);
 
         return CompletableFuture.runAsync(() -> reload(sharedState.resourceManager()), backgroundExecutor)
                 .thenCompose(preparationBarrier::wait)
-                .thenRunAsync(CursorResourceReloader::resetCursor, gameExecutor);
+                .thenRunAsync(CursorResourceReloader::onResourceReload, gameExecutor);
     }
 
-    public static void reload(ResourceManager manager) {
+    public static void reload() {
+        reload(Minecraft.getInstance().getResourceManager());
+    }
+
+    private static void reload(ResourceManager manager) {
         LOGGER.info("[cursors_extended] Loading cursors...");
         if (checkHash(manager)) {
             loadCursorTextures(manager);
@@ -66,12 +73,6 @@ public class CursorResourceReloader implements PreparableReloadListener {
             });
         }
         CONFIG.save();
-    }
-
-    static void resetCursor() {
-        if (CursorManager.INSTANCE.isRegistered(CursorType.DEFAULT)) {
-            CursorManager.INSTANCE.setCurrentCursor(CursorType.DEFAULT);
-        }
     }
 
     private static boolean checkHash(ResourceManager manager) {
@@ -119,46 +120,23 @@ public class CursorResourceReloader implements PreparableReloadListener {
         return Optional.of(hash.toString());
     }
 
-    public static boolean isResourceSetting(@NotNull Cursor cursor, @Nullable Config.CursorSettings settings) {
-        return SettingsUtil.equalSettings(cursor.getMetadata().getCursorSettings(), settings, true);
-    }
-
-    public static boolean retoreActiveResourceSettings(@NotNull Cursor cursor) {
-        if (cursor.isLoaded()) {
-            CONFIG.replaceActiveSettings(cursor.getMetadata().getCursorSettings(), cursor);
-            cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
-            return true;
-        } else {
-            LOGGER.error("Failed to apply resource settings for '{}'", cursor.getName());
-        }
-        return false;
-    }
-
-    public static void restoreResourceSettings() {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
-            settings.merge(cursor.getMetadata().getCursorSettings());
-            cursor.apply(CONFIG.getGlobal().apply(settings));
-        }
-    }
-
     private static void loadCursorTextures(ResourceManager manager) {
         for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
             loadCursorTexture(manager, cursor);
         }
     }
 
-    public static void loadCursorTexture(Cursor cursor) {
-        loadCursorTexture(Minecraft.getInstance().getResourceManager(), cursor);
+    public static boolean loadCursorTexture(Cursor cursor) {
+        return loadCursorTexture(Minecraft.getInstance().getResourceManager(), cursor);
     }
 
-    public static boolean loadCursorTexture(ResourceManager manager, Cursor cursor) {
+    private static boolean loadCursorTexture(ResourceManager manager, Cursor cursor) {
         ResourceLocation location = cursor.getLocation();
         Optional<Resource> cursorResource = manager.getResource(location);
 
         try {
             if (cursorResource.isEmpty()) {
-                LOGGER.error("[cursors-extended] Cursor Type: '{}' not found", cursor.getName());
+                LOGGER.error("[cursors_extended] Cursor Type: '{}' not found", cursor.getName());
                 cursor.destroy();
                 return false;
             }
@@ -171,7 +149,7 @@ public class CursorResourceReloader implements PreparableReloadListener {
                 CursorManager.INSTANCE.loadCursor(cursor, image, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)), metadata);
                 return true;
             } catch (IOException e) {
-                LOGGER.error("[cursors-extended] Failed to load cursor at '{}': {}", location, e.getMessage());
+                LOGGER.error("[cursors_extended] Failed to load cursor at '{}': {}", location, e.getMessage());
                 return false;
             }
         } finally {

@@ -45,6 +45,10 @@ public class Config implements Serializable {
         return cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
     }
 
+    public void putCursorSettings(Cursor cursor, CursorSettings settings) {
+        this.cursors.put(cursor.getName(), settings);
+    }
+
     public boolean isStale(Cursor cursor) {
         CursorSettings settings = cursors.get(cursor.getName());
         return settings == null || settings.stale;
@@ -72,26 +76,6 @@ public class Config implements Serializable {
 
     public GlobalSettings getGlobal() {
         return global;
-    }
-
-    private CursorSettings filterInactive(@NotNull Cursor cursor, @NotNull Config.CursorSettings settingsToApply) {
-        CursorSettings currentSettings = this.cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
-        CursorSettings validated = settingsToApply.copy();
-
-        if (this.global.isScaleActive()) {
-            validated.setScale(currentSettings.getScale());
-        }
-        if (this.global.isXHotActive()) {
-            validated.setXHot(cursor, currentSettings.getXHot());
-        }
-        if (this.global.isYHotActive()) {
-            validated.setYHot(cursor, currentSettings.getYHot());
-        }
-        return validated;
-    }
-
-    public void replaceActiveSettings(CursorSettings settings, Cursor cursor) {
-        this.cursors.put(cursor.getName(), this.filterInactive(cursor, settings));
     }
 
     public boolean isCreativeTabsEnabled() {

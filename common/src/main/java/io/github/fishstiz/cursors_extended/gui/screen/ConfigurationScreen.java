@@ -7,6 +7,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.screen.panel.*;
+import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -19,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-
-import static io.github.fishstiz.cursors_extended.resource.CursorResourceReloader.reload;
 
 public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final Component GLOBAL_TEXT = Component.translatable("cursors_extended.options.global");
@@ -71,7 +70,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
         this.getRefreshButton().active = false;
         this.refreshFuture = CompletableFuture
-                .runAsync(() -> reload(Objects.requireNonNull(this.minecraft).getResourceManager()), Util.backgroundExecutor())
+                .runAsync(CursorResourceReloader::reload, Util.backgroundExecutor())
                 .whenCompleteAsync((result, error) -> {
                     if (error != null) {
                         CursorsExtended.LOGGER.error("[cursors_extended] An error occurred while refreshing cursors. {}", error.getMessage());

@@ -51,7 +51,7 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
         if (deferredCursor.isLoaded()) {
             throw new IllegalStateException("Cursor is already loaded");
         }
-        if (CursorResourceReloader.loadCursorTexture(this.getMinecraft().getResourceManager(), deferredCursor)) {
+        if (CursorResourceReloader.loadCursorTexture(deferredCursor)) {
             return true;
         }
         this.getMinecraft().getToastManager().addToast(SystemToast.multiline(

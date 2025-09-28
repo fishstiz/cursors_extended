@@ -2,7 +2,6 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.datafixers.util.Pair;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.cursor.AnimatedCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
@@ -210,7 +209,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void resetCursorSettings() {
-        CursorResourceReloader.restoreResourceSettings();
+        SettingsUtil.restoreCursorSettings();
         this.refreshCursors.run();
         this.refreshWidgets();
         this.repositionElements();

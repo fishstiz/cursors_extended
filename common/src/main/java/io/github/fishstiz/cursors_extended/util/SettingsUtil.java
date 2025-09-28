@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.util;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Objects;
+
+import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
@@ -117,6 +120,40 @@ public class SettingsUtil {
             return equal;
         }
         return false;
+    }
+
+    public static boolean restoreNonGlobalSettings(@NotNull Cursor cursor) {
+        if (!cursor.isLoaded()) {
+            return false;
+        }
+
+        CONFIG.putCursorSettings(cursor, ignoreIfGlobal(cursor, cursor.getMetadata().getCursorSettings()));
+        cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
+        return true;
+    }
+
+    public static void restoreCursorSettings() {
+        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
+            Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+            settings.merge(cursor.getMetadata().getCursorSettings());
+            cursor.apply(CONFIG.getGlobal().apply(settings));
+        }
+    }
+
+    private static Config.CursorSettings ignoreIfGlobal(@NotNull Cursor cursor, @NotNull Config.CursorSettings settings) {
+        Config.CursorSettings currentSettings = CONFIG.getOrCreateSettings(cursor);
+        Config.CursorSettings validated = settings.copy();
+
+        if (CONFIG.getGlobal().isScaleActive()) {
+            validated.setScale(currentSettings.getScale());
+        }
+        if (CONFIG.getGlobal().isXHotActive()) {
+            validated.setXHot(cursor, currentSettings.getXHot());
+        }
+        if (CONFIG.getGlobal().isYHotActive()) {
+            validated.setYHot(cursor, currentSettings.getYHot());
+        }
+        return validated;
     }
 
     public static <T> T getOrDefault(@Nullable T value, T defaultValue) {
