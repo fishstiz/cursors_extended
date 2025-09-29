@@ -1,10 +1,8 @@
-modLoader = "javafml" #mandatory
-loaderVersion = "${neoforge_loader_version_range}" #mandatory
 license = "${license}" # Review your options at https://choosealicense.com/.
 issueTrackerURL = "${issues}" #optional
 
 [[mods]] #mandatory
-modId = "${neoforge_mod_id}" #mandatory
+modId = "${mod_id}" #mandatory
 version = "${version}" #mandatory
 displayName = "${mod_name}" #mandatory
 displayURL = "${sources}" #optional (displayed in the mod UI)
@@ -12,7 +10,6 @@ logoFile = "icon.png" #optional
 credits = "${credits}" #optional
 authors = "${mod_author}" #optional
 description = "${mod_description}" #mandatory (Supports multiline text)
-clientSideOnly = true
 
 [[mixins]]
 config = "${mod_id}.mixins.json"
@@ -20,14 +17,14 @@ config = "${mod_id}.mixins.json"
 [[accessTransformers]]
 file="accesstransformer.cfg"
 
-[[dependencies.${neoforge_mod_id}]] #optional
+[[dependencies.${mod_id}]] #optional
 modId = "neoforge" #mandatory
 type = "required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
 versionRange = "${neoforge_version_range}" #mandatory
 ordering = "NONE" # The order that this dependency should load in relation to your mod, required to be either 'BEFORE' or 'AFTER' if the dependency is not mandatory
 side = "CLIENT" # Side this dependency is applied on - 'BOTH', 'CLIENT' or 'SERVER'
 
-[[dependencies.${neoforge_mod_id}]]
+[[dependencies.${mod_id}]]
 modId = "minecraft"
 type = "required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
 versionRange = "${minecraft_version_range_maven}"

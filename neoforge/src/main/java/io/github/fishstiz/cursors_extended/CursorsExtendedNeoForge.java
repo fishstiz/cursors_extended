@@ -4,7 +4,6 @@ import io.github.fishstiz.cursors_extended.cursor.inspector.CursorProviderInspec
 import io.github.fishstiz.cursors_extended.gui.screen.ConfigurationScreen;
 import io.github.fishstiz.cursors_extended.resource.BuiltinCursorResourcePack;
 import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -21,21 +20,17 @@ import net.neoforged.neoforge.event.AddPackFindersEvent;
 
 @Mod(value = CursorsExtended.MOD_ID, dist = Dist.CLIENT)
 public class CursorsExtendedNeoForge {
-    public CursorsExtendedNeoForge(ModContainer container, IEventBus modEventBus) {
-        container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) -> new ConfigurationScreen(screen));
-        modEventBus.addListener(EventPriority.HIGHEST, (ClientStartedEvent event) -> CursorsExtended.init());
+    public CursorsExtendedNeoForge(ModContainer modContainer, IEventBus modEventBus) {
+        modContainer.registerExtensionPoint(IConfigScreenFactory.class, (container, screen) -> new ConfigurationScreen(screen));
+        modEventBus.addListener((AddPackFindersEvent event) -> {
+            registerCursorPack(event, BuiltinCursorResourcePack.DEFAULT_AUTO);
+            registerCursorPack(event, BuiltinCursorResourcePack.LEGACY);
+        });
         modEventBus.addListener((AddClientReloadListenersEvent event) -> event.addListener(
                 CursorResourceReloader.getDirectory(),
                 new CursorResourceReloader()
         ));
-        modEventBus.addListener((AddPackFindersEvent event) -> event.addPackFinders(
-                underResourcePacksPath(BuiltinCursorResourcePack.LEGACY.getLocation()),
-                PackType.CLIENT_RESOURCES,
-                BuiltinCursorResourcePack.LEGACY.getDisplayName(),
-                PackSource.BUILT_IN,
-                false,
-                Pack.Position.BOTTOM
-        ));
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, (ClientStartedEvent event) -> CursorsExtended.init());
         NeoForge.EVENT_BUS.addListener((ScreenEvent.Init.Post event) -> CursorProviderInspector.INSTANCE.setVisibleScreen(event.getScreen()));
         NeoForge.EVENT_BUS.addListener((ScreenEvent.Closing event) -> CursorProviderInspector.INSTANCE.setVisibleScreen(null));
         NeoForge.EVENT_BUS.addListener((ScreenEvent.Render.Post event) -> CursorProviderInspector.INSTANCE.renderDebugger(
@@ -47,7 +42,14 @@ public class CursorsExtendedNeoForge {
         ));
     }
 
-    private static ResourceLocation underResourcePacksPath(ResourceLocation location) {
-        return CursorsExtended.loc("resourcepacks/" + location.getPath());
+    private static void registerCursorPack(AddPackFindersEvent event, BuiltinCursorResourcePack pack) {
+        event.addPackFinders(
+                CursorsExtended.loc("resourcepacks/" + pack.getLocation().getPath()),
+                PackType.CLIENT_RESOURCES,
+                pack.getDisplayName(),
+                PackSource.BUILT_IN,
+                false,
+                Pack.Position.TOP
+        );
     }
 }

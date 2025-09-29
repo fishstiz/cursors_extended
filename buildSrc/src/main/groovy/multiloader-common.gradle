@@ -42,7 +42,6 @@ def configureResourceExpansion = { CopySpec spec ->
             'minecraft_version_range_maven' : minecraft_version_range_maven,
             'minecraft_version_range_semver': minecraft_version_range_semver,
             'fabric_loader_version'         : fabric_loader_version,
-            'neoforge_loader_version_range' : neoforge_loader_version_range,
             'neoforge_version'              : neoforge_version,
             'neoforge_version_range'        : neoforge_version_range,
             'java_version'                  : java_version,

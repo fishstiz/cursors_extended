@@ -1,7 +1,5 @@
 package io.github.fishstiz.cursors_extended.resource;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
@@ -9,20 +7,16 @@ import io.github.fishstiz.cursors_extended.config.JsonLoader;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -37,10 +31,8 @@ public class CursorResourceReloader implements PreparableReloadListener {
         return DIRECTORY;
     }
 
-    private static void onResourceReload() {
-        if (CursorManager.INSTANCE.isRegistered(CursorType.DEFAULT)) {
-            Minecraft.getInstance().getWindow().selectCursor(CursorType.DEFAULT);
-        }
+    private static void resetCursor() {
+        Minecraft.getInstance().getWindow().selectCursor(CursorType.DEFAULT);
     }
 
     @Override
@@ -50,11 +42,10 @@ public class CursorResourceReloader implements PreparableReloadListener {
             PreparationBarrier preparationBarrier,
             Executor gameExecutor
     ) {
-        gameExecutor.execute(CursorResourceReloader::onResourceReload);
-
+        gameExecutor.execute(CursorResourceReloader::resetCursor);
         return CompletableFuture.runAsync(() -> reload(sharedState.resourceManager()), backgroundExecutor)
                 .thenCompose(preparationBarrier::wait)
-                .thenRunAsync(CursorResourceReloader::onResourceReload, gameExecutor);
+                .thenRunAsync(CursorResourceReloader::resetCursor, gameExecutor);
     }
 
     public static void reload() {
@@ -62,62 +53,33 @@ public class CursorResourceReloader implements PreparableReloadListener {
     }
 
     private static void reload(ResourceManager manager) {
-        LOGGER.info("[cursors_extended] Loading cursors...");
-        if (checkHash(manager)) {
-            loadCursorTextures(manager);
-            LOGGER.info("[cursors_extended] Loading cursors finished.");
-        } else {
-            CursorManager.INSTANCE.getCursors().forEach(cursor -> {
-                cursor.destroy();
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(cursor.getLocation()));
-            });
-        }
-        CONFIG.save();
-    }
-
-    private static boolean checkHash(ResourceManager manager) {
-        return getHash(manager.getResourceStack(DIRECTORY))
-                .map(hash -> {
+        Services.PLATFORM.packHashing().aggregateHash(manager, getDirectory())
+                .ifPresentOrElse(hash -> {
+                    LOGGER.info("[cursors_extended] Loading cursors...");
                     if (!Objects.equals(CONFIG.getHash(), hash)) {
                         LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
                         CONFIG.setHash(hash);
                         CONFIG.getGlobal().setActiveAll(false);
                         CONFIG.markSettingsStale();
                     }
-                    return true;
-                })
-                .orElseGet(() -> {
+
+                    loadCursorTextures(manager);
+                    LOGGER.info("[cursors_extended] Loading cursors finished.");
+                }, () -> {
                     LOGGER.info("[cursors_extended] No resource pack detected.");
                     CONFIG.setHash("");
-                    return false;
+
+                    CursorManager.INSTANCE.getCursors().forEach(cursor -> {
+                        cursor.destroy();
+                        releaseTexture(cursor);
+                    });
                 });
+
+        CONFIG.save();
     }
 
-    private static Optional<String> getHash(List<Resource> resources) {
-        if (resources.isEmpty()) return Optional.empty();
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        for (Resource resource : resources) {
-            try (PackResources packs = resource.source()) {
-                out.write(resource.sourcePackId().getBytes(StandardCharsets.UTF_8));
-                packs.listResources(PackType.CLIENT_RESOURCES, MOD_ID, DIRECTORY.getPath(), (resourceLocation, ioSupplier) -> {
-                    if (resourceLocation.getPath().endsWith(CursorMetadata.FILE_TYPE)) {
-                        try (InputStream in = ioSupplier.get()) {
-                            in.transferTo(out);
-                        } catch (IOException ignore) {
-                        }
-                    }
-                });
-            } catch (IOException ignore) {
-            }
-        }
-
-        if (out.size() == 0) {
-            return Optional.empty();
-        }
-
-        HashCode hash = Hashing.murmur3_32_fixed().hashBytes(out.toByteArray());
-        return Optional.of(hash.toString());
+    private static void releaseTexture(Cursor cursor) {
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(cursor.getLocation()));
     }
 
     private static void loadCursorTextures(ResourceManager manager) {
@@ -153,7 +115,7 @@ public class CursorResourceReloader implements PreparableReloadListener {
                 return false;
             }
         } finally {
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(location));
+            releaseTexture(cursor);
         }
     }
 

@@ -37,9 +37,27 @@ loom {
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
 }
 
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+compileJava {
+    enabled = false
+}
+
+remapJar {
+    enabled = false
+}
+
+remapSourcesJar {
+    enabled = false
 }

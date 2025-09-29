@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.PackType;
 
@@ -19,24 +20,9 @@ public class CursorsExtendedFabric implements ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> CursorsExtended.init());
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(CursorResourceReloader.getDirectory(), new CursorResourceReloader());
         FabricLoader.getInstance().getModContainer(CursorsExtended.MOD_ID).ifPresent(modContainer -> {
-            ResourceManagerHelper.registerBuiltinResourcePack(
-                    BuiltinCursorResourcePack.DEFAULT.getLocation(),
-                    modContainer,
-                    BuiltinCursorResourcePack.DEFAULT.getDisplayName(),
-                    ResourcePackActivationType.DEFAULT_ENABLED
-            );
-            ResourceManagerHelper.registerBuiltinResourcePack(
-                    BuiltinCursorResourcePack.DEFAULT_AUTO.getLocation(),
-                    modContainer,
-                    BuiltinCursorResourcePack.DEFAULT_AUTO.getDisplayName(),
-                    ResourcePackActivationType.NORMAL
-            );
-            ResourceManagerHelper.registerBuiltinResourcePack(
-                    BuiltinCursorResourcePack.LEGACY.getLocation(),
-                    modContainer,
-                    BuiltinCursorResourcePack.LEGACY.getDisplayName(),
-                    ResourcePackActivationType.NORMAL
-            );
+            registerCursorPack(modContainer, BuiltinCursorResourcePack.DEFAULT, ResourcePackActivationType.DEFAULT_ENABLED);
+            registerCursorPack(modContainer, BuiltinCursorResourcePack.DEFAULT_AUTO, ResourcePackActivationType.NORMAL);
+            registerCursorPack(modContainer, BuiltinCursorResourcePack.LEGACY, ResourcePackActivationType.NORMAL);
         });
         ScreenEvents.AFTER_INIT.register((client, currentScreen, width, height) -> {
             CursorProviderInspector.INSTANCE.setVisibleScreen(currentScreen);
@@ -44,5 +30,9 @@ public class CursorsExtendedFabric implements ClientModInitializer {
             ScreenEvents.afterRender(currentScreen).register((screen, guiGraphics, mouseX, mouseY, tickDelta) ->
                     CursorProviderInspector.INSTANCE.renderDebugger(Minecraft.getInstance(), screen, guiGraphics, mouseX, mouseY));
         });
+    }
+
+    private static void registerCursorPack(ModContainer mod, BuiltinCursorResourcePack pack, ResourcePackActivationType type) {
+        ResourceManagerHelper.registerBuiltinResourcePack(pack.getLocation(), mod, pack.getDisplayName(), type);
     }
 }

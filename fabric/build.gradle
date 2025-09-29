@@ -44,3 +44,9 @@ loom {
         }
     }
 }
+
+processResources {
+    doLast {
+        delete "${sourceSets.main.output.resourcesDir}/META-INF/accesstransformer.cfg"
+    }
+}

@@ -9,6 +9,8 @@ public interface PlatformHelper {
 
     GuiGraphicsHelper guiGraphicsHelper();
 
+    PackHashing packHashing();
+
     default String mapClassName(String namespace, String className) {
         return className;
     }

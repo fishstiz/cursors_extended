@@ -5,10 +5,10 @@ import io.github.fishstiz.cursors_extended.platform.services.PlatformHelper;
 import java.util.ServiceLoader;
 
 public class Services {
+    public static final PlatformHelper PLATFORM = load(PlatformHelper.class);
+
     private Services() {
     }
-
-    public static final PlatformHelper PLATFORM = load(PlatformHelper.class);
 
     public static <T> T load(Class<T> clazz) {
         return ServiceLoader.load(clazz)

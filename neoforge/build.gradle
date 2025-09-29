@@ -1,3 +1,6 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
@@ -25,11 +28,41 @@ neoForge {
         mappingsVersion = parchment_version
     }
 
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+
     runs {
         client {
             client()
             gameDirectory = project.file('run/client')
             setIdeName("NeoForge Client (${project.path})")
+        }
+    }
+}
+
+// NeoForge doesn't have a way to enable a pack by default without making it required
+processResources {
+    def defaultPack = "${sourceSets.main.output.resourcesDir}/resourcepacks/default"
+
+    from("${defaultPack}/assets") {
+        into "assets"
+    }
+
+    doLast {
+        delete defaultPack
+        delete "${sourceSets.main.output.resourcesDir}/${mod_id}.accesswidener"
+
+        def mixinConfigFile = file("${sourceSets.main.output.resourcesDir}/${mod_id}.mixins.json")
+        if (mixinConfigFile.exists()) {
+            def jsonSlurper = new JsonSlurper()
+            def mixinConfig = jsonSlurper.parse(mixinConfigFile)
+
+            mixinConfig.remove("refmap")
+
+            mixinConfigFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(mixinConfig))
         }
     }
 }

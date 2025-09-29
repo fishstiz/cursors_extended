@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.platform;
 
 import io.github.fishstiz.cursors_extended.platform.services.GuiGraphicsHelper;
+import io.github.fishstiz.cursors_extended.platform.services.PackHashing;
 import io.github.fishstiz.cursors_extended.platform.services.PlatformHelper;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
@@ -10,7 +11,7 @@ import java.nio.file.Path;
 public class NeoForgePlatformHelper implements PlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLLoader.isProduction();
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
@@ -21,5 +22,10 @@ public class NeoForgePlatformHelper implements PlatformHelper {
     @Override
     public GuiGraphicsHelper guiGraphicsHelper() {
         return NeoForgeGuiGraphicsHelper.INSTANCE;
+    }
+
+    @Override
+    public PackHashing packHashing() {
+        return NeoForgePackHashing.INSTANCE;
     }
 }
