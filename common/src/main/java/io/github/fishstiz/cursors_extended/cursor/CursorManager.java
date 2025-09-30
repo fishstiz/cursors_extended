@@ -24,7 +24,7 @@ public class CursorManager {
     private final Map<AliasMap.Key, Cursor> cursors = new Object2ObjectLinkedOpenHashMap<>(CAPACITY, LOAD_FACTOR);
     private final AliasMap aliases = new AliasMap(CAPACITY, LOAD_FACTOR);
     private final AnimationState animationState = new AnimationState();
-    private Map<String, Cursor> dummies;
+    private Map<String, Cursor> externalCursors;
     private CursorRenderer renderer;
     private Cursor currentCursor;
 
@@ -110,14 +110,14 @@ public class CursorManager {
     }
 
     private void handleCursorExternal(CursorType cursorType) {
-        if (this.dummies == null) {
-            this.dummies = new Object2ObjectOpenHashMap<>();
+        if (this.externalCursors == null) {
+            this.externalCursors = new Object2ObjectOpenHashMap<>();
         }
 
-        Cursor cursor = this.dummies.get(cursorType.toString());
+        Cursor cursor = this.externalCursors.get(cursorType.toString());
         if (cursor == null) {
             CursorsExtended.LOGGER.info("[cursors_extended] Registered an external cursor: {}", cursorType);
-            cursor = this.dummies.computeIfAbsent(cursorType.toString(), name -> Cursor.loadOrCreateDummy(cursorType, this::onLoad));
+            cursor = this.externalCursors.computeIfAbsent(cursorType.toString(), name -> Cursor.loadOrCreateDummy(cursorType, this::onLoad));
         }
 
         if (cursor.isLoaded()) {

@@ -6,6 +6,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import static io.github.fishstiz.cursors_extended.util.SettingsUtil.getOrDefault
 
 public class AnimatedCursor extends Cursor {
     private AnimationMode mode = AnimationMode.LOOP;
-    private Map<Integer, FrameCursor> cursors = new HashMap<>();
+    private Map<Integer, FrameCursor> cursors = new Int2ObjectOpenHashMap<>();
     private List<Frame> frames = new ArrayList<>();
     private boolean animated = true;
     private Frame fallbackFrame;
@@ -52,7 +53,14 @@ public class AnimatedCursor extends Cursor {
             Map<Integer, FrameCursor> newCursors = createCursors(image, settings, metadata, availableFrames);
             List<Frame> newFrames = createFrames(animation, newCursors, availableFrames);
 
-            updateState(settings.isAnimated(), animation, newCursors, newFrames);
+            this.setAnimated(settings.isAnimated());
+            this.fallbackFrame = new Frame(this, 1);
+            this.mode = animation.mode;
+            this.frames = this.mode.isReversed() ? newFrames.reversed() : newFrames;
+
+            List<Cursor> oldCursors = List.copyOf(this.cursors.values());
+            this.cursors = newCursors;
+            oldCursors.forEach(Cursor::destroy);
         } catch (Exception e) {
             this.destroy();
             throw e;
@@ -97,16 +105,6 @@ public class AnimatedCursor extends Cursor {
         return cursor;
     }
 
-    private void updateState(Boolean animated, CursorMetadata.Animation animation, Map<Integer, FrameCursor> newCursors, List<Frame> newFrames) {
-        this.setAnimated(animated);
-        this.fallbackFrame = new Frame(this, 1);
-        this.mode = animation.mode;
-        this.frames = this.mode.isReversed() ? newFrames.reversed() : newFrames;
-
-        List<Cursor> oldCursors = List.copyOf(this.cursors.values());
-        this.cursors = newCursors;
-        oldCursors.forEach(Cursor::destroy);
-    }
 
     @Override
     protected void updateImage(double scale, int xhot, int yhot) {

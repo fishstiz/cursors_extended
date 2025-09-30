@@ -19,7 +19,6 @@ public final class CursorsExtended {
 
     static void init() {
         CursorManager.INSTANCE.registerType(CursorType.DEFAULT);
-        // technically not needed (CursorTypeMixin automatically creates the alias), but just for explicitness.
         CursorManager.INSTANCE.registerAlias(CursorType.DEFAULT, CursorTypes.ARROW);
         CursorManager.INSTANCE.registerType(CursorTypes.POINTING_HAND);
         CursorManager.INSTANCE.registerType(CursorTypesExt.GRABBING);

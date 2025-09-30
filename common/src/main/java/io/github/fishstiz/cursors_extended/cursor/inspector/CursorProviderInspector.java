@@ -50,11 +50,11 @@ public class CursorProviderInspector {
                 }
             }
             if (element instanceof CursorProvider provider) {
-                debugRenderer.setInspected(element, mouseX, mouseY);
+                debugRenderer.onInspect(element, mouseX, mouseY);
                 return provider.cursors_extended$cursorType(mouseX, mouseY);
             }
         }
-        debugRenderer.setInspected(element, mouseX, mouseY);
+        debugRenderer.onInspect(element, mouseX, mouseY);
         return CursorType.DEFAULT;
     }
 
@@ -74,8 +74,8 @@ public class CursorProviderInspector {
         debugRenderer = this.debugRenderer == InspectorDebugRenderer.NO_OP ? new InspectorDebugRendererImpl() : InspectorDebugRenderer.NO_OP;
     }
 
-    public void renderDebugger(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        this.debugRenderer.render(minecraft, screen, guiGraphics, mouseX, mouseY);
+    public void renderDebugger(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        this.debugRenderer.render(minecraft, this::getVisibleScreen, guiGraphics, mouseX, mouseY);
     }
 
     public boolean isDebugging() {

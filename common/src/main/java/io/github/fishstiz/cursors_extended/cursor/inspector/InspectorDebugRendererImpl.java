@@ -18,7 +18,9 @@ import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
-final class InspectorDebugRendererImpl implements InspectorDebugRenderer {
+import java.util.function.Supplier;
+
+class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     private static final float TEXT_SCALE = 0.75f;
     private final Component screenLabel = Component.literal("S: ").withColor(0xFF339BFF); // blue
     private final Component deepestLabel = Component.literal("D: ").withColor(0xFF00FF00); // green
@@ -41,7 +43,7 @@ final class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     }
 
     @Override
-    public void setInspected(GuiEventListener inspected, double mouseX, double mouseY) {
+    public void onInspect(GuiEventListener inspected, double mouseX, double mouseY) {
         if (CursorTypeUtil.isHovered(inspected, mouseX, mouseY)) {
             this.inspectedBounds = getBounds(inspected);
             this.inspectedElement = getClassName(inspected);
@@ -49,8 +51,9 @@ final class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     }
 
     @Override
-    public void render(Minecraft minecraft, @Nullable Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        if (this.active) {
+    public void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        Screen screen = visibleScreen.get();
+        if (this.active && screen != null) {
             ScreenRectangle screenRectangle = getBounds(screen);
             renderScreenName(minecraft, screen, screenRectangle, guiGraphics);
             renderInspected(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);

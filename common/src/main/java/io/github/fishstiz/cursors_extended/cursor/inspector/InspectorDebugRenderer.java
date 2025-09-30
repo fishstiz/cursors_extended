@@ -4,24 +4,24 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-sealed interface InspectorDebugRenderer permits InspectorDebugRenderer.Nop, InspectorDebugRendererImpl {
-    InspectorDebugRenderer NO_OP = new Nop();
+import java.util.function.Supplier;
+
+interface InspectorDebugRenderer {
+    InspectorDebugRenderer NO_OP = new InspectorDebugRenderer() {
+    };
 
     default void destroy() {
     }
 
-    default void setInspected(GuiEventListener processed, double mouseX, double mouseY) {
+    default void onInspect(GuiEventListener inspected, double mouseX, double mouseY) {
     }
 
-    default void render(Minecraft minecraft, @NotNull Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    default void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
     }
 
     default boolean isActive() {
         return false;
-    }
-
-    record Nop() implements InspectorDebugRenderer {
     }
 }

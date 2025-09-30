@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.PackType;
 
 public class CursorsExtendedFabric implements ClientModInitializer {
@@ -27,8 +26,6 @@ public class CursorsExtendedFabric implements ClientModInitializer {
         ScreenEvents.AFTER_INIT.register((client, currentScreen, width, height) -> {
             CursorProviderInspector.INSTANCE.setVisibleScreen(currentScreen);
             ScreenEvents.remove(currentScreen).register(screen -> CursorProviderInspector.INSTANCE.setVisibleScreen(null));
-            ScreenEvents.afterRender(currentScreen).register((screen, guiGraphics, mouseX, mouseY, tickDelta) ->
-                    CursorProviderInspector.INSTANCE.renderDebugger(Minecraft.getInstance(), screen, guiGraphics, mouseX, mouseY));
         });
     }
 

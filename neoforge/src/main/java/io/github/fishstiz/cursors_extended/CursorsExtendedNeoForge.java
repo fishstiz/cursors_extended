@@ -33,13 +33,6 @@ public class CursorsExtendedNeoForge {
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, (ClientStartedEvent event) -> CursorsExtended.init());
         NeoForge.EVENT_BUS.addListener((ScreenEvent.Init.Post event) -> CursorProviderInspector.INSTANCE.setVisibleScreen(event.getScreen()));
         NeoForge.EVENT_BUS.addListener((ScreenEvent.Closing event) -> CursorProviderInspector.INSTANCE.setVisibleScreen(null));
-        NeoForge.EVENT_BUS.addListener((ScreenEvent.Render.Post event) -> CursorProviderInspector.INSTANCE.renderDebugger(
-                event.getScreen().getMinecraft(),
-                event.getScreen(),
-                event.getGuiGraphics(),
-                event.getMouseX(),
-                event.getMouseY()
-        ));
     }
 
     private static void registerCursorPack(AddPackFindersEvent event, BuiltinCursorResourcePack pack) {

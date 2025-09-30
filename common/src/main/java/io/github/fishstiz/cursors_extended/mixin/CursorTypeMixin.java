@@ -17,6 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CursorType.class)
 public abstract class CursorTypeMixin {
+    static {
+        CursorsExtended.LOGGER.debug("[cursors_extended] Initializing CursorTypes: {}", CursorTypes.class);
+    }
+
     @WrapOperation(method = "select", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwSetCursor(JJ)V", remap = false))
     private void onSelect(long window, long cursor, Operation<Void> original) {
         CursorType cursorType = (CursorType) (Object) this;
@@ -38,7 +42,6 @@ public abstract class CursorTypeMixin {
 
     @Unique
     private static @Nullable CursorType cursors_extended$mapStandardCursor(int shape) {
-        CursorsExtended.LOGGER.debug("Forcing static initialization. {}, {}", CursorTypes.ARROW, CursorType.DEFAULT);
         return switch (shape) {
             case GLFW.GLFW_ARROW_CURSOR -> CursorType.DEFAULT;
             case GLFW.GLFW_POINTING_HAND_CURSOR -> CursorTypes.POINTING_HAND;

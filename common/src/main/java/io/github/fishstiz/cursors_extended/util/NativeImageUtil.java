@@ -57,15 +57,10 @@ public class NativeImageUtil {
         int[] pixelsABGR = image.getPixelsABGR();
 
         for (int abgr : pixelsABGR) {
-            int a = (abgr >> 24) & 0xFF;
-            int b = (abgr >> 16) & 0xFF;
-            int g = (abgr >> 8) & 0xFF;
-            int r = abgr & 0xFF;
-
-            buffer.put((byte) r);
-            buffer.put((byte) g);
-            buffer.put((byte) b);
-            buffer.put((byte) a);
+            buffer.put((byte) (abgr & 0xFF));
+            buffer.put((byte) ((abgr >> 8) & 0xFF));
+            buffer.put((byte) ((abgr >> 16) & 0xFF));
+            buffer.put((byte) ((abgr >> 24) & 0xFF));
         }
 
         buffer.flip();

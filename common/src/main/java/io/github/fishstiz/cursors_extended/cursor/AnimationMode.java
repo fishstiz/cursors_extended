@@ -35,7 +35,7 @@ public enum AnimationMode {
         }
     }
 
-    public record Deserializer() implements JsonDeserializer<AnimationMode> {
+    public static class Deserializer implements JsonDeserializer<AnimationMode> {
         @Override
         public AnimationMode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return AnimationMode.getOrDefault(json.getAsString());

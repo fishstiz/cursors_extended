@@ -70,7 +70,7 @@ public final class CursorMetadata implements Serializable {
                 return this.time;
             }
 
-            public record Deserializer() implements JsonDeserializer<Animation.Frame> {
+            public static class Deserializer implements JsonDeserializer<Animation.Frame> {
                 @Override
                 public Animation.Frame deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
                     if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
