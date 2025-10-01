@@ -116,7 +116,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             });
 
             if (CONFIG.isStale(cursor)) {
-                CONFIG.getOrCreateSettings(cursor).merge(metadata.getCursorSettings());
+                CONFIG.getOrCreateSettings(cursor).mergeSelective(metadata.cursor());
             }
         });
 
@@ -145,13 +145,13 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
                         CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
                         Config.CursorSettings settings = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
-                        float scale = sanitizeScale(settings.getScale());
-                        int xhot = sanitizeHotspot(settings.getXHot(), image.getWidth());
-                        int yhot = sanitizeHotspot(settings.getYHot(), image.getHeight());
+                        float scale = sanitizeScale(settings.scale());
+                        int xhot = sanitizeHotspot(settings.xhot(), image.getWidth());
+                        int yhot = sanitizeHotspot(settings.yhot(), image.getHeight());
 
-                        CursorTexture texture = metadata.getAnimation() != null
-                                ? createAnimated(image, path, settings.isAnimated(), settings.isEnabled(), scale, xhot, yhot, metadata)
-                                : createBasic(image, path, settings.isEnabled(), scale, xhot, yhot, metadata);
+                        CursorTexture texture = metadata.animation() != null
+                                ? createAnimated(image, path, settings.animated(), settings.enabled(), scale, xhot, yhot, metadata)
+                                : createBasic(image, path, settings.enabled(), scale, xhot, yhot, metadata);
 
                         cursor.setTexture(texture);
                         minecraft.execute(() -> minecraft.getTextureManager().release(path));
@@ -214,7 +214,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     public void updateTexture(Cursor cursor, Config.CursorSettings settings) {
-        updateTexture(cursor, settings.getScale(), settings.getXHot(), settings.getYHot());
+        updateTexture(cursor, settings.scale(), settings.xhot(), settings.yhot());
     }
 
     private CursorMetadata loadMetadata(ResourceManager manager, ResourceLocation location, String source) {
@@ -281,15 +281,15 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             int yhot,
             CursorMetadata metadata
     ) throws IOException {
-        CursorMetadata.Animation animation = Objects.requireNonNull(metadata.getAnimation(), "metadata animation must not be null");
+        CursorMetadata.Animation animation = Objects.requireNonNull(metadata.animation(), "metadata animation must not be null");
 
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
         int preferredFrameSize = Math.min(imageWidth, imageHeight);
 
-        int frameWidth = Math.min(Math.abs(getOrDefault(animation.getWidth(), preferredFrameSize)), imageWidth);
-        int frameHeight = Math.min(Math.abs(getOrDefault(animation.getHeight(), preferredFrameSize)), imageHeight);
+        int frameWidth = Math.min(Math.abs(getOrDefault(animation.width(), preferredFrameSize)), imageWidth);
+        int frameHeight = Math.min(Math.abs(getOrDefault(animation.height(), preferredFrameSize)), imageHeight);
         assertImageSize(frameWidth, frameHeight);
 
         int availableFrames = image.getHeight() / frameHeight;
@@ -303,7 +303,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                 }
             }
 
-            AnimatedCursorTexture.Frame baseFrame = new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.getFrametime());
+            AnimatedCursorTexture.Frame baseFrame = new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.frametime());
             List<AnimatedCursorTexture.Frame> frames = createAnimationFrames(animation, textures, availableFrames);
             return new AnimatedCursorTexture(animated, enabled, scale, xhot, yhot, image, path, metadata, baseFrame, frames);
         } catch (Exception e) {
@@ -319,25 +319,25 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     ) {
         List<AnimatedCursorTexture.Frame> frames = new ObjectArrayList<>();
 
-        if (animation.getFrames().isEmpty()) {
+        if (animation.frames().isEmpty()) {
             for (int i = 0; i < availableFrames; i++) {
-                frames.add(new AnimatedCursorTexture.Frame(textures.get(i), i, animation.getFrametime()));
+                frames.add(new AnimatedCursorTexture.Frame(textures.get(i), i, animation.frametime()));
             }
             return frames;
         }
 
-        for (CursorMetadata.Animation.Frame frame : animation.getFrames()) {
-            int index = frame.getIndex();
+        for (CursorMetadata.Animation.Frame frame : animation.frames()) {
+            int index = frame.index();
             if (index < 0 || index >= availableFrames) {
                 LOGGER.warn("[cursors_extended] Sprite does not exist on index {}.", index);
                 continue;
             }
-            frames.add(new AnimatedCursorTexture.Frame(textures.get(index), index, frame.getTime(animation)));
+            frames.add(new AnimatedCursorTexture.Frame(textures.get(index), index, frame.clampedTime(animation)));
         }
 
         if (frames.isEmpty()) {
             LOGGER.warn("[cursors_extended] No valid frames found, using first frame as fallback");
-            frames.add(new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.getFrametime()));
+            frames.add(new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.frametime()));
         }
 
         return frames;
@@ -345,28 +345,28 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
 
     private static void writeBytes(ByteArrayOutputStream out, CursorMetadata metadata) throws IOException {
-        Config.CursorSettings cs = metadata.getCursorSettings();
-        out.write(Float.toString(cs.getScale()).getBytes(StandardCharsets.UTF_8));
-        out.write(Integer.toString(cs.getXHot()).getBytes(StandardCharsets.UTF_8));
-        out.write(Integer.toString(cs.getYHot()).getBytes(StandardCharsets.UTF_8));
-        out.write(Boolean.toString(cs.isEnabled()).getBytes(StandardCharsets.UTF_8));
-        if (cs.isAnimated() != null) {
-            out.write(Boolean.toString(cs.isAnimated()).getBytes(StandardCharsets.UTF_8));
+        CursorMetadata.CursorSettings cs = metadata.cursor();
+        out.write(Float.toString(cs.scale()).getBytes(StandardCharsets.UTF_8));
+        out.write(Integer.toString(cs.xhot()).getBytes(StandardCharsets.UTF_8));
+        out.write(Integer.toString(cs.yhot()).getBytes(StandardCharsets.UTF_8));
+        out.write(Boolean.toString(cs.enabled()).getBytes(StandardCharsets.UTF_8));
+        if (cs.animated() != null) {
+            out.write(Boolean.toString(cs.animated()).getBytes(StandardCharsets.UTF_8));
         }
 
-        CursorMetadata.Animation anim = metadata.getAnimation();
+        CursorMetadata.Animation anim = metadata.animation();
         if (anim != null) {
-            out.write(anim.mode.name().getBytes(StandardCharsets.UTF_8));
-            out.write(Integer.toString(anim.getFrametime()).getBytes(StandardCharsets.UTF_8));
-            if (anim.getWidth() != null) {
-                out.write(Integer.toString(anim.getWidth()).getBytes(StandardCharsets.UTF_8));
+            out.write(anim.mode().name().getBytes(StandardCharsets.UTF_8));
+            out.write(Integer.toString(anim.frametime()).getBytes(StandardCharsets.UTF_8));
+            if (anim.width() != null) {
+                out.write(Integer.toString(anim.width()).getBytes(StandardCharsets.UTF_8));
             }
-            if (anim.getHeight() != null) {
-                out.write(Integer.toString(anim.getHeight()).getBytes(StandardCharsets.UTF_8));
+            if (anim.height() != null) {
+                out.write(Integer.toString(anim.height()).getBytes(StandardCharsets.UTF_8));
             }
-            for (CursorMetadata.Animation.Frame f : anim.getFrames()) {
-                out.write(Integer.toString(f.getIndex()).getBytes(StandardCharsets.UTF_8));
-                out.write(Integer.toString(f.getTime(anim)).getBytes(StandardCharsets.UTF_8));
+            for (CursorMetadata.Animation.Frame f : anim.frames()) {
+                out.write(Integer.toString(f.index()).getBytes(StandardCharsets.UTF_8));
+                out.write(Integer.toString(f.clampedTime(anim)).getBytes(StandardCharsets.UTF_8));
             }
         }
     }

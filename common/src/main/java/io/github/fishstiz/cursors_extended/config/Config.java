@@ -3,7 +3,6 @@ package io.github.fishstiz.cursors_extended.config;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.platform.Services;
-import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -207,11 +206,11 @@ public class Config implements Serializable {
     }
 
     public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {
-        protected boolean enabled = SettingsUtil.ENABLED;
-        protected Boolean animated;
+        protected boolean enabled = ENABLED;
+        protected Boolean animated = ANIMATED;
         private transient boolean stale = false;
 
-        CursorSettings() {
+        private CursorSettings() {
         }
 
         public void setScale(float scale) {
@@ -230,11 +229,11 @@ public class Config implements Serializable {
             this.enabled = enabled;
         }
 
-        public boolean isEnabled() {
+        public boolean enabled() {
             return enabled;
         }
 
-        public Boolean isAnimated() {
+        public Boolean animated() {
             return this.animated;
         }
 
@@ -242,13 +241,22 @@ public class Config implements Serializable {
             this.animated = animated;
         }
 
-        public void merge(CursorSettings settings) {
-            // other settings should not enable the cursor back on.
-            if (this.enabled) this.enabled = settings.enabled;
-            this.scale = sanitizeScale(settings.scale);
-            this.xhot = sanitizeHotspot(settings.xhot, Integer.MAX_VALUE);
-            this.yhot = sanitizeHotspot(settings.yhot, Integer.MAX_VALUE);
-            this.animated = settings.animated;
+        private void mergeCommon(CursorMetadata.CursorSettings metadata) {
+            this.scale = sanitizeScale(metadata.scale());
+            this.xhot = sanitizeHotspot(metadata.xhot(), Integer.MAX_VALUE);
+            this.yhot = sanitizeHotspot(metadata.yhot(), Integer.MAX_VALUE);
+            this.animated = metadata.animated();
+        }
+
+        public void mergeSelective(CursorMetadata.CursorSettings metadata) {
+            // pack settings should not enable the cursor back on. https://github.com/fishstiz/minecraft-cursor/issues/29
+            if (this.enabled) this.enabled = metadata.enabled();
+            mergeCommon(metadata);
+        }
+
+        public void mergeAll(CursorMetadata.CursorSettings metadata) {
+            this.enabled = metadata.enabled();
+            mergeCommon(metadata);
         }
 
         @Override
@@ -267,6 +275,9 @@ public class Config implements Serializable {
         private boolean scaleActive = false;
         private boolean xhotActive = false;
         private boolean yhotActive = false;
+
+        private GlobalSettings() {
+        }
 
         public void setActiveAll(boolean active) {
             setScaleActive(active);
@@ -311,7 +322,7 @@ public class Config implements Serializable {
         }
 
         @Override
-        public int getXHot() {
+        public int xhot() {
             return Math.max(0, this.xhot);
         }
 
@@ -324,12 +335,22 @@ public class Config implements Serializable {
         }
 
         @Override
-        public int getYHot() {
+        public int yhot() {
             return Math.max(0, this.yhot);
         }
 
         @Override
-        GlobalSettings copy() {
+        public boolean enabled() {
+            throw new UnsupportedOperationException("GlobalSettings does not have an enabled setting");
+        }
+
+        @Override
+        public Boolean animated() {
+            throw new UnsupportedOperationException("GlobalSettings does not have an animated setting");
+        }
+
+        @Override
+        public GlobalSettings copy() {
             GlobalSettings globalSettings = new GlobalSettings();
             globalSettings.scale = this.scale;
             globalSettings.xhot = this.xhot;
@@ -342,10 +363,28 @@ public class Config implements Serializable {
 
         public <T extends AbstractCursorSettings<T>> T apply(T settings) {
             T copied = settings.copy();
-            copied.scale = this.isScaleActive() ? this.getScale() : copied.getScale();
-            copied.xhot = this.isXHotActive() ? this.getXHot() : copied.getXHot();
-            copied.yhot = this.isYHotActive() ? this.getYHot() : copied.getYHot();
+            copied.scale = this.isScaleActive() ? this.scale() : copied.scale();
+            copied.xhot = this.isXHotActive() ? this.xhot() : copied.xhot();
+            copied.yhot = this.isYHotActive() ? this.yhot() : copied.yhot();
             return copied;
+        }
+    }
+
+    public abstract static class AbstractCursorSettings<T extends AbstractCursorSettings<T>> implements SharedCursorSettings<T> {
+        protected float scale = SCALE;
+        protected int xhot = X_HOT;
+        protected int yhot = Y_HOT;
+
+        public float scale() {
+            return scale;
+        }
+
+        public int xhot() {
+            return xhot;
+        }
+
+        public int yhot() {
+            return yhot;
         }
     }
 }

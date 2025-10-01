@@ -10,7 +10,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 public final class AnimatedCursorTexture implements CursorTexture {
     private final AnimationState animationState;
@@ -43,13 +42,13 @@ public final class AnimatedCursorTexture implements CursorTexture {
             throw new IllegalArgumentException("frames cannot be empty.");
         }
 
-        CursorMetadata.Animation animation = Objects.requireNonNull(metadata.getAnimation(), "metadata animation must not be null");
+        CursorMetadata.Animation animation = metadata.requireAnimation();
 
         this.enabled = enabled;
         this.animated = animated == null || animated;
         this.metadata = metadata;
-        this.animationState = AnimationState.of(animation.mode);
-        this.frames = List.copyOf(animation.mode.isReversed() ? frames.reversed() : frames);
+        this.animationState = AnimationState.of(animation.mode());
+        this.frames = List.copyOf(animation.mode().isReversed() ? frames.reversed() : frames);
         this.baseFrame = baseFrame;
         this.path = path;
         this.scale = scale;

@@ -64,7 +64,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         this.optionList = new OptionsListWidget(this.getMinecraft(), this.getFont(), Button.DEFAULT_HEIGHT, this.getSpacing());
         this.optionList.addToggleableSlider(
                 new SliderWidget(
-                        CONFIG.getGlobal().getScale(),
+                        CONFIG.getGlobal().scale(),
                         SettingsUtil.SCALE_MIN,
                         SettingsUtil.SCALE_MAX,
                         SettingsUtil.SCALE_STEP,
@@ -80,7 +80,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         );
         this.optionList.addToggleableSlider(
                 new SliderWidget(
-                        CONFIG.getGlobal().getXHot(),
+                        CONFIG.getGlobal().xhot(),
                         SettingsUtil.HOT_MIN,
                         maxHotspot.getFirst(),
                         SettingsUtil.HOT_STEP,
@@ -96,7 +96,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         );
         this.optionList.addToggleableSlider(
                 new SliderWidget(
-                        CONFIG.getGlobal().getYHot(),
+                        CONFIG.getGlobal().yhot(),
                         SettingsUtil.HOT_MIN,
                         maxHotspot.getSecond(),
                         SettingsUtil.HOT_STEP,
@@ -170,11 +170,11 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         if (mouseEvent.released()) {
             CursorRegistry registry = CursorsExtended.getInstance().getRegistry();
             if (target.getPrefix().equals(SCALE_TEXT) && CONFIG.getGlobal().isScaleActive()) {
-                registry.getInternalCursors().forEach(cursor -> setScale(cursor, CONFIG.getGlobal().getScale()));
+                registry.getInternalCursors().forEach(cursor -> setScale(cursor, CONFIG.getGlobal().scale()));
             } else if (target.getPrefix().equals(XHOT_TEXT) && CONFIG.getGlobal().isXHotActive()) {
-                registry.getInternalCursors().forEach(cursor -> setXHot(cursor, CONFIG.getGlobal().getXHot()));
+                registry.getInternalCursors().forEach(cursor -> setXHot(cursor, CONFIG.getGlobal().xhot()));
             } else if (target.getPrefix().equals(YHOT_TEXT) && CONFIG.getGlobal().isYHotActive()) {
-                registry.getInternalCursors().forEach(cursor -> setYHot(cursor, CONFIG.getGlobal().getYHot()));
+                registry.getInternalCursors().forEach(cursor -> setYHot(cursor, CONFIG.getGlobal().yhot()));
             }
         }
     }

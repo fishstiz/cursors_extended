@@ -1,12 +1,6 @@
 package io.github.fishstiz.cursors_extended.cursor;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-
-import java.lang.reflect.Type;
 
 public enum AnimationMode {
     LOOP,
@@ -32,13 +26,6 @@ public enum AnimationMode {
         } catch (IllegalArgumentException e) {
             CursorsExtended.LOGGER.warn("[cursors-extended] Animation mode: '{}' does not exist. Using default 'loop'.", name);
             return AnimationMode.LOOP;
-        }
-    }
-
-    public static class Deserializer implements JsonDeserializer<AnimationMode> {
-        @Override
-        public AnimationMode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return AnimationMode.getOrDefault(json.getAsString());
         }
     }
 }

@@ -85,8 +85,8 @@ public class CursorHotspotWidget extends CursorWidget {
         int colorX = isGlobalX ? OVERRIDE_RULER_COLOR : RULER_COLOR;
         int colorY = isGlobalY ? OVERRIDE_RULER_COLOR : RULER_COLOR;
 
-        int xhot = this.clampHotspot(isGlobalX ? CONFIG.getGlobal().getXHot() : (int) this.xhotSlider.getMappedValue(), this.maxXHot);
-        int yhot = this.clampHotspot(isGlobalY ? CONFIG.getGlobal().getYHot() : (int) this.yhotSlider.getMappedValue(), this.maxYHot);
+        int xhot = this.clampHotspot(isGlobalX ? CONFIG.getGlobal().xhot() : (int) this.xhotSlider.getMappedValue(), this.maxXHot);
+        int yhot = this.clampHotspot(isGlobalY ? CONFIG.getGlobal().yhot() : (int) this.yhotSlider.getMappedValue(), this.maxYHot);
 
         float rulerWidth = this.getCellWidth();
         float rulerHeight = this.getCellHeight();

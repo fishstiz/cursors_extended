@@ -93,7 +93,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         if (this.cursor.getTexture() != null) {
             this.scaleSlider = this.optionsList.addOption(
                     new SliderWidget(
-                            sanitizeScale(this.settings.getScale()),
+                            sanitizeScale(this.settings.scale()),
                             SCALE_MIN,
                             SCALE_MAX,
                             SCALE_STEP,
@@ -108,7 +108,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             this.guiScaleButton = this.optionsList.addOption(new ButtonWidget(GUI_SCALE_TEXT, this::setGuiScale));
             this.xhotSlider = this.optionsList.addOption(
                     new SliderWidget(
-                            sanitizeXHot(this.settings.getXHot(), this.cursor),
+                            sanitizeXHot(this.settings.xhot(), this.cursor),
                             HOT_MIN,
                             getMaxXHot(this.cursor),
                             HOT_STEP,
@@ -120,7 +120,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             );
             this.yhotSlider = this.optionsList.addOption(
                     new SliderWidget(
-                            sanitizeYHot(this.settings.getYHot(), this.cursor),
+                            sanitizeYHot(this.settings.yhot(), this.cursor),
                             HOT_MIN,
                             getMaxYHot(this.cursor),
                             HOT_STEP,
@@ -147,7 +147,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
             this.resetToDefaultsButton = this.optionsList.addOption(new ButtonWidget(RESET_DEFAULTS_TEXT, this::resetToDefaults));
 
-            this.refreshGuiScaleButton(this.settings.getScale());
+            this.refreshGuiScaleButton(this.settings.scale());
             this.refreshDefaultsButton();
         }
 
@@ -293,7 +293,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
     private void refreshDefaultsButton() {
         if (this.resetToDefaultsButton != null && this.cursor.getTexture() != null) {
-            this.resetToDefaultsButton.active = !equalSettings(this.cursor.getTexture().metadata().getCursorSettings(), this.settings, true);
+            this.resetToDefaultsButton.active = !equalSettings(this.cursor.getTexture().metadata().cursor(), this.settings, true);
         }
     }
 

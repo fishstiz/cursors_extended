@@ -2,6 +2,8 @@ package io.github.fishstiz.cursors_extended.util;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
+import io.github.fishstiz.cursors_extended.config.CursorMetadata;
+import io.github.fishstiz.cursors_extended.config.SharedCursorSettings;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.client.Minecraft;
@@ -29,6 +31,7 @@ public class SettingsUtil {
     public static final int HOT_MIN = 0;
     public static final int HOT_STEP = 1;
     public static final boolean ENABLED = true;
+    public static final Boolean ANIMATED = null;
 
     private SettingsUtil() {
     }
@@ -115,22 +118,21 @@ public class SettingsUtil {
         return 0;
     }
 
-    public static boolean equalSettings(@Nullable Config.CursorSettings a, @Nullable Config.CursorSettings b, boolean excludeGlobal) {
+    public static boolean equalSettings(@Nullable SharedCursorSettings<?> a, @Nullable SharedCursorSettings<?> b, boolean excludeGlobal) {
         if (Objects.equals(a, b)) {
             return true;
         }
         if (a != null && b != null) {
-            boolean equal = a.isEnabled() == b.isEnabled() &&
-                            Objects.equals(a.isAnimated(), b.isAnimated());
+            boolean equal = a.enabled() == b.enabled() && Objects.equals(a.animated(), b.animated());
 
             if (!excludeGlobal || !CursorsExtended.CONFIG.getGlobal().isXHotActive()) {
-                equal &= a.getXHot() == b.getXHot();
+                equal &= a.xhot() == b.xhot();
             }
             if (!excludeGlobal || !CursorsExtended.CONFIG.getGlobal().isYHotActive()) {
-                equal &= a.getYHot() == b.getYHot();
+                equal &= a.yhot() == b.yhot();
             }
             if (!excludeGlobal || !CursorsExtended.CONFIG.getGlobal().isScaleActive()) {
-                equal &= Double.compare(a.getScale(), b.getScale()) == 0;
+                equal &= Float.compare(a.scale(), b.scale()) == 0;
             }
 
             return equal;
@@ -144,10 +146,10 @@ public class SettingsUtil {
             return false;
         }
 
-        CONFIG.putCursorSettings(cursor, ignoreIfGlobal(cursor, texture.metadata().getCursorSettings()));
+        CONFIG.putCursorSettings(cursor, mergeIfGlobal(cursor, texture.metadata().cursor()));
         Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
-        cursor.setEnabled(settings.isEnabled());
 
+        cursor.setEnabled(settings.enabled());
         CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
         return true;
     }
@@ -157,26 +159,28 @@ public class SettingsUtil {
             CursorTexture texture = cursor.getTexture();
             if (texture != null) {
                 Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
-                settings.merge(texture.metadata().getCursorSettings());
+                settings.mergeSelective(texture.metadata().cursor());
                 CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
             }
         }
     }
 
-    private static Config.CursorSettings ignoreIfGlobal(@NotNull Cursor cursor, @NotNull Config.CursorSettings settings) {
-        Config.CursorSettings currentSettings = CONFIG.getOrCreateSettings(cursor);
-        Config.CursorSettings validated = settings.copy();
+    private static Config.CursorSettings mergeIfGlobal(@NotNull Cursor source, @NotNull CursorMetadata.CursorSettings target) {
+        Config.CursorSettings sourceSettings = CONFIG.getOrCreateSettings(source);
+        Config.CursorSettings targetSettings = sourceSettings.copy();
+
+        targetSettings.mergeAll(target);
 
         if (CONFIG.getGlobal().isScaleActive()) {
-            validated.setScale(currentSettings.getScale());
+            targetSettings.setScale(sourceSettings.scale());
         }
         if (CONFIG.getGlobal().isXHotActive()) {
-            validated.setXHot(cursor, currentSettings.getXHot());
+            targetSettings.setXHot(source, sourceSettings.xhot());
         }
         if (CONFIG.getGlobal().isYHotActive()) {
-            validated.setYHot(cursor, currentSettings.getYHot());
+            targetSettings.setYHot(source, sourceSettings.yhot());
         }
-        return validated;
+        return targetSettings;
     }
 
     public static <T> T getOrDefault(@Nullable T value, T defaultValue) {
