@@ -1,9 +1,8 @@
 package io.github.fishstiz.cursors_extended;
 
-import io.github.fishstiz.cursors_extended.cursor.inspector.CursorProviderInspector;
 import io.github.fishstiz.cursors_extended.gui.screen.ConfigurationScreen;
 import io.github.fishstiz.cursors_extended.resource.BuiltinCursorResourcePack;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
+import io.github.fishstiz.cursors_extended.resource.CursorTextureLoader;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -27,12 +26,12 @@ public class CursorsExtendedNeoForge {
             registerCursorPack(event, BuiltinCursorResourcePack.LEGACY);
         });
         modEventBus.addListener((AddClientReloadListenersEvent event) -> event.addListener(
-                CursorResourceReloader.getDirectory(),
-                new CursorResourceReloader()
+                CursorTextureLoader.getDir(),
+                CursorsExtended.getInstance().getLoader()
         ));
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, (ClientStartedEvent event) -> CursorsExtended.init());
-        NeoForge.EVENT_BUS.addListener((ScreenEvent.Init.Post event) -> CursorProviderInspector.INSTANCE.setVisibleScreen(event.getScreen()));
-        NeoForge.EVENT_BUS.addListener((ScreenEvent.Closing event) -> CursorProviderInspector.INSTANCE.setVisibleScreen(null));
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, (ClientStartedEvent event) -> CursorsExtended.getInstance().onClientStarted(event.getClient()));
+        NeoForge.EVENT_BUS.addListener((ScreenEvent.Init.Post event) -> CursorsExtended.getInstance().getDisplay().setVisibleScreen(event.getScreen()));
+        NeoForge.EVENT_BUS.addListener((ScreenEvent.Closing event) -> CursorsExtended.getInstance().getDisplay().setVisibleScreen(null));
     }
 
     private static void registerCursorPack(AddPackFindersEvent event, BuiltinCursorResourcePack pack) {

@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -70,7 +71,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
 
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (this.cursor.isLoaded()) {
+        if (this.cursor.hasTexture()) {
             this.renderBackground(guiGraphics);
             this.renderCursor(guiGraphics, this.cursor);
 
@@ -94,30 +95,30 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     }
 
     protected float getCellWidth() {
-        Cursor currentCursor = this.getCursor();
-        if (!currentCursor.isLoaded()) return 0;
+        CursorTexture texture = this.getCursor().getTexture();
+        if (texture == null) return 0;
 
-        int spriteWidth = cursor.getSpriteWidth();
-        int spriteHeight = cursor.getSpriteHeight();
+        int spriteWidth = texture.spriteWidth();
+        int spriteHeight = texture.spriteHeight();
         float scale = (float) this.getWidth() / Math.max(spriteWidth, spriteHeight);
         int drawWidth = Math.round(spriteWidth * scale);
         return (float) drawWidth / spriteWidth;
     }
 
     protected float getCellHeight() {
-        Cursor currentCursor = this.getCursor();
-        if (!currentCursor.isLoaded()) return 0;
+        CursorTexture texture = this.getCursor().getTexture();
+        if (texture == null) return 0;
 
-        int spriteWidth = cursor.getSpriteWidth();
-        int spriteHeight = cursor.getSpriteHeight();
+        int spriteWidth = texture.spriteWidth();
+        int spriteHeight = texture.spriteHeight();
         float scale = (float) this.getHeight() / Math.max(spriteWidth, spriteHeight);
         int drawHeight = Math.round(spriteHeight * scale);
         return (float) drawHeight / spriteHeight;
     }
 
     protected boolean isOverflowing() {
-        Cursor currentCursor = this.getCursor();
-        return !currentCursor.isLoaded() || (currentCursor.getSpriteWidth() > IMAGE_SIZE_GUI_MAX || currentCursor.getSpriteHeight() > IMAGE_SIZE_GUI_MAX);
+        CursorTexture texture = this.getCursor().getTexture();
+        return texture == null || (texture.spriteWidth() > IMAGE_SIZE_GUI_MAX || texture.spriteHeight() > IMAGE_SIZE_GUI_MAX);
     }
 
     @Override

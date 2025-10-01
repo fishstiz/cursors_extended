@@ -1,13 +1,11 @@
 package io.github.fishstiz.cursors_extended.gui.screen;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
-import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
-import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
+import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.gui.screen.panel.*;
-import io.github.fishstiz.cursors_extended.resource.CursorResourceReloader;
+import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -34,12 +32,20 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     private static final int LIST_CURSOR_SIZE = 16;
     private static final CatalogItem GLOBAL_CATEGORY = new CatalogItem("global", GLOBAL_TEXT);
     private static final CatalogItem CURSORS_CATEGORY = new CatalogItem("cursors", CURSORS_TEXT);
-    private final CursorAnimationHelper animationHelper = new CursorAnimationHelper();
     private CatalogItem defaultItem;
     private CompletableFuture<Void> refreshFuture;
 
     public ConfigurationScreen(Screen previous) {
         super(Component.translatable("cursors_extended.options"), HEADER_HEIGHT, SIDEBAR_WIDTH, MAX_CONTENT_WIDTH, SPACING, previous);
+    }
+
+    @Override
+    public void added() {
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (cursor.isLazy()) {
+                CursorsExtended.getInstance().getLoader().loadTexture(cursor);
+            }
+        }
     }
 
     @Override
@@ -70,7 +76,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
         this.getRefreshButton().active = false;
         this.refreshFuture = CompletableFuture
-                .runAsync(CursorResourceReloader::reload, Util.backgroundExecutor())
+                .runAsync(CursorsExtended.getInstance().getLoader()::reload, Util.backgroundExecutor())
                 .whenCompleteAsync((result, error) -> {
                     if (error != null) {
                         CursorsExtended.LOGGER.error("[cursors_extended] An error occurred while refreshing cursors. {}", error.getMessage());
@@ -87,7 +93,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     private void addAdaptiveItems() {
-        this.addCategoryOnly(new CatalogItem("adaptive", ADAPTIVE_TEXT), new AdaptiveOptionsPanel(ADAPTIVE_TEXT, this.animationHelper, this::refreshCursors));
+        this.addCategoryOnly(new CatalogItem("adaptive", ADAPTIVE_TEXT), new AdaptiveOptionsPanel(ADAPTIVE_TEXT, this::refreshCursors));
     }
 
     private void addCompatibilityItems() {
@@ -101,10 +107,9 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
             }
 
             this.addOrUpdateItem(CURSORS_CATEGORY, cursorItem, new CursorOptionsPanel(
-                    this.animationHelper,
                     this::refreshCursors,
                     GLOBAL_CATEGORY,
-                    Objects.requireNonNull(CursorManager.INSTANCE.getCursor(cursorItem.id()))
+                    Objects.requireNonNull(CursorsExtended.getInstance().getRegistry().tryGet(cursorItem.id()))
             ));
         }
     }
@@ -123,12 +128,12 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     private int renderListCursor(GuiGraphics guiGraphics, Font font, CatalogItem item, LayoutElement bounds, int spacing, int mouseX, int mouseY, float partialTick) {
-        Cursor cursor = CursorManager.INSTANCE.getCursor(item.id());
+        Cursor cursor = CursorsExtended.getInstance().getRegistry().tryGet(item.id());
 
-        if (cursor != null && cursor.isLoaded()) {
+        if (cursor != null && cursor.getTexture() != null) {
             int prefixX = bounds.getX() + spacing;
             int prefixY = bounds.getY() + (bounds.getHeight() - LIST_CURSOR_SIZE) / 2;
-            this.animationHelper.drawSprite(guiGraphics, cursor, prefixX, prefixY, LIST_CURSOR_SIZE);
+            DrawUtil.drawCursor(guiGraphics, cursor, prefixX, prefixY, LIST_CURSOR_SIZE);
         }
 
         return LIST_CURSOR_SIZE;
@@ -140,21 +145,21 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     private List<CatalogItem> createCursorItems() {
-        return CursorManager.INSTANCE.getCursors()
+        return CursorsExtended.getInstance().getRegistry().getInternalCursors()
                 .stream()
                 .map(cursor -> new CatalogItem(
-                        cursor.getName(),
-                        cursor.getText().copy().withStyle(getCursorFormat(cursor)),
+                        cursor.name(),
+                        cursor.text().copy().withStyle(getCursorFormat(cursor)),
                         this::renderListCursor
                 ))
                 .toList();
     }
 
     private static ChatFormatting getCursorFormat(@NotNull Cursor cursor) {
-        if (cursor.isEnabled()) {
+        if (cursor.isTextureEnabled()) {
             return ChatFormatting.WHITE;
         }
-        if (cursor.isLoaded()) {
+        if (cursor.hasTexture()) {
             return ChatFormatting.GRAY;
         }
         return ChatFormatting.DARK_GRAY;

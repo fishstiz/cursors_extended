@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.resource.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,6 +26,7 @@ public class CursorPreviewWidget extends CursorWidget {
     private static final int DEFAULT_BUTTON_SIZE = 20;
     private final @Nullable Button button;
     private final Font font;
+    private boolean mouseEntered;
 
     public CursorPreviewWidget(@NotNull Cursor cursor, @NotNull Font font, @Nullable Button button) {
         super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
@@ -50,23 +52,36 @@ public class CursorPreviewWidget extends CursorWidget {
         }
     }
 
+    protected void updateMouseMoved() {
+        if (this.isHovered()) {
+            if (!mouseEntered && getCursor().getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
+                animatedCursorTexture.restartAnimation();
+            }
+            mouseEntered = true;
+        } else {
+            mouseEntered = false;
+        }
+    }
+
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Cursor cursor = this.getCursor();
 
-        if (cursor.isLoaded()) {
+        if (cursor.hasTexture()) {
             this.renderBackground(guiGraphics);
-            if (cursor.isEnabled()) {
+            if (cursor.isTextureEnabled()) {
                 this.renderPreviewText(guiGraphics);
                 this.renderTestButton(guiGraphics, mouseX, mouseY, partialTick);
                 this.renderRuler(guiGraphics, mouseX, mouseY);
             }
         }
-        if (!cursor.isEnabled()) {
+        if (!cursor.isTextureEnabled()) {
             guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), BACKGROUND_DISABLED);
         }
 
         this.renderBorder(guiGraphics);
+
+        updateMouseMoved();
         if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
     }
 
@@ -125,6 +140,6 @@ public class CursorPreviewWidget extends CursorWidget {
 
     @Override
     public CursorType cursors_extended$cursorType(double mouseX, double mouseY) {
-        return this.getCursor().getType();
+        return this.getCursor().cursorType();
     }
 }

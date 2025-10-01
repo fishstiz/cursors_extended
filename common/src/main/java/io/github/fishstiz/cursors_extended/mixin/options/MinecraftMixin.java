@@ -1,7 +1,8 @@
-package io.github.fishstiz.cursors_extended.mixin;
+package io.github.fishstiz.cursors_extended.mixin.options;
 
 import com.mojang.blaze3d.platform.Window;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
@@ -27,9 +28,18 @@ public abstract class MinecraftMixin {
 
         if (this.cursors_extended$previousGuiScale != guiScale) {
             this.cursors_extended$previousGuiScale = guiScale;
-            CursorManager.INSTANCE.getCursors().forEach(cursor -> {
-                if (cursor.isEnabled() && SettingsUtil.isAutoScale(cursor.getScale())) {
-                    cursor.reload();
+
+            CursorsExtended.getInstance().getRegistry().getCursors().forEach(cursor -> {
+                if (cursor.isTextureEnabled()) {
+                    CursorTexture texture = cursor.getTexture();
+                    if (texture != null && SettingsUtil.isAutoScale(texture.scale())) {
+                        CursorsExtended.getInstance().getLoader().updateTexture(
+                                cursor,
+                                texture.scale(),
+                                texture.xhot(),
+                                texture.yhot()
+                        );
+                    }
                 }
             });
         }

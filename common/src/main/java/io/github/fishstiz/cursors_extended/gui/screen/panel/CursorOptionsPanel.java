@@ -1,15 +1,13 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
-import io.github.fishstiz.cursors_extended.cursor.AnimatedCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogItem;
 import io.github.fishstiz.cursors_extended.gui.widget.*;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
+import io.github.fishstiz.cursors_extended.resource.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
@@ -30,6 +28,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static io.github.fishstiz.cursors_extended.util.CursorTypeUtil.*;
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
 public class CursorOptionsPanel extends AbstractOptionsPanel {
@@ -41,7 +40,6 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip GLOBAL_XHOT_TOOLTIP = createGlobalTooltip(XHOT_TEXT);
     private static final Tooltip GLOBAL_YHOT_TOOLTIP = createGlobalTooltip(YHOT_TEXT);
     private static final int CELL_SIZE_STEP = 32;
-    private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
     private final CatalogItem globalOptions;
     private final Config.CursorSettings settings;
@@ -60,14 +58,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private boolean scaling = false;
 
     public CursorOptionsPanel(
-            CursorAnimationHelper animationHelper,
             Runnable refreshCursors,
             CatalogItem globalOptions,
             Cursor cursor
     ) {
-        super(Component.translatable("cursors_extended.options.cursor-type", cursor.getText()));
+        super(Component.translatable("cursors_extended.options.cursor-type", cursor.text()));
 
-        this.animationHelper = animationHelper;
         this.refreshCursors = refreshCursors;
         this.globalOptions = globalOptions;
         this.settings = CursorsExtended.CONFIG.getOrCreateSettings(cursor);
@@ -89,12 +85,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         this.optionsList = new OptionsList(this.getMinecraft(), Button.DEFAULT_HEIGHT, this.getSpacing());
 
         this.enableToggler = this.optionsList.addOption(new ToggleWidget(
-                this.cursor.isLoaded() && this.cursor.isEnabled(),
+                this.cursor.isTextureEnabled(),
                 ENABLE_TEXT,
                 this::onToggleEnable
         ));
 
-        if (this.cursor.isLoaded()) {
+        if (this.cursor.getTexture() != null) {
             this.scaleSlider = this.optionsList.addOption(
                     new SliderWidget(
                             sanitizeScale(this.settings.getScale()),
@@ -140,7 +136,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
                     this::onToggleGuide
             ));
 
-            if (this.cursor instanceof AnimatedCursor animatedCursor) {
+            if (this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
                 this.optionsList.addOption(new ToggleWidget(
                         animatedCursor.isAnimated(),
                         ANIMATE_TEXT,
@@ -164,11 +160,10 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
         GridLayout cursorWidgetsLayout = new GridLayout().spacing(this.getSpacing());
 
-        if (this.cursor.isLoaded()) {
+        if (this.cursor.getTexture() != null) {
             this.hotspotWidget = cursorWidgetsLayout.addChild(
                     new CursorHotspotWidget(
                             this.cursor,
-                            this.animationHelper,
                             Objects.requireNonNull(this.xhotSlider),
                             Objects.requireNonNull(this.yhotSlider),
                             this::onHotspotWidgetMouseEvent
@@ -225,16 +220,15 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onToggleEnable(ToggleWidget target, boolean enabled) {
-        if (!this.cursor.isLoaded() && this.loadCursor(this.cursor)) {
-            Cursor loaded = Objects.requireNonNull(CursorManager.INSTANCE.getCursor(this.cursor.getType()));
-            loaded.enable(true);
+        if (!this.cursor.hasTexture() && this.loadCursor(this.cursor)) {
+            this.cursor.setEnabled(true);
             this.settings.setEnabled(true);
             this.refreshCursors.run();
             return;
         }
 
-        if (this.cursor.isLoaded()) {
-            this.cursor.enable(enabled);
+        if (this.cursor.hasTexture()) {
+            this.cursor.setEnabled(enabled);
             this.settings.setEnabled(enabled);
             this.refreshCursors.run();
         } else {
@@ -243,26 +237,26 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onChangeScale(double scale) {
-        this.cursor.setScale(scale);
+        setScale(cursor, (float) scale);
         this.settings.setScale(scale);
         this.refreshGuiScaleButton(scale);
         this.refreshDefaultsButton();
     }
 
     private void onChangeXHot(double xhot) {
-        this.cursor.setXHot(xhot);
+        setXHot(cursor, (int) xhot);
         this.settings.setXHot(this.cursor, (int) xhot);
         this.refreshDefaultsButton();
     }
 
     private void onChangeYHot(double yhot) {
-        this.cursor.setYHot(yhot);
+        setYHot(cursor, (int) yhot);
         this.settings.setYHot(this.cursor, (int) yhot);
         this.refreshDefaultsButton();
     }
 
     private void onToggleAnimate(boolean animated) {
-        if (!(this.cursor instanceof AnimatedCursor animatedCursor)) {
+        if (!(this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor)) {
             throw new IllegalStateException("Cursor is not an animated cursor");
         }
         animatedCursor.setAnimated(animated);
@@ -277,8 +271,8 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void restartAnimation() {
-        if (this.cursor instanceof AnimatedCursor animatedCursor) {
-            this.animationHelper.reset(animatedCursor);
+        if (this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
+            animatedCursor.restartAnimation();
         }
     }
 
@@ -298,8 +292,8 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void refreshDefaultsButton() {
-        if (this.resetToDefaultsButton != null) {
-            this.resetToDefaultsButton.active = !equalSettings(this.cursor.getMetadata().getCursorSettings(), this.settings, true);
+        if (this.resetToDefaultsButton != null && this.cursor.getTexture() != null) {
+            this.resetToDefaultsButton.active = !equalSettings(this.cursor.getTexture().metadata().getCursorSettings(), this.settings, true);
         }
     }
 
@@ -313,7 +307,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onScaleMouseEvent(SliderWidget target, MouseEvent mouseEvent, double mappedValue) {
-        this.scaling = (mouseEvent.clicked() || mouseEvent.dragged()) && CursorManager.INSTANCE.isEnabled(this.cursor);
+        this.scaling = (mouseEvent.clicked() || mouseEvent.dragged()) && this.cursor.isTextureEnabled();
     }
 
     private void onHotspotWidgetMouseEvent(CursorHotspotWidget target, MouseEvent mouseEvent, int xhot, int yhot) {
@@ -339,7 +333,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.scaling) {
-            guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.cursor.getType()));
+            guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.cursor.cursorType()));
         } else if (this.hotspotWidget != null) {
             CursorType cursorType = this.hotspotWidget.cursors_extended$cursorType(mouseX, mouseY);
             if (cursorType != CursorType.DEFAULT) {

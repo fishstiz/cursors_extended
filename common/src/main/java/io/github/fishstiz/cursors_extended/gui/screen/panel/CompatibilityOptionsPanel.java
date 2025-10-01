@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -38,11 +38,11 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 true
         );
         this.optionsList.addToggle(
-                CursorManager.INSTANCE.isVirtual(),
+                CursorsExtended.getInstance().getDisplay().isVirtual(),
                 defaults.isVirtualMode(),
                 value -> {
-                    CursorManager.INSTANCE.toggleVirtual();
-                    CONFIG.setVirtualMode(CursorManager.INSTANCE.isVirtual());
+                    CursorsExtended.getInstance().getDisplay().toggleVirtual();
+                    CONFIG.setVirtualMode(CursorsExtended.getInstance().getDisplay().isVirtual());
                 },
                 this.index(VIRTUAL_TEXT),
                 VIRTUAL_INFO,

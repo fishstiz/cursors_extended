@@ -4,8 +4,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -19,40 +21,28 @@ public class CursorTypeUtil {
 
     public static final Window WINDOW = Minecraft.getInstance().getWindow();
 
-    public static final long HANDLE = WINDOW.handle();
-
     public static boolean nameEquals(CursorType a, CursorType b) {
         return Objects.equals(a.toString(), b.toString());
     }
 
     public static boolean canShift() {
-        return CursorManager.INSTANCE.isEnabled(CursorTypesExt.SHIFT) &&
+        return CursorsExtended.getInstance().getRegistry().get(CursorTypesExt.SHIFT).isTextureEnabled() &&
                (InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                 InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_RIGHT_SHIFT));
     }
 
     public static boolean isLeftClickHeld() {
-        return GLFW.glfwGetMouseButton(HANDLE, GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
+        return GLFW.glfwGetMouseButton(WINDOW.handle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
 
     public static boolean isHeld(CursorType lastCursorType) {
         return CursorTypesExt.isHoldType(lastCursorType) &&
-               CursorManager.INSTANCE.isEnabled(lastCursorType) &&
-               CursorTypeUtil.nameEquals(CursorManager.INSTANCE.getAppliedCursor().getType(), lastCursorType) &&
+               CursorsExtended.getInstance().getRegistry().get(lastCursorType).isEnabled() &&
                CursorTypeUtil.isLeftClickHeld();
     }
 
     public static boolean nonDefault(CursorType cursorType) {
-        return cursorType != null && cursorType != CursorType.DEFAULT;
-    }
-
-    public static CursorType firstNonDefault(CursorType... cursorTypes) {
-        for (CursorType cursorType : cursorTypes) {
-            if (nonDefault(cursorType)) {
-                return cursorType;
-            }
-        }
-        return CursorType.DEFAULT;
+        return cursorType != null && !nameEquals(cursorType, CursorType.DEFAULT);
     }
 
     public static CursorType arrowIfDefault(CursorType cursorType) {
@@ -64,5 +54,33 @@ public class CursorTypeUtil {
             return widget.visible && (widget.isHovered() || widget.isMouseOver(mouseX, mouseY));
         }
         return guiEventListener.isMouseOver(mouseX, mouseY);
+    }
+
+    public static void setScale(Cursor cursor, float scale) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, scale, texture.xhot(), texture.yhot());
+        }
+    }
+
+    public static void setXHot(Cursor cursor, int xhot) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, texture.yhot());
+        }
+    }
+
+    public static void setYHot(Cursor cursor, int yhot) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), texture.xhot(), yhot);
+        }
+    }
+
+    public static void setHotspots(Cursor cursor, int xhot, int yhot) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, yhot);
+        }
     }
 }

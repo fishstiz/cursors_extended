@@ -1,7 +1,9 @@
 package io.github.fishstiz.cursors_extended.util;
 
+import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.renderstate.GuiColoredRectRenderState;
 import io.github.fishstiz.cursors_extended.platform.Services;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -104,5 +106,28 @@ public class DrawUtil {
                 guiGraphics,
                 new GuiColoredRectRenderState(new Matrix3x2f(guiGraphics.pose()), minX, minY, maxX, maxY, color)
         );
+    }
+
+    public static void drawCursor(GuiGraphics guiGraphics, Cursor cursor, int x, int y, int size) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
+            int spriteWidth = texture.spriteWidth();
+            int spriteHeight = texture.spriteHeight();
+
+            float scale = (float) size / Math.max(spriteWidth, spriteHeight);
+            int drawWidth = Math.round(spriteWidth * scale);
+            int drawHeight = Math.round(spriteHeight * scale);
+
+            guiGraphics.blit(
+                    RenderPipelines.GUI_TEXTURED,
+                    texture.texturePath(),
+                    x, y,
+                    0, texture.spriteVOffset(),
+                    drawWidth, drawHeight,
+                    spriteWidth, spriteHeight,
+                    texture.textureWidth(),
+                    texture.textureHeight()
+            );
+        }
     }
 }

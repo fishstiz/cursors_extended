@@ -42,15 +42,15 @@ public class Config implements Serializable {
     }
 
     public CursorSettings getOrCreateSettings(Cursor cursor) {
-        return cursors.computeIfAbsent(cursor.getName(), k -> new CursorSettings());
+        return cursors.computeIfAbsent(cursor.name(), k -> new CursorSettings());
     }
 
     public void putCursorSettings(Cursor cursor, CursorSettings settings) {
-        this.cursors.put(cursor.getName(), settings);
+        this.cursors.put(cursor.name(), settings);
     }
 
     public boolean isStale(Cursor cursor) {
-        CursorSettings settings = cursors.get(cursor.getName());
+        CursorSettings settings = cursors.get(cursor.name());
         return settings == null || settings.stale;
     }
 

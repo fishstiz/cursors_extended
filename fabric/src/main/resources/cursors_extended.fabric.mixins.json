@@ -4,7 +4,7 @@
   "package": "io.github.fishstiz.cursors_extended.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "io.github.fishstiz.cursors_extended.CursorsExtFabricMixinConfigPlugin",
+  "plugin": "io.github.fishstiz.cursors_extended.platform.CursorsExtendedFabricMixinConfigPlugin",
   "injectors": {
     "defaultRequire": 1
   },

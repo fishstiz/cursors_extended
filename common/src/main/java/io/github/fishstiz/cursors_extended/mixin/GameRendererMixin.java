@@ -1,8 +1,8 @@
 package io.github.fishstiz.cursors_extended.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import io.github.fishstiz.cursors_extended.cursor.*;
-import io.github.fishstiz.cursors_extended.cursor.inspector.CursorProviderInspector;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,7 +27,8 @@ public abstract class GameRendererMixin {
             @Local(ordinal = 0) int mouseX,
             @Local(ordinal = 1) int mouseY
     ) {
-        CursorProviderInspector.INSTANCE.renderDebugger(minecraft, guiGraphics, mouseX, mouseY);
-        CursorManager.INSTANCE.renderCursor(minecraft, guiGraphics, mouseX, mouseY);
+        CursorDisplay display = CursorsExtended.getInstance().getDisplay();
+        display.renderDebugger(guiGraphics, mouseX, mouseY);
+        display.renderCursor(minecraft.getWindow(), guiGraphics, mouseX, mouseY);
     }
 }

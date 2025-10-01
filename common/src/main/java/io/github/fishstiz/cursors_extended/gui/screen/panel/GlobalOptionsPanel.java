@@ -2,14 +2,15 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.datafixers.util.Pair;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
-import io.github.fishstiz.cursors_extended.cursor.AnimatedCursor;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
 import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.CursorPreviewWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.SliderWidget;
+import io.github.fishstiz.cursors_extended.resource.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.gui.Font;
@@ -22,10 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
+import static io.github.fishstiz.cursors_extended.util.CursorTypeUtil.*;
 
 public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static final Component TITLE = Component.translatable("cursors_extended.options.global.title");
@@ -46,7 +47,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     public GlobalOptionsPanel(Runnable refreshCursors) {
         super(TITLE);
-
         this.refreshCursors = refreshCursors;
     }
 
@@ -144,36 +144,37 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private void onChangeScale(double scale) {
         CONFIG.getGlobal().setScale(scale);
         if (CONFIG.getGlobal().isScaleActive()) {
-            this.currentCursor.setScale(scale);
+            setScale(currentCursor, (float) scale);
         }
     }
 
     private void onChangeXHot(double xhot) {
         CONFIG.getGlobal().setXHot(xhot);
         if (CONFIG.getGlobal().isXHotActive()) {
-            this.currentCursor.setXHot(xhot);
+            setXHot(currentCursor, (int) xhot);
         }
     }
 
     private void onChangeYHot(double yhot) {
         CONFIG.getGlobal().setYHot(yhot);
         if (CONFIG.getGlobal().isYHotActive()) {
-            this.currentCursor.setYHot(yhot);
+            setYHot(currentCursor, (int) yhot);
         }
     }
 
     private void onSliderMouseEvent(SliderWidget target, MouseEvent mouseEvent, double scale) {
         if (target.getPrefix().equals(SCALE_TEXT)) {
-            this.scaling = (mouseEvent.clicked() || mouseEvent.dragged()) && CursorManager.INSTANCE.isEnabled(this.currentCursor);
+            this.scaling = (mouseEvent.clicked() || mouseEvent.dragged()) && currentCursor.isTextureEnabled();
         }
 
         if (mouseEvent.released()) {
+            CursorRegistry registry = CursorsExtended.getInstance().getRegistry();
             if (target.getPrefix().equals(SCALE_TEXT) && CONFIG.getGlobal().isScaleActive()) {
-                CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setScale(CONFIG.getGlobal().getScale()));
+                registry.getInternalCursors().forEach(cursor -> setScale(cursor, CONFIG.getGlobal().getScale()));
             } else if (target.getPrefix().equals(XHOT_TEXT) && CONFIG.getGlobal().isXHotActive()) {
-                CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setXHot(CONFIG.getGlobal().getXHot()));
+                registry.getInternalCursors().forEach(cursor -> setXHot(cursor, CONFIG.getGlobal().getXHot()));
             } else if (target.getPrefix().equals(YHOT_TEXT) && CONFIG.getGlobal().isYHotActive()) {
-                CursorManager.INSTANCE.getCursors().forEach(cursor -> cursor.setYHot(CONFIG.getGlobal().getYHot()));
+                registry.getInternalCursors().forEach(cursor -> setYHot(cursor, CONFIG.getGlobal().getYHot()));
             }
         }
     }
@@ -200,10 +201,10 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void toggleCursorAnimations(boolean animated) {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            if (cursor instanceof AnimatedCursor animatedCursor) {
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
                 animatedCursor.setAnimated(animated);
-                CONFIG.getOrCreateSettings(animatedCursor).setAnimated(animated);
+                CONFIG.getOrCreateSettings(cursor).setAnimated(animated);
             }
         }
     }
@@ -223,8 +224,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     public boolean hasAnimationAny() {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            if (cursor instanceof AnimatedCursor) {
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (cursor.getTexture() instanceof AnimatedCursorTexture) {
                 return true;
             }
         }
@@ -232,8 +233,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     public boolean isAnimatedAny() {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            if (cursor instanceof AnimatedCursor animatedCursor && animatedCursor.isAnimated()) {
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor && animatedCursor.isAnimated()) {
                 return true;
             }
         }
@@ -244,8 +245,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static Consumer<Boolean> applyGlobalOnToggle(Consumer<Boolean> onToggle) {
         return value -> {
             onToggle.accept(value);
-            CursorManager.INSTANCE.getCursors().forEach(cursor ->
-                    cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)))
+            CursorsExtended.getInstance().getRegistry().getInternalCursors().forEach(cursor ->
+                    CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)))
             );
         };
     }
@@ -255,19 +256,22 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private static Iterator<Cursor> cursorIterator() {
-        return CursorManager.INSTANCE.getCursors().stream().filter(Cursor::isEnabled).iterator();
+        return CursorsExtended.getInstance().getRegistry().getInternalCursors()
+                .stream()
+                .filter(Cursor::isTextureEnabled)
+                .iterator();
     }
 
     private static @NotNull Cursor getDefaultCursor() {
-        return Objects.requireNonNull(CursorManager.INSTANCE.getCursor(CursorType.DEFAULT));
+        return CursorsExtended.getInstance().getRegistry().get(CursorType.DEFAULT);
     }
 
     private static Pair<Integer, Integer> getMaxHotspots() {
         int currentMaxX = -1;
         int currentMaxY = -1;
 
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            if (cursor.isLoaded()) {
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (cursor.hasTexture()) {
                 int maxXHot = SettingsUtil.getMaxXHot(cursor);
                 if (maxXHot > currentMaxX) {
                     currentMaxX = maxXHot;
@@ -287,7 +291,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.scaling) {
-            guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.currentCursor.getType()));
+            guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.currentCursor.cursorType()));
         }
     }
 
@@ -309,6 +313,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             this.renderRuler(guiGraphics, mouseX, mouseY);
             this.renderBorder(guiGraphics);
 
+            updateMouseMoved();
             if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
         }
 

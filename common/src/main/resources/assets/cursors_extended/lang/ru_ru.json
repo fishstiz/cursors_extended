@@ -39,8 +39,6 @@
 
   "cursors_extended.options.global.animation": "Анимации курсоров",
   "cursors_extended.options.global.animation.tooltip": "Обновляет настройку анимации для всех анимированных курсоров.",
-  "cursors_extended.options.global.deferred_loading": "Отложенная загрузка",
-  "cursors_extended.options.global.deferred_loading.tooltip": "Откладывает загрузку отключенных курсоров до следующего запуска или их включения.",
   "cursors_extended.options.global.deferred_loading.fail": "Ошибка загрузки курсора '%1$s'",
 
   "cursors_extended.options.adapt": "Адаптивный курсор",

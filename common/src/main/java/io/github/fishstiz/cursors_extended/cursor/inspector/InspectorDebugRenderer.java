@@ -8,9 +8,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-interface InspectorDebugRenderer {
-    InspectorDebugRenderer NO_OP = new InspectorDebugRenderer() {
+public interface InspectorDebugRenderer {
+    InspectorDebugRenderer NOP = new InspectorDebugRenderer() {
     };
+
+    static InspectorDebugRenderer create() {
+        return new InspectorDebugRendererImpl();
+    }
 
     default void destroy() {
     }

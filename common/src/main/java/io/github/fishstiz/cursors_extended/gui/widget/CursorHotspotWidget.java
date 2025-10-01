@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
@@ -27,7 +26,6 @@ public class CursorHotspotWidget extends CursorWidget {
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
     private static final Component OVERFLOW_TEXT = Component.translatable("cursors_extended.options.image_too_large");
     private static final int OVERFLOW_COLOR = 0xFFFFFFFF; // white
-    private final CursorAnimationHelper animationHelper;
     private final SliderWidget xhotSlider;
     private final SliderWidget yhotSlider;
     private final @Nullable MouseEventListener mouseEventListener;
@@ -37,14 +35,12 @@ public class CursorHotspotWidget extends CursorWidget {
 
     public CursorHotspotWidget(
             @NotNull Cursor cursor,
-            @NotNull CursorAnimationHelper animationHelper,
             @NotNull SliderWidget xhotSlider,
             @NotNull SliderWidget yhotSlider,
             @Nullable MouseEventListener mouseEventListener
     ) {
         super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
 
-        this.animationHelper = animationHelper;
         this.xhotSlider = xhotSlider;
         this.yhotSlider = yhotSlider;
         this.mouseEventListener = mouseEventListener;
@@ -76,7 +72,7 @@ public class CursorHotspotWidget extends CursorWidget {
 
     @Override
     protected void renderCursor(@NotNull GuiGraphics guiGraphics, @NotNull Cursor cursor) {
-        this.animationHelper.drawSprite(guiGraphics, cursor, this.getX(), this.getY(), this.getWidth());
+        DrawUtil.drawCursor(guiGraphics, cursor, this.getX(), this.getY(), this.getWidth());
     }
 
     @Override

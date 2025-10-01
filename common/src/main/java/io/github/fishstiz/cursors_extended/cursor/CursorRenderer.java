@@ -1,44 +1,49 @@
 package io.github.fishstiz.cursors_extended.cursor;
 
-import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.mixin.WindowAccess;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.MemoryUtil;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-interface CursorRenderer {
-    void setCursor(@NotNull Cursor cursor);
+public sealed interface CursorRenderer {
+    CursorRegistry registry();
 
-    void resetCursor();
+    void setCursor(Window window);
 
-    void render(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY);
+    void resetCursor(Window window);
 
-    class Native implements CursorRenderer {
-        Native() {
+    void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY);
+
+    default Cursor getCurrentCursor(Window window) {
+        return registry().get(((WindowAccess) (Object) window).cursors_extended$getCurrentCursor());
+    }
+
+    record Native(CursorRegistry registry) implements CursorRenderer {
+        @Override
+        public void setCursor(Window window) {
+            getCurrentCursor(window).cursorType().select(window);
         }
 
         @Override
-        public void setCursor(@NotNull Cursor cursor) {
-            glfwSetCursor(CursorTypeUtil.HANDLE, cursor.getId());
+        public void resetCursor(Window window) {
+            window.selectCursor(CursorType.DEFAULT);
         }
 
         @Override
-        public void resetCursor() {
-            glfwSetCursor(CursorTypeUtil.HANDLE, MemoryUtil.NULL);
-        }
-
-        @Override
-        public void render(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        public void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
             // no-op
         }
     }
 
-    class Virtual implements CursorRenderer {
+    final class Virtual implements CursorRenderer {
+        private final CursorRegistry registry;
         private ResourceLocation textureLocation;
         private int textureWidth;
         private int textureHeight;
@@ -50,52 +55,71 @@ interface CursorRenderer {
         private double xhot;
         private double yhot;
 
-        Virtual() {
+        public Virtual(CursorRegistry registry) {
+            this.registry = registry;
         }
 
         @Override
-        public void setCursor(@NotNull Cursor cursor) {
-            this.textureLocation = cursor.getLocation();
-            this.textureWidth = cursor.getTextureWidth();
-            this.textureHeight = cursor.getTextureHeight();
-            this.spriteWidth = cursor.getSpriteWidth();
-            this.spriteHeight = cursor.getSpriteHeight();
-            this.vOffset = cursor.getSpriteHeight() * cursor.getSpriteIndex();
+        public CursorRegistry registry() {
+            return registry;
+        }
 
-            double scale = SettingsUtil.getAutoScale(cursor.getScale());
-            this.xhot = cursor.getXHot() * scale;
-            this.yhot = cursor.getYHot() * scale;
+        @Override
+        public void setCursor(Window window) {
+            Cursor cursor = getCurrentCursor(window);
+            cursor.cursorType().select(window);
+
+            CursorTexture texture = cursor.getTexture();
+            if (texture == null || !cursor.isEnabled()) {
+                this.textureLocation = null;
+                return;
+            }
+
+            this.textureLocation = texture.texturePath();
+            this.textureWidth = texture.textureWidth();
+            this.textureHeight = texture.textureHeight();
+            this.spriteWidth = texture.spriteWidth();
+            this.spriteHeight = texture.spriteHeight();
+            this.vOffset = texture.spriteHeight() * texture.spriteVOffset();
+
+            double scale = SettingsUtil.getAutoScale(texture.scale());
+            this.xhot = texture.xhot() * scale;
+            this.yhot = texture.yhot() * scale;
             this.drawWidth = this.spriteWidth * scale;
             this.drawHeight = this.spriteHeight * scale;
         }
 
         @Override
-        public void resetCursor() {
-            glfwSetInputMode(CursorTypeUtil.HANDLE, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        public void resetCursor(Window window) {
+            glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             this.textureLocation = null;
         }
 
         @Override
-        public void render(Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-            if (!minecraft.mouseHandler.isMouseGrabbed() && this.textureLocation != null) {
-                int guiScale = minecraft.getWindow().getGuiScale();
-                int scaledWidth = (int) Math.round(this.drawWidth / guiScale);
-                int scaledHeight = (int) Math.round(this.drawHeight / guiScale);
-                int x = mouseX - (int) Math.round(this.xhot / guiScale);
-                int y = mouseY - (int) Math.round(this.yhot / guiScale);
+        public void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+            if (!minecraft.mouseHandler.isMouseGrabbed()) {
+                if (this.textureLocation != null) {
+                    int guiScale = minecraft.getWindow().getGuiScale();
+                    int scaledWidth = (int) Math.round(this.drawWidth / guiScale);
+                    int scaledHeight = (int) Math.round(this.drawHeight / guiScale);
+                    int x = mouseX - (int) Math.round(this.xhot / guiScale);
+                    int y = mouseY - (int) Math.round(this.yhot / guiScale);
 
-                glfwSetInputMode(CursorTypeUtil.HANDLE, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+                    glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-                guiGraphics.nextStratum();
-                guiGraphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
-                        this.textureLocation,
-                        x, y,
-                        0, this.vOffset,
-                        scaledWidth, scaledHeight,
-                        this.spriteWidth, this.spriteHeight,
-                        this.textureWidth, this.textureHeight
-                );
+                    guiGraphics.nextStratum();
+                    guiGraphics.blit(
+                            RenderPipelines.GUI_TEXTURED,
+                            this.textureLocation,
+                            x, y,
+                            0, this.vOffset,
+                            scaledWidth, scaledHeight,
+                            this.spriteWidth, this.spriteHeight,
+                            this.textureWidth, this.textureHeight
+                    );
+                } else {
+                    glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                }
             }
         }
     }

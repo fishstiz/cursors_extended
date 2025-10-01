@@ -2,14 +2,13 @@ package io.github.fishstiz.cursors_extended.util;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.mixin.NativeImageAccess;
+import io.github.fishstiz.cursors_extended.mixin.util.NativeImageAccess;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
-import java.util.Base64;
 
 public class NativeImageUtil {
     private NativeImageUtil() {
@@ -66,20 +65,15 @@ public class NativeImageUtil {
         buffer.flip();
     }
 
-    public static String toBase64String(NativeImage image) throws IOException {
+    public static byte[] getBytes(NativeImage image) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         WritableByteChannel channel = Channels.newChannel(baos);
 
-        boolean success = ((NativeImageAccess) (Object) image).invokeWriteToChannel(channel);
+        boolean success = ((NativeImageAccess) (Object) image).cursors_extended$writeToChannel(channel);
         channel.close();
 
         if (!success) throw new IOException("Failed to write NativeImage to PNG bytes.");
 
-        return Base64.getEncoder().encodeToString(baos.toByteArray());
-    }
-
-    public static NativeImage fromBase64String(String base64) throws IOException {
-        byte[] bytes = Base64.getDecoder().decode(base64);
-        return NativeImage.read(bytes);
+        return baos.toByteArray();
     }
 }

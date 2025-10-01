@@ -7,8 +7,7 @@
   "client": [
     "CursorTypeMixin",
     "GameRendererMixin",
-    "MinecraftMixin",
-    "NativeImageAccess",
+    "WindowAccess",
     "WindowMixin",
     "cursorprovider.AbstractButtonMixin",
     "cursorprovider.AbstractScrollAreaMixin",
@@ -32,8 +31,13 @@
     "cursorprovider.menus.access.RecipeAlternativesWidgetAccessor",
     "cursorprovider.menus.access.RecipeBookResultsAccessor",
     "cursorprovider.menus.access.RecipeBookWidgetAccessor",
-    "options.MouseOptionsScreenMixin"
+    "options.MinecraftMixin",
+    "options.MouseOptionsScreenMixin",
+    "util.NativeImageAccess"
   ],
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
   "injectors": {
     "defaultRequire": 1
   }

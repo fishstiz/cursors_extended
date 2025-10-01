@@ -39,8 +39,6 @@
 
   "cursors_extended.options.global.animation": "İmleç Animasyonları",
   "cursors_extended.options.global.animation.tooltip": "Tüm animasyonlu imleçlerin animasyon ayarını günceller.",
-  "cursors_extended.options.global.deferred_loading": "Devre dışıyken yüklemeyi ertele",
-  "cursors_extended.options.global.deferred_loading.tooltip": "Devre dışı imleçlerin yüklenmesini, bir sonraki başlatmaya kadar erteler.",
   "cursors_extended.options.global.deferred_loading.fail": "'%1$s' imleci yüklenemedi",
 
   "cursors_extended.options.adapt": "Uyarlanabilir İmleç",

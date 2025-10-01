@@ -40,8 +40,6 @@
 
   "cursors_extended.options.global.animation": "Анімації",
   "cursors_extended.options.global.animation.tooltip": "Просто оновлює налаштування анімації для всіх анімованих курсорів.",
-  "cursors_extended.options.global.deferred_loading": "Відкласти завантаження, коли вимкнено",
-  "cursors_extended.options.global.deferred_loading.tooltip": "Відкладає завантаження вимкнених курсорів під час наступного запуску, доки їх не буде увімкнено.",
   "cursors_extended.options.global.deferred_loading.fail": "Не вдалося завантажити курсор «%1$s»",
 
   "cursors_extended.options.adapt": "Адаптивний курсор",

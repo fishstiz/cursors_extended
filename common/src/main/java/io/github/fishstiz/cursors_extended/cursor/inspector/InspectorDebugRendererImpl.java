@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.cursor.inspector;
 
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
@@ -28,16 +28,14 @@ class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     private final Component virtualModeLabel = Component.literal("Virtual Mode: ").withStyle(ChatFormatting.GOLD);
     private ScreenRectangle inspectedBounds;
     private String inspectedElement;
-    private boolean active = true;
 
     @Override
     public boolean isActive() {
-        return this.active;
+        return true;
     }
 
     @Override
     public void destroy() {
-        this.active = false;
         this.inspectedBounds = null;
         this.inspectedElement = null;
     }
@@ -53,7 +51,7 @@ class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     @Override
     public void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         Screen screen = visibleScreen.get();
-        if (this.active && screen != null) {
+        if (screen != null) {
             ScreenRectangle screenRectangle = getBounds(screen);
             renderScreenName(minecraft, screen, screenRectangle, guiGraphics);
             renderInspected(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);
@@ -84,7 +82,7 @@ class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     }
 
     private void renderVirtualInfo(Minecraft minecraft, ScreenRectangle screenBounds, GuiGraphics guiGraphics) {
-        Component virtualMode = virtualModeLabel.copy().append(CursorManager.INSTANCE.isVirtual() ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
+        Component virtualMode = virtualModeLabel.copy().append(CursorsExtended.getInstance().getDisplay().isVirtual() ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
         renderInfo(minecraft, guiGraphics, screenBounds, virtualMode, Position.TOP_RIGHT, false);
     }
 

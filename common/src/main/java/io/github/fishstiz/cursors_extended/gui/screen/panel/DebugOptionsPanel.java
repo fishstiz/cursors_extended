@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
-import io.github.fishstiz.cursors_extended.cursor.inspector.CursorProviderInspector;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -25,8 +25,8 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
         this.optionsList = new OptionsListWidget(this.getMinecraft(), this.getFont(), this.getSpacing());
 
         this.optionsList.addToggle(
-                CursorProviderInspector.INSTANCE.isDebugging(),
-                v -> CursorProviderInspector.INSTANCE.toggleDebugger(),
+                CursorsExtended.getInstance().getDisplay().isDebugging(),
+                v -> CursorsExtended.getInstance().getDisplay().toggleDebugger(),
                 this.index(INSPECT_TEXT),
                 null,
                 true

@@ -3,8 +3,9 @@ package io.github.fishstiz.cursors_extended.util;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,12 +18,12 @@ import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
     public static final int IMAGE_SIZE_GUI_MAX = 128;
-    public static final double SCALE_AUTO_PREFERRED = 0;
-    public static final double SCALE_AUTO_THRESHOLD_MAX = 0.49;
-    public static final double SCALE = 1.0;
-    public static final double SCALE_MIN = 0;
-    public static final double SCALE_MAX = 8.0;
-    public static final double SCALE_STEP = 0.05;
+    public static final float SCALE_AUTO_PREFERRED = 0;
+    public static final float SCALE_AUTO_THRESHOLD_MAX = 0.49f;
+    public static final float SCALE = 1;
+    public static final float SCALE_MIN = 0;
+    public static final float SCALE_MAX = 8;
+    public static final float SCALE_STEP = 0.05f;
     public static final int X_HOT = 0;
     public static final int Y_HOT = 0;
     public static final int HOT_MIN = 0;
@@ -48,13 +49,20 @@ public class SettingsUtil {
 
     public static double getAutoScale(double scale) {
         if (isAutoScale(scale)) {
-            int guiScale = Minecraft.getInstance().options.guiScale().get();
-            return guiScale != 0 ? guiScale : CursorTypeUtil.WINDOW.getGuiScale();
+            OptionInstance<Integer> guiScale = Minecraft.getInstance().options.guiScale();
+            int max = Integer.MAX_VALUE;
+            int guiScaleValue = guiScale.get();
+
+            if (guiScale.values() instanceof OptionInstance.ClampingLazyMaxIntRange range) {
+                max = range.maxInclusive();
+            }
+
+            return guiScaleValue != 0 ? Math.min(max, guiScaleValue) : Minecraft.getInstance().getWindow().getGuiScale();
         }
         return scale;
     }
 
-    public static double sanitizeScale(double scale) {
+    public static float sanitizeScale(double scale) {
         double clampedScale = clamp(scale, SCALE_MIN, SCALE_MAX);
         double mappedScale = Math.round(clampedScale / SCALE_STEP) * SCALE_STEP;
 
@@ -62,7 +70,7 @@ public class SettingsUtil {
             return SCALE_AUTO_PREFERRED;
         }
 
-        return (double) Math.round(mappedScale * 100) / 100;
+        return Math.round(mappedScale * 100) / 100f;
     }
 
     public static int sanitizeHotspot(int hotspot, int imageSize) {
@@ -70,11 +78,11 @@ public class SettingsUtil {
     }
 
     public static int sanitizeXHot(int xhot, @NotNull Cursor cursor) {
-        return sanitizeHotspot(xhot, cursor.isLoaded() ? cursor.getSpriteWidth() : 0);
+        return sanitizeHotspot(xhot, cursor.getTexture() != null ? cursor.getTexture().spriteWidth() : 0);
     }
 
     public static int sanitizeYHot(int yhot, @NotNull Cursor cursor) {
-        return sanitizeHotspot(yhot, cursor.isLoaded() ? cursor.getSpriteHeight() : 0);
+        return sanitizeHotspot(yhot, cursor.getTexture() != null ? cursor.getTexture().spriteHeight() : 0);
     }
 
     public static double clamp(double value, double min, double max) {
@@ -86,15 +94,15 @@ public class SettingsUtil {
     }
 
     public static int getMaxXHot(Cursor cursor) {
-        if (cursor != null && cursor.isLoaded()) {
-            return cursor.getSpriteWidth() - 1;
+        if (cursor != null && cursor.getTexture() != null) {
+            return cursor.getTexture().spriteWidth() - 1;
         }
         return 0;
     }
 
     public static int getMaxYHot(Cursor cursor) {
-        if (cursor != null && cursor.isLoaded()) {
-            return cursor.getSpriteHeight() - 1;
+        if (cursor != null && cursor.getTexture() != null) {
+            return cursor.getTexture().spriteHeight() - 1;
         }
         return 0;
     }
@@ -123,20 +131,24 @@ public class SettingsUtil {
     }
 
     public static boolean restoreNonGlobalSettings(@NotNull Cursor cursor) {
-        if (!cursor.isLoaded()) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture == null) {
             return false;
         }
 
-        CONFIG.putCursorSettings(cursor, ignoreIfGlobal(cursor, cursor.getMetadata().getCursorSettings()));
-        cursor.apply(CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
+        CONFIG.putCursorSettings(cursor, ignoreIfGlobal(cursor, texture.metadata().getCursorSettings()));
+        CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
         return true;
     }
 
     public static void restoreCursorSettings() {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
-            settings.merge(cursor.getMetadata().getCursorSettings());
-            cursor.apply(CONFIG.getGlobal().apply(settings));
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getCursors()) {
+            CursorTexture texture = cursor.getTexture();
+            if (texture != null) {
+                Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+                settings.merge(texture.metadata().getCursorSettings());
+                CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
+            }
         }
     }
 

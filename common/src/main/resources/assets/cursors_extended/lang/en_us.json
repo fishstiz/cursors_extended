@@ -46,8 +46,6 @@
 
   "cursors_extended.options.global.animation": "Cursor Animations",
   "cursors_extended.options.global.animation.tooltip": "Simply updates the animated setting on all animated cursors.",
-  "cursors_extended.options.global.deferred_loading": "Defer loading when disabled",
-  "cursors_extended.options.global.deferred_loading.tooltip": "Defers loading of disabled cursors on the next launch until they’re enabled.",
   "cursors_extended.options.global.deferred_loading.fail": "Failed to load cursor '%1$s'",
 
   "cursors_extended.options.adapt": "Adaptive Cursor",
@@ -66,7 +64,7 @@
   "cursors_extended.options.adapt.server": "Server Icon Play Button",
 
   "cursors_extended.options.resource_pack.reset": "Reset Cursor Settings",
-  "cursors_extended.options.resource_pack.reset.tooltip": "Resets personal cursor settings to match the settings provided by resource packs (or the built-in default).",
+  "cursors_extended.options.resource_pack.reset.tooltip": "Matches your cursor settings with the resource pack settings.",
 
   "cursors_extended.options.compat": "Compatibility",
   "cursors_extended.options.compat.aggressive_cursor": "Aggressive cursor updates",
@@ -74,7 +72,7 @@
   "cursors_extended.options.compat.virtual_mode": "Virtual Mode",
   "cursors_extended.options.compat.virtual_mode.info": "Renders the cursor directly in-game instead of letting the operating system handle it.",
   "cursors_extended.options.compat.legacy_mode": "Legacy Cursor Mode",
-  "cursors_extended.options.compat.legacy_mode.info": "Detects the hovered element by traversing the GUI hierarchy and enables additional cursor mappings beyond vanilla.\n\nOther legacy cursor mappings can be toggled in the Adaptive Cursor options.",
+  "cursors_extended.options.compat.legacy_mode.info": "Enhanced cursor logic, traverses the GUI hierarchy to determine the cursor.\n\nOther legacy options can be toggled from the Adaptive Cursor Options.",
 
   "cursors_extended.options.debug": "Debug",
   "cursors_extended.options.debug.inspect": "Inspect Element",

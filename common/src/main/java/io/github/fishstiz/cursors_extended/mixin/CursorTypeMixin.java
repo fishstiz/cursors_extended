@@ -2,41 +2,76 @@ package io.github.fishstiz.cursors_extended.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
+import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
+import io.github.fishstiz.cursors_extended.cursor.TexturedCursorType;
+import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
+import org.lwjgl.system.MemoryUtil;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CursorType.class)
-public abstract class CursorTypeMixin {
+public abstract class CursorTypeMixin implements TexturedCursorType {
+    @Shadow
+    public abstract void select(Window window);
+
+    @Unique
+    private CursorTexture cursors_extended$texture;
+
     static {
         CursorsExtended.LOGGER.debug("[cursors_extended] Initializing CursorTypes: {}", CursorTypes.class);
     }
 
-    @WrapOperation(method = "select", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwSetCursor(JJ)V", remap = false))
-    private void onSelect(long window, long cursor, Operation<Void> original) {
-        CursorType cursorType = (CursorType) (Object) this;
-        if (CursorManager.INSTANCE.isRegistered(cursorType) && CursorManager.INSTANCE.isActive()) {
-            CursorManager.INSTANCE.setCurrentCursor(cursorType);
-        } else {
-            original.call(window, cursor);
+    @Override
+    public @Nullable CursorTexture cursors_extended$getTexture() {
+        return cursors_extended$texture;
+    }
+
+    @Override
+    public void cursors_extended$setTexture(CursorTexture texture) {
+        CursorTexture previousTexture = cursors_extended$texture;
+        this.cursors_extended$texture = texture;
+
+        CursorDisplay cursorDisplay = CursorsExtended.getInstance().getDisplay();
+        CursorRegistry cursorRegistry = CursorsExtended.getInstance().getRegistry();
+        if (cursorDisplay.getDisplayedCursor() == cursorRegistry.get(((CursorType) (Object) this))) {
+            select(cursorDisplay.getWindow());
         }
+
+        if (previousTexture != null) {
+            previousTexture.close();
+        }
+    }
+
+    @WrapOperation(method = "select", at = @At(
+            value = "FIELD",
+            target = "Lcom/mojang/blaze3d/platform/cursor/CursorType;handle:J"
+    ))
+    private long onSetCursor(CursorType instance, Operation<Long> original) {
+        if (cursors_extended$texture != null && cursors_extended$texture.handle() != MemoryUtil.NULL) {
+            return cursors_extended$texture.handle();
+        }
+
+        return original.call(instance);
     }
 
     @Inject(method = "createStandardCursor", at = @At("RETURN"))
     private static void registerStandardCursors(int shape, String name, CursorType fallback, CallbackInfoReturnable<CursorType> cir) {
-        CursorType standardCursorType = cursors_extended$mapStandardCursor(shape);
-        if (standardCursorType != null) {
-            CursorsExtended.LOGGER.info("[cursors_extended] Registering an alias for {}: {}", standardCursorType, name);
-            CursorManager.INSTANCE.registerAlias(standardCursorType.toString(), name);
+        if (cir.getReturnValue() != null) {
+            CursorType standardCursorType = cursors_extended$mapStandardCursor(shape);
+            if (standardCursorType != null) {
+                CursorsExtended.LOGGER.info("[cursors_extended] Registering an alias for {}: {}", standardCursorType, name);
+                CursorsExtended.getInstance().getRegistry().registerAlias(standardCursorType, cir.getReturnValue());
+            }
         }
     }
 

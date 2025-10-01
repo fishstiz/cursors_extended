@@ -6,11 +6,11 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import org.lwjgl.system.MemoryUtil;
 
 public class CursorTypesExt {
-    public static final CursorType GRABBING = createDummy("grabbing");
-    public static final CursorType SHIFT = createDummy("shift");
-    public static final CursorType BUSY = createDummy("busy");
-    public static final CursorType RESIZE_NWSE = createDummy("resize_nwse");
-    public static final CursorType RESIZE_NESW = createDummy("resize_nesw");
+    public static final CursorType GRABBING = create("grabbing");
+    public static final CursorType SHIFT = create("shift");
+    public static final CursorType BUSY = create("busy");
+    public static final CursorType RESIZE_NWSE = create("resize_nwse");
+    public static final CursorType RESIZE_NESW = create("resize_nesw");
     public static final CursorType GRABBING_HOLD = new HoldType(GRABBING);
     public static final CursorType RESIZE_EW_HOLD = new HoldType(CursorTypes.RESIZE_EW);
     public static final CursorType RESIZE_NS_HOLD = new HoldType(CursorTypes.RESIZE_NS);
@@ -19,7 +19,7 @@ public class CursorTypesExt {
     private CursorTypesExt() {
     }
 
-    private static CursorType createDummy(String name) {
+    private static CursorType create(String name) {
         return new CursorType(name, MemoryUtil.NULL);
     }
 

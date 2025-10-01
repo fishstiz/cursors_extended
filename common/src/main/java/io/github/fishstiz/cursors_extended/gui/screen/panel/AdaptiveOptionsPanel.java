@@ -2,18 +2,18 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
-import io.github.fishstiz.cursors_extended.cursor.CursorManager;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.gui.CursorAnimationHelper;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
+import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
+import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
@@ -34,14 +34,11 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Component WORLD = Component.translatable("cursors_extended.options.adapt.world");
     private static final Component SERVER = Component.translatable("cursors_extended.options.adapt.server");
     private static final int CURSOR_SIZE_STEP = 8;
-    private final CursorAnimationHelper animationHelper;
     private final Runnable refreshCursors;
     private OptionsListWidget optionsList;
 
-    public AdaptiveOptionsPanel(Component title, CursorAnimationHelper animationHelper, Runnable refreshCursors) {
+    public AdaptiveOptionsPanel(Component title, Runnable refreshCursors) {
         super(title);
-
-        this.animationHelper = animationHelper;
         this.refreshCursors = refreshCursors;
     }
 
@@ -49,7 +46,7 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     protected void initContents() {
         this.optionsList = new OptionsListWidget(this.getMinecraft(), this.getFont(), Button.DEFAULT_HEIGHT, this.getSpacing());
 
-        boolean adaptive = CursorManager.INSTANCE.isAdaptive();
+        boolean adaptive = isAdaptive();
         this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
         this.addOption(CONFIG.isHeldCursorsEnabled(), CONFIG::setHeldCursorsEnabled, HOLD_CURSORS, HOLD_CURSORS_INFO, null, adaptive);
         this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorTypes.POINTING_HAND, adaptive);
@@ -80,12 +77,12 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private OptionsListWidget.Prefix prefixCursor(CursorType cursorType) {
         if (cursorType == null) return null;
 
-        Cursor cursor = Objects.requireNonNull(CursorManager.INSTANCE.getCursor(cursorType));
+        Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
 
         return (guiGraphics, font, x, y, height) -> {
             int adjustedHeight = height - (height % CURSOR_SIZE_STEP);
             int offsetY = y + (height - adjustedHeight) / 2;
-            this.animationHelper.drawSprite(guiGraphics, cursor, x, offsetY, adjustedHeight);
+            DrawUtil.drawCursor(guiGraphics, cursor, x, offsetY, adjustedHeight);
             return adjustedHeight;
         };
     }
@@ -106,21 +103,29 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void toggleAdaptive(boolean adaptive) {
-        for (Cursor cursor : CursorManager.INSTANCE.getCursors()) {
-            if (cursor.getType() == CursorType.DEFAULT) continue;
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (cursor.cursorType() == CursorType.DEFAULT) continue;
 
-            Cursor loadedCursor = cursor;
-            if (adaptive && !cursor.isLoaded() && this.loadCursor(cursor)) {
-                loadedCursor = Objects.requireNonNull(CursorManager.INSTANCE.getCursor(cursor.getType()));
+            if (adaptive && cursor.getTexture() == null) {
+                this.loadCursor(cursor);
             }
 
-            loadedCursor.enable(adaptive);
-            CONFIG.getOrCreateSettings(loadedCursor).setEnabled(adaptive);
+            cursor.setEnabled(adaptive);
+            CONFIG.getOrCreateSettings(cursor).setEnabled(adaptive);
         }
 
         this.refreshCursors.run();
         this.refreshWidgets();
         this.repositionElements();
+    }
+
+    private boolean isAdaptive() {
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
+            if (CursorTypeUtil.nonDefault(cursor.cursorType()) && cursor.isTextureEnabled()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Component scrollbarText(CursorType cursorType) {
