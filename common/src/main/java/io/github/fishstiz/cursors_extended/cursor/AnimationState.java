@@ -15,11 +15,13 @@ public sealed interface AnimationState {
             case LOOP, LOOP_REVERSE -> new Loop(initialFrameIndex);
             case FORWARDS, REVERSE -> new Forwards(initialFrameIndex);
             case OSCILLATE -> new Oscillate(initialFrameIndex);
-            case RANDOM, RANDOM_CYCLE -> new RandomCycle(initialFrameIndex);
+            case RANDOM -> new RandomState(initialFrameIndex);
+            case RANDOM_CYCLE -> new RandomCycle(initialFrameIndex);
         };
     }
 
     abstract sealed class Base implements AnimationState {
+        protected static final long MS_PER_TICK = 50;
         protected int currentFrameIndex;
         protected long lastFrameTime = 0;
 
@@ -30,7 +32,7 @@ public sealed interface AnimationState {
         protected boolean shouldAdvance(AnimatedCursorTexture texture) {
             AnimatedCursorTexture.Frame currentFrame = texture.getFrame(currentFrameIndex);
             long currentTime = Util.getMillis();
-            return currentTime - lastFrameTime >= currentFrame.time() * 50L;
+            return currentTime - lastFrameTime >= currentFrame.time() * MS_PER_TICK;
         }
 
         protected void updateFrameTime() {
@@ -97,6 +99,31 @@ public sealed interface AnimationState {
         public void reset() {
             super.reset();
             reversed = false;
+        }
+    }
+
+    final class RandomState extends Base {
+        private final Random random = new Random();
+
+        public RandomState(int initialFrameIndex) {
+            super(initialFrameIndex);
+        }
+
+        @Override
+        public int next(AnimatedCursorTexture texture) {
+            if (shouldAdvance(texture)) {
+                updateFrameTime();
+
+                int count = texture.frameCount();
+                if (count > 1) {
+                    int newFrame;
+                    do {
+                        newFrame = random.nextInt(count);
+                    } while (newFrame == currentFrameIndex);
+                    currentFrameIndex = newFrame;
+                }
+            }
+            return currentFrameIndex;
         }
     }
 
