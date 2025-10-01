@@ -10,11 +10,15 @@ import java.util.Objects;
 
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
-public record CursorMetadata(CursorSettings cursor, Animation animation) implements Serializable {
+public record CursorMetadata(CursorSettings cursor, @Nullable Animation animation) implements Serializable {
     public static final String FILE_TYPE = ".json";
 
+    public CursorMetadata {
+        cursor = cursor != null ? cursor : new CursorSettings();
+    }
+
     public CursorMetadata() {
-        this(new CursorSettings(), new Animation());
+        this(new CursorSettings(), null);
     }
 
     public Animation requireAnimation() {
@@ -46,10 +50,6 @@ public record CursorMetadata(CursorSettings cursor, Animation animation) impleme
             mode = mode != null ? mode : AnimationMode.LOOP;
             frametime = Math.max(frametime, MIN_TIME);
             frames = frames != null ? frames : Collections.emptyList();
-        }
-
-        public Animation() {
-            this(AnimationMode.LOOP, MIN_TIME, Collections.emptyList(), null, null);
         }
 
         @Override
