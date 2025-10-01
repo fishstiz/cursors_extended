@@ -34,7 +34,7 @@ if (secretsFile.exists()) {
 
 publishMods {
     changelog = file("CHANGELOG.md").text
-    type = BETA
+    type = STABLE
 
     def fabricOptions = publishOptions {
         displayName = "${mod_name} for Fabric v${mod_version}"
@@ -43,13 +43,13 @@ publishMods {
                 "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar")
         )
     }
-//    def neoforgeOptions = publishOptions {
-//        displayName = "${mod_name} for NeoForge v${mod_version}"
-//        file project(":neoforge")
-//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
-//        )
-//    }
+    def neoforgeOptions = publishOptions {
+        displayName = "${mod_name} for NeoForge v${mod_version}"
+        file project(":neoforge")
+        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
+        )
+    }
 
     def githubOptions = githubOptions {
         accessToken = secrets.getProperty("GITHUB_TOKEN")
@@ -62,12 +62,12 @@ publishMods {
         additionalFiles.from(project(":fabric").layout.buildDirectory.file(
                 "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar"
         ))
-//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
-//        ))
-//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
-//        ))
+        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
+        ))
+        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
+        ))
     }
     def modrinthOptions = modrinthOptions {
         accessToken = secrets.getProperty("MODRINTH_TOKEN")
@@ -91,10 +91,10 @@ publishMods {
         requires("fabric-api")
         optional("modmenu")
     }
-//    modrinth("modrinthNeoForge") {
-//        from modrinthOptions, neoforgeOptions
-//        modLoaders.add("neoforge")
-//    }
+    modrinth("modrinthNeoForge") {
+        from modrinthOptions, neoforgeOptions
+        modLoaders.add("neoforge")
+    }
 
     curseforge("curseforgeFabric") {
         from curseforgeOptions, fabricOptions
@@ -104,13 +104,13 @@ publishMods {
         requires("fabric-api")
         optional("modmenu")
     }
-//    curseforge("curseforgeNeoForge") {
-//        from curseforgeOptions, neoforgeOptions
-//        modLoaders.add("neoforge")
-//        clientRequired = true
-//    }
+    curseforge("curseforgeNeoForge") {
+        from curseforgeOptions, neoforgeOptions
+        modLoaders.add("neoforge")
+        clientRequired = true
+    }
 }
 
-//tasks.named("publishGithub") {
-//    mustRunAfter(":neoforge:jar")
-//}
+tasks.named("publishGithub") {
+    mustRunAfter(":neoforge:jar")
+}
