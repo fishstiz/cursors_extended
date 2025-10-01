@@ -1,11 +1,8 @@
 package io.github.fishstiz.cursors_extended;
 
-import com.mojang.blaze3d.platform.cursor.CursorType;
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
-import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
 import io.github.fishstiz.cursors_extended.resource.CursorTextureLoader;
 import net.minecraft.client.Minecraft;
@@ -26,23 +23,10 @@ public final class CursorsExtended implements ClientStartedListener {
     }
 
     public void onClientStarted(Minecraft minecraft) {
+        registry.onClientStarted(minecraft);
         textureLoader.onClientStarted(minecraft);
         display.onClientStarted(minecraft);
 
-        registry.register(CursorType.DEFAULT);
-        registry.registerAlias(CursorType.DEFAULT, CursorTypes.ARROW);
-        registry.register(CursorTypes.POINTING_HAND);
-        registry.register(CursorTypesExt.GRABBING);
-        registry.register(CursorTypes.IBEAM);
-        registry.register(CursorTypesExt.SHIFT);
-        registry.register(CursorTypesExt.BUSY);
-        registry.register(CursorTypes.NOT_ALLOWED);
-        registry.register(CursorTypes.CROSSHAIR);
-        registry.register(CursorTypes.RESIZE_ALL);
-        registry.register(CursorTypes.RESIZE_EW);
-        registry.register(CursorTypes.RESIZE_NS);
-        registry.register(CursorTypesExt.RESIZE_NWSE);
-        registry.register(CursorTypesExt.RESIZE_NESW);
     }
 
     public static CursorsExtended getInstance() {
