@@ -11,6 +11,7 @@ import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +37,7 @@ import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 public class CursorTextureLoader implements PreparableReloadListener, ClientStartedListener {
     private static final int RGBA_BYTES_PER_PIXEL = 4;
     private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors");
+    private final Map<String, CursorMetadata> preparedMetadata = new Object2ObjectOpenHashMap<>();
     private final CursorRegistry registry;
     private Minecraft minecraft;
     private boolean prepared;
@@ -65,8 +67,33 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         loadTextures(registry.getCursors());
     }
 
+    private Optional<String> prepareMetadataHash(ResourceManager manager, Iterable<Cursor> hashableCursors) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        for (Cursor cursor : hashableCursors) {
+            ResourceLocation path = getExpectedPath(cursor.cursorType());
+            manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE)).ifPresent(resource -> {
+                try {
+                    CursorMetadata metadata = loadMetadata(manager, path, resource.sourcePackId());
+                    preparedMetadata.put(cursor.name(), metadata);
+
+                    out.write(resource.sourcePackId().getBytes(StandardCharsets.UTF_8));
+                    writeBytes(out, metadata);
+                } catch (Exception ignore) {
+                }
+            });
+        }
+
+        return out.size() == 0
+                ? Optional.empty()
+                : Optional.of(Hashing.murmur3_32_fixed().hashBytes(out.toByteArray()).toString());
+    }
+
+
     private void prepare(ResourceManager manager) {
-        getHash(manager).ifPresentOrElse(hash -> {
+        preparedMetadata.clear();
+
+        prepareMetadataHash(manager, registry.getInternalCursors()).ifPresentOrElse(hash -> {
             if (!Objects.equals(CONFIG.getHash(), hash)) {
                 LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
                 CONFIG.setHash(hash);
@@ -78,7 +105,21 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             CONFIG.setHash("");
         });
 
-        registry.getCursors().forEach(Cursor::prepareReload);
+        registry.getCursors().forEach(cursor -> {
+            cursor.prepareReload();
+
+            CursorMetadata metadata = preparedMetadata.computeIfAbsent(cursor.name(), type -> {
+                ResourceLocation path = getExpectedPath(cursor.cursorType());
+                return manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE))
+                        .map(resource -> loadMetadata(manager, path, resource.sourcePackId()))
+                        .orElse(new CursorMetadata());
+            });
+
+            if (CONFIG.isStale(cursor)) {
+                CONFIG.getOrCreateSettings(cursor).merge(metadata.getCursorSettings());
+            }
+        });
+
         prepared = true;
         CONFIG.save();
     }
@@ -102,11 +143,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                     try (InputStream in = resource.open(); NativeImage image = NativeImage.read(in)) {
                         assertImageSize(image.getWidth(), image.getHeight());
 
-                        CursorMetadata metadata = loadMetadata(manager, path, resource.sourcePackId());
-                        if (CONFIG.isStale(cursor)) {
-                            CONFIG.getOrCreateSettings(cursor).merge(metadata.getCursorSettings());
-                        }
-
+                        CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
                         Config.CursorSettings settings = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
                         float scale = sanitizeScale(settings.getScale());
                         int xhot = sanitizeHotspot(settings.getXHot(), image.getWidth());
@@ -118,6 +155,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
                         cursor.setTexture(texture);
                         minecraft.execute(() -> minecraft.getTextureManager().release(path));
+
                         return true;
                     } catch (Exception e) {
                         LOGGER.error("[cursors_extended] Failed to load cursor texture for '{}'. ", cursor.cursorType(), e);
@@ -305,53 +343,36 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         return frames;
     }
 
-    private Optional<String> getHash(ResourceManager manager) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        for (Cursor cursor : registry.getInternalCursors()) {
-            ResourceLocation path = getExpectedPath(cursor.cursorType());
-            manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE)).ifPresent(resource -> {
-                try {
-                    CursorMetadata metadata = JsonLoader.fromResource(CursorMetadata.class, resource, "");
-                    out.write(resource.sourcePackId().getBytes(StandardCharsets.UTF_8));
-                    if (metadata == null) return;
-
-                    Config.CursorSettings cs = metadata.getCursorSettings();
-                    out.write(Float.toString(cs.getScale()).getBytes(StandardCharsets.UTF_8));
-                    out.write(Integer.toString(cs.getXHot()).getBytes(StandardCharsets.UTF_8));
-                    out.write(Integer.toString(cs.getYHot()).getBytes(StandardCharsets.UTF_8));
-                    out.write(Boolean.toString(cs.isEnabled()).getBytes(StandardCharsets.UTF_8));
-                    if (cs.isAnimated() != null) {
-                        out.write(Boolean.toString(cs.isAnimated()).getBytes(StandardCharsets.UTF_8));
-                    }
-
-                    CursorMetadata.Animation anim = metadata.getAnimation();
-                    if (anim != null) {
-                        out.write(anim.mode.name().getBytes(StandardCharsets.UTF_8));
-                        out.write(Integer.toString(anim.getFrametime()).getBytes(StandardCharsets.UTF_8));
-                        if (anim.getWidth() != null) {
-                            out.write(Integer.toString(anim.getWidth()).getBytes(StandardCharsets.UTF_8));
-                        }
-                        if (anim.getHeight() != null) {
-                            out.write(Integer.toString(anim.getHeight()).getBytes(StandardCharsets.UTF_8));
-                        }
-                        for (CursorMetadata.Animation.Frame f : anim.getFrames()) {
-                            out.write(Integer.toString(f.getIndex()).getBytes(StandardCharsets.UTF_8));
-                            out.write(Integer.toString(f.getTime(anim)).getBytes(StandardCharsets.UTF_8));
-                        }
-                    }
-                } catch (Exception ignore) {
-                }
-            });
+    private static void writeBytes(ByteArrayOutputStream out, CursorMetadata metadata) throws IOException {
+        Config.CursorSettings cs = metadata.getCursorSettings();
+        out.write(Float.toString(cs.getScale()).getBytes(StandardCharsets.UTF_8));
+        out.write(Integer.toString(cs.getXHot()).getBytes(StandardCharsets.UTF_8));
+        out.write(Integer.toString(cs.getYHot()).getBytes(StandardCharsets.UTF_8));
+        out.write(Boolean.toString(cs.isEnabled()).getBytes(StandardCharsets.UTF_8));
+        if (cs.isAnimated() != null) {
+            out.write(Boolean.toString(cs.isAnimated()).getBytes(StandardCharsets.UTF_8));
         }
 
-        return out.size() == 0
-                ? Optional.empty()
-                : Optional.of(Hashing.murmur3_32_fixed().hashBytes(out.toByteArray()).toString());
+        CursorMetadata.Animation anim = metadata.getAnimation();
+        if (anim != null) {
+            out.write(anim.mode.name().getBytes(StandardCharsets.UTF_8));
+            out.write(Integer.toString(anim.getFrametime()).getBytes(StandardCharsets.UTF_8));
+            if (anim.getWidth() != null) {
+                out.write(Integer.toString(anim.getWidth()).getBytes(StandardCharsets.UTF_8));
+            }
+            if (anim.getHeight() != null) {
+                out.write(Integer.toString(anim.getHeight()).getBytes(StandardCharsets.UTF_8));
+            }
+            for (CursorMetadata.Animation.Frame f : anim.getFrames()) {
+                out.write(Integer.toString(f.getIndex()).getBytes(StandardCharsets.UTF_8));
+                out.write(Integer.toString(f.getTime(anim)).getBytes(StandardCharsets.UTF_8));
+            }
+        }
     }
 
     private static ResourceLocation getExpectedPath(CursorType cursorType) {
-        return DIRECTORY.withSuffix("/" + cursorType + ".png");
+        return DIRECTORY.withSuffix("/" + cursorType.toString() + ".png");
     }
 
     public static ResourceLocation getDir() {
