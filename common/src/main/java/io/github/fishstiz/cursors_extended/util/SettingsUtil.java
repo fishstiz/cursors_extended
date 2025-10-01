@@ -145,7 +145,10 @@ public class SettingsUtil {
         }
 
         CONFIG.putCursorSettings(cursor, ignoreIfGlobal(cursor, texture.metadata().getCursorSettings()));
-        CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor)));
+        Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+        cursor.setEnabled(settings.isEnabled());
+
+        CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
         return true;
     }
 
