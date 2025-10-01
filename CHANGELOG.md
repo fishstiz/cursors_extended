@@ -1,6 +1,6 @@
-- New wiki: https://fishstiz.github.io/cursors_extended-wiki/resource-pack/getting-started
-  - Includes tool to convert resource packs using v3 format to v4.
-- Default textures are now shown as an optional resource pack.
-- Added built-in resource pack for auto-scaling default textures.
-- Fixed inconsistent resource pack change detection.
-- Full 4.0.0 Changelog here: https://github.com/fishstiz/cursors_extended/issues/1
+- Changed pack hash generation to fix inconsistencies. Will reset your config.
+- Cursors are now lazily loaded.
+- Fixed cursor flickering when configuring sliders in the config screen if hold cursor option is disabled.
+- **NeoForge** port. The default resource pack is not optional as the API has no way to make it optional and enabled by
+  default.
+- Full v4.0.0 Changelog here: https://github.com/fishstiz/cursors_extended/issues/1

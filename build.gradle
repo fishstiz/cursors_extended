@@ -53,8 +53,8 @@ publishMods {
 
     def githubOptions = githubOptions {
         accessToken = secrets.getProperty("GITHUB_TOKEN")
-        repository = "fishstiz/minecraft-cursor"
-        commitish = "mc/1.21.9"
+        repository = "fishstiz/cursors_extended"
+        commitish = "mc/$minecraft_version"
         tagName = "v${mod_version}"
         displayName = "${mod_name} v${mod_version}"
 
@@ -77,7 +77,7 @@ publishMods {
     def curseforgeOptions = curseforgeOptions {
         accessToken = secrets.getProperty("CURSEFORGE_TOKEN")
         projectId = "1184736"
-        minecraftVersions.add("1.21.9-snapshot")
+        minecraftVersions.add(minecraft_version)
     }
 
     github("github") {
