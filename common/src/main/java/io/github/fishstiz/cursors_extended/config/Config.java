@@ -370,7 +370,7 @@ public class Config implements Serializable {
         }
     }
 
-    public abstract static class AbstractCursorSettings<T extends AbstractCursorSettings<T>> implements SharedCursorSettings<T> {
+    public abstract static class AbstractCursorSettings<T extends AbstractCursorSettings<T>> implements CursorProperties {
         protected float scale = SCALE;
         protected int xhot = X_HOT;
         protected int yhot = Y_HOT;
@@ -386,5 +386,7 @@ public class Config implements Serializable {
         public int yhot() {
             return yhot;
         }
+
+        public abstract T copy();
     }
 }

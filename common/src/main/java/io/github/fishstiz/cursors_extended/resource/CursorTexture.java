@@ -1,24 +1,17 @@
 package io.github.fishstiz.cursors_extended.resource;
 
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
+import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
-public sealed interface CursorTexture extends ClientAsset.Texture, AutoCloseable permits BasicCursorTexture, AnimatedCursorTexture {
-    boolean enabled();
-
+public sealed interface CursorTexture extends CursorProperties, ClientAsset.Texture, AutoCloseable permits BasicCursorTexture, AnimatedCursorTexture {
     void toggle();
 
     long handle();
-
-    float scale();
-
-    int xhot();
-
-    int yhot();
 
     int textureWidth();
 

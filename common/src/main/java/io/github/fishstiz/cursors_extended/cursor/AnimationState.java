@@ -10,18 +10,22 @@ public sealed interface AnimationState {
 
     void reset();
 
-    static AnimationState of(AnimationMode mode) {
+    static AnimationState of(AnimationMode mode, int initialFrameIndex) {
         return switch (mode) {
-            case LOOP, LOOP_REVERSE -> new Loop();
-            case FORWARDS, REVERSE -> new Forwards();
-            case OSCILLATE -> new Oscillate();
-            case RANDOM, RANDOM_CYCLE -> new RandomCycle();
+            case LOOP, LOOP_REVERSE -> new Loop(initialFrameIndex);
+            case FORWARDS, REVERSE -> new Forwards(initialFrameIndex);
+            case OSCILLATE -> new Oscillate(initialFrameIndex);
+            case RANDOM, RANDOM_CYCLE -> new RandomCycle(initialFrameIndex);
         };
     }
 
     abstract sealed class Base implements AnimationState {
-        protected int currentFrameIndex = 0;
+        protected int currentFrameIndex;
         protected long lastFrameTime = 0;
+
+        protected Base(int initialFrameIndex) {
+            this.currentFrameIndex = initialFrameIndex;
+        }
 
         protected boolean shouldAdvance(AnimatedCursorTexture texture) {
             AnimatedCursorTexture.Frame currentFrame = texture.getFrame(currentFrameIndex);
@@ -41,6 +45,10 @@ public sealed interface AnimationState {
     }
 
     final class Loop extends Base {
+        public Loop(int initialFrameIndex) {
+            super(initialFrameIndex);
+        }
+
         @Override
         public int next(AnimatedCursorTexture texture) {
             if (shouldAdvance(texture)) {
@@ -52,6 +60,10 @@ public sealed interface AnimationState {
     }
 
     final class Forwards extends Base {
+        public Forwards(int initialFrameIndex) {
+            super(initialFrameIndex);
+        }
+
         @Override
         public int next(AnimatedCursorTexture texture) {
             if (shouldAdvance(texture)) {
@@ -63,7 +75,12 @@ public sealed interface AnimationState {
     }
 
     final class Oscillate extends Base {
-        private boolean reversed = false;
+        private boolean reversed;
+
+        public Oscillate(int initialFrameIndex) {
+            super(initialFrameIndex);
+            this.reversed = initialFrameIndex > 0;
+        }
 
         @Override
         public int next(AnimatedCursorTexture texture) {
@@ -87,6 +104,10 @@ public sealed interface AnimationState {
         private final Random random = new Random();
         private int[] shuffledFrames;
         private int shuffledIndex = 0;
+
+        public RandomCycle(int initialFrameIndex) {
+            super(initialFrameIndex);
+        }
 
         @Override
         public int next(AnimatedCursorTexture texture) {

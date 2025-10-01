@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.resource;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
+import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.cursor.AnimationState;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import net.minecraft.resources.ResourceLocation;
@@ -27,16 +28,13 @@ public final class AnimatedCursorTexture implements CursorTexture {
     private boolean animated;
 
     public AnimatedCursorTexture(
-            Boolean animated,
-            boolean enabled,
-            float scale,
-            int xhot,
-            int yhot,
+            int initialFrameIndex,
+            Frame baseFrame,
+            List<Frame> frames,
             NativeImage image,
             ResourceLocation path,
             CursorMetadata metadata,
-            Frame baseFrame,
-            List<Frame> frames
+            CursorProperties settings
     ) throws IOException {
         if (frames.isEmpty()) {
             throw new IllegalArgumentException("frames cannot be empty.");
@@ -44,16 +42,16 @@ public final class AnimatedCursorTexture implements CursorTexture {
 
         CursorMetadata.Animation animation = metadata.requireAnimation();
 
-        this.enabled = enabled;
-        this.animated = animated == null || animated;
+        this.enabled = settings.enabled();
+        this.animated = settings.animated() == null || settings.animated();
         this.metadata = metadata;
-        this.animationState = AnimationState.of(animation.mode());
+        this.animationState = AnimationState.of(animation.mode(), initialFrameIndex);
         this.frames = List.copyOf(animation.mode().isReversed() ? frames.reversed() : frames);
         this.baseFrame = baseFrame;
         this.path = path;
-        this.scale = scale;
-        this.xhot = xhot;
-        this.yhot = yhot;
+        this.scale = settings.scale();
+        this.xhot = settings.xhot();
+        this.yhot = settings.yhot();
         this.textureWidth = image.getWidth();
         this.textureHeight = image.getHeight();
         this.pixels = NativeImageUtil.getBytes(image);
@@ -88,6 +86,15 @@ public final class AnimatedCursorTexture implements CursorTexture {
     @Override
     public int yhot() {
         return yhot;
+    }
+
+    @Override
+    public @NotNull Boolean animated() {
+        return animated;
+    }
+
+    public void setAnimated(boolean animated) {
+        this.animated = animated;
     }
 
     @Override
@@ -146,21 +153,13 @@ public final class AnimatedCursorTexture implements CursorTexture {
     }
 
     public Frame getFrame(int index) {
-        if (!animated) {
+        if (!animated || !enabled) {
             return baseFrame;
         }
         if (index < 0 || index >= frames.size()) {
             return frames.getFirst();
         }
         return frames.get(index);
-    }
-
-    public boolean isAnimated() {
-        return animated;
-    }
-
-    public void setAnimated(boolean animated) {
-        this.animated = animated;
     }
 
     public void restartAnimation() {

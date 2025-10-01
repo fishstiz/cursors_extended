@@ -137,11 +137,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             ));
 
             if (this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
-                this.optionsList.addOption(new ToggleWidget(
-                        animatedCursor.isAnimated(),
-                        ANIMATE_TEXT,
-                        this::onToggleAnimate
-                ));
+                this.optionsList.addOption(new ToggleWidget(animatedCursor.animated(), ANIMATE_TEXT, this::onToggleAnimate));
                 this.optionsList.addOption(new ButtonWidget(RESET_ANIMATION_TEXT, this::restartAnimation));
             }
 

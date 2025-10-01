@@ -234,7 +234,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     public boolean isAnimatedAny() {
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor && animatedCursor.isAnimated()) {
+            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor && animatedCursor.animated()) {
                 return true;
             }
         }

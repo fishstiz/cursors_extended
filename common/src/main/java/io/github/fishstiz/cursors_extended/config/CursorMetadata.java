@@ -1,6 +1,5 @@
 package io.github.fishstiz.cursors_extended.config;
 
-import com.google.gson.*;
 import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,14 +27,9 @@ public record CursorMetadata(CursorSettings cursor, Animation animation) impleme
             int xhot,
             int yhot,
             @Nullable Boolean animated
-    ) implements SharedCursorSettings<CursorSettings> {
+    ) implements CursorProperties {
         public CursorSettings() {
             this(ENABLED, SCALE, X_HOT, Y_HOT, ANIMATED);
-        }
-
-        @Override
-        public CursorSettings copy() {
-            return new CursorSettings(enabled, scale, xhot, yhot, animated);
         }
     }
 

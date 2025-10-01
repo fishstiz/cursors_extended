@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.config;
 
-public interface SharedCursorSettings<T extends SharedCursorSettings<T>> {
+public interface CursorProperties {
     boolean enabled();
 
     float scale();
@@ -10,6 +10,4 @@ public interface SharedCursorSettings<T extends SharedCursorSettings<T>> {
     int yhot();
 
     Boolean animated();
-
-    T copy();
 }

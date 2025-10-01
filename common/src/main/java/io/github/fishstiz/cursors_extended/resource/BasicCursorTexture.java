@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.resource;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
+import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -22,20 +23,17 @@ public final class BasicCursorTexture implements CursorTexture {
     private long handle;
 
     public BasicCursorTexture(
-            boolean enabled,
             long handle,
-            float scale,
-            int xhot,
-            int yhot,
             NativeImage image,
             ResourceLocation texturePath,
-            CursorMetadata metadata
+            CursorMetadata metadata,
+            CursorProperties settings
     ) throws IOException {
-        this.enabled = enabled;
         this.handle = handle;
-        this.scale = scale;
-        this.xhot = xhot;
-        this.yhot = yhot;
+        this.enabled = settings.enabled();
+        this.scale = settings.scale();
+        this.xhot = settings.xhot();
+        this.yhot = settings.yhot();
         this.textureWidth = image.getWidth();
         this.textureHeight = image.getHeight();
         this.pixels = NativeImageUtil.getBytes(image);
@@ -71,6 +69,11 @@ public final class BasicCursorTexture implements CursorTexture {
     @Override
     public int yhot() {
         return yhot;
+    }
+
+    @Override
+    public Boolean animated() {
+        return false;
     }
 
     @Override

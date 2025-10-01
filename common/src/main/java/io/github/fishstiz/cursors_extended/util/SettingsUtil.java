@@ -3,7 +3,7 @@ package io.github.fishstiz.cursors_extended.util;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
-import io.github.fishstiz.cursors_extended.config.SharedCursorSettings;
+import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.client.Minecraft;
@@ -118,7 +118,7 @@ public class SettingsUtil {
         return 0;
     }
 
-    public static boolean equalSettings(@Nullable SharedCursorSettings<?> a, @Nullable SharedCursorSettings<?> b, boolean excludeGlobal) {
+    public static boolean equalSettings(@Nullable CursorProperties a, @Nullable CursorProperties b, boolean excludeGlobal) {
         if (Objects.equals(a, b)) {
             return true;
         }

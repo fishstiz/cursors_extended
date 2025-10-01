@@ -7,6 +7,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
+import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
@@ -144,14 +145,18 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                         assertImageSize(image.getWidth(), image.getHeight());
 
                         CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
-                        Config.CursorSettings settings = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
-                        float scale = sanitizeScale(settings.scale());
-                        int xhot = sanitizeHotspot(settings.xhot(), image.getWidth());
-                        int yhot = sanitizeHotspot(settings.yhot(), image.getHeight());
+                        CursorProperties merged = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
+                        CursorProperties sanitized = new CursorMetadata.CursorSettings(
+                                merged.enabled(),
+                                sanitizeScale(merged.scale()),
+                                sanitizeHotspot(merged.xhot(), image.getWidth()),
+                                sanitizeHotspot(merged.yhot(), image.getHeight()),
+                                merged.animated()
+                        );
 
                         CursorTexture texture = metadata.animation() != null
-                                ? createAnimated(image, path, settings.animated(), settings.enabled(), scale, xhot, yhot, metadata)
-                                : createBasic(image, path, settings.enabled(), scale, xhot, yhot, metadata);
+                                ? createAnimated(0, image, path, metadata, sanitized)
+                                : createBasic(image, path, metadata, sanitized);
 
                         cursor.setTexture(texture);
                         minecraft.execute(() -> minecraft.getTextureManager().release(path));
@@ -188,27 +193,34 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
     public void updateTexture(Cursor cursor, float scale, int xhot, int yhot) {
         CursorTexture texture = cursor.getTexture();
+        if (texture == null) {
+            return;
+        }
 
-        if (texture != null) {
-            NativeImage copy = null;
-            try {
-                copy = NativeImage.read(texture.pixels());
+        Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+        settings.setScale(scale);
+        settings.setXHot(cursor, xhot);
+        settings.setYHot(cursor, yhot);
 
-                CursorTexture updatedTexture = switch (texture) {
-                    case BasicCursorTexture ignoreBasic ->
-                            createBasic(copy, texture.texturePath(), texture.enabled(), scale, xhot, yhot, texture.metadata());
-                    case AnimatedCursorTexture animated ->
-                            createAnimated(copy, texture.texturePath(), animated.isAnimated(), texture.enabled(), scale, xhot, yhot, texture.metadata());
-                };
+        NativeImage image = null;
 
-                cursor.setTexture(updatedTexture);
-                texture.close();
-            } catch (Exception e) {
-                LOGGER.error("[cursors_extended] Failed to update texture of cursor '{}'", cursor.cursorType(), e);
-                cursor.setTexture(texture);
-                if (copy != null) {
-                    copy.close();
-                }
+        try {
+            image = NativeImage.read(texture.pixels());
+
+            CursorTexture updatedTexture = switch (texture) {
+                case BasicCursorTexture ignore ->
+                        createBasic(image, texture.texturePath(), texture.metadata(), settings);
+                case AnimatedCursorTexture animated ->
+                        createAnimated(animated.currentFrame().index(), image, texture.texturePath(), texture.metadata(), settings);
+            };
+
+            cursor.setTexture(updatedTexture);
+            texture.close();
+        } catch (Exception e) {
+            LOGGER.error("[cursors_extended] Failed to update texture of cursor '{}'", cursor.cursorType(), e);
+            cursor.setTexture(texture);
+            if (image != null) {
+                image.close();
             }
         }
     }
@@ -229,21 +241,18 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     private static BasicCursorTexture createBasic(
             NativeImage image,
             ResourceLocation path,
-            boolean enabled,
-            float scale,
-            int xhot,
-            int yhot,
-            CursorMetadata metadata
+            CursorMetadata metadata,
+            CursorProperties settings
     ) throws IOException {
-        float trueScale = getAutoScale(scale);
-        int scaledXHot = scale == 1 ? xhot : Math.round(xhot * trueScale);
-        int scaledYHot = scale == 1 ? yhot : Math.round(yhot * trueScale);
+        float trueScale = getAutoScale(settings.scale());
+        int scaledXHot = settings.scale() == 1 ? settings.xhot() : Math.round(settings.xhot() * trueScale);
+        int scaledYHot = settings.scale() == 1 ? settings.yhot() : Math.round(settings.yhot() * trueScale);
 
         ByteBuffer pixels = null;
         NativeImage scaledImage = null;
 
         try {
-            if (scale != 1) {
+            if (settings.scale() != 1) {
                 scaledImage = NativeImageUtil.scaleImage(image, trueScale);
             }
 
@@ -260,7 +269,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                 throw new IOException("Could not create GLFW Cursor");
             }
 
-            return new BasicCursorTexture(enabled, handle, scale, xhot, yhot, image, path, metadata);
+            return new BasicCursorTexture(handle, image, path, metadata, settings);
         } finally {
             if (scaledImage != null) {
                 scaledImage.close();
@@ -272,16 +281,13 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     private static AnimatedCursorTexture createAnimated(
+            int initialFrameIndex,
             NativeImage image,
             ResourceLocation path,
-            Boolean animated,
-            boolean enabled,
-            float scale,
-            int xhot,
-            int yhot,
-            CursorMetadata metadata
+            CursorMetadata metadata,
+            CursorProperties settings
     ) throws IOException {
-        CursorMetadata.Animation animation = Objects.requireNonNull(metadata.animation(), "metadata animation must not be null");
+        CursorMetadata.Animation animation = metadata.requireAnimation();
 
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
@@ -299,13 +305,13 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             for (int i = 0; i < availableFrames; i++) {
                 int yOffset = i * frameHeight;
                 try (NativeImage croppedImage = NativeImageUtil.cropImage(image, 0, yOffset, frameWidth, frameHeight)) {
-                    textures.add(createBasic(croppedImage, path, enabled, scale, xhot, yhot, metadata));
+                    textures.add(createBasic(croppedImage, path, metadata, settings));
                 }
             }
 
             AnimatedCursorTexture.Frame baseFrame = new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.frametime());
             List<AnimatedCursorTexture.Frame> frames = createAnimationFrames(animation, textures, availableFrames);
-            return new AnimatedCursorTexture(animated, enabled, scale, xhot, yhot, image, path, metadata, baseFrame, frames);
+            return new AnimatedCursorTexture(initialFrameIndex, baseFrame, frames, image, path, metadata, settings);
         } catch (Exception e) {
             textures.forEach(BasicCursorTexture::close);
             throw e;
@@ -342,7 +348,6 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
         return frames;
     }
-
 
     private static void writeBytes(ByteArrayOutputStream out, CursorMetadata metadata) throws IOException {
         CursorMetadata.CursorSettings cs = metadata.cursor();
