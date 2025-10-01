@@ -197,7 +197,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             int yhot,
             CursorMetadata metadata
     ) throws IOException {
-        float trueScale = (float) getAutoScale(scale);
+        float trueScale = getAutoScale(scale);
         int scaledXHot = scale == 1 ? xhot : Math.round(xhot * trueScale);
         int scaledYHot = scale == 1 ? yhot : Math.round(yhot * trueScale);
 

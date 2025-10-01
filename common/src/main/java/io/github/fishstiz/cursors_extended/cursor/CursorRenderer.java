@@ -49,11 +49,11 @@ public sealed interface CursorRenderer {
         private int textureHeight;
         private int spriteWidth;
         private int spriteHeight;
-        private double drawWidth;
-        private double drawHeight;
+        private float drawWidth;
+        private float drawHeight;
         private int vOffset;
-        private double xhot;
-        private double yhot;
+        private float xhot;
+        private float yhot;
 
         public Virtual(CursorRegistry registry) {
             this.registry = registry;
@@ -80,9 +80,9 @@ public sealed interface CursorRenderer {
             this.textureHeight = texture.textureHeight();
             this.spriteWidth = texture.spriteWidth();
             this.spriteHeight = texture.spriteHeight();
-            this.vOffset = texture.spriteHeight() * texture.spriteVOffset();
+            this.vOffset = texture.spriteVOffset();
 
-            double scale = SettingsUtil.getAutoScale(texture.scale());
+            float scale = SettingsUtil.getAutoScale(texture.scale());
             this.xhot = texture.xhot() * scale;
             this.yhot = texture.yhot() * scale;
             this.drawWidth = this.spriteWidth * scale;
@@ -100,10 +100,10 @@ public sealed interface CursorRenderer {
             if (!minecraft.mouseHandler.isMouseGrabbed()) {
                 if (this.textureLocation != null) {
                     int guiScale = minecraft.getWindow().getGuiScale();
-                    int scaledWidth = (int) Math.round(this.drawWidth / guiScale);
-                    int scaledHeight = (int) Math.round(this.drawHeight / guiScale);
-                    int x = mouseX - (int) Math.round(this.xhot / guiScale);
-                    int y = mouseY - (int) Math.round(this.yhot / guiScale);
+                    int scaledWidth = Math.round(this.drawWidth / guiScale);
+                    int scaledHeight = Math.round(this.drawHeight / guiScale);
+                    int x = mouseX - Math.round(this.xhot / guiScale);
+                    int y = mouseY - Math.round(this.yhot / guiScale);
 
                     glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 

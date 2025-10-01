@@ -39,15 +39,23 @@ public class SettingsUtil {
         }
     }
 
-    public static boolean isAutoScale(double scale) {
+    public static boolean isAutoScale(float scale) {
         return scale <= SCALE_AUTO_THRESHOLD_MAX;
     }
 
-    public static @Nullable Component getAutoText(double scale) {
+    public static boolean isAutoScale(double scale) {
+        return isAutoScale((float) scale);
+    }
+
+    public static @Nullable Component getAutoText(float scale) {
         return isAutoScale(scale) ? Component.translatable("options.guiScale.auto") : null;
     }
 
-    public static double getAutoScale(double scale) {
+    public static @Nullable Component getAutoText(double scale) {
+        return getAutoText((float) scale);
+    }
+
+    public static float getAutoScale(float scale) {
         if (isAutoScale(scale)) {
             OptionInstance<Integer> guiScale = Minecraft.getInstance().options.guiScale();
             int max = Integer.MAX_VALUE;
@@ -62,7 +70,7 @@ public class SettingsUtil {
         return scale;
     }
 
-    public static float sanitizeScale(double scale) {
+    public static float sanitizeScale(float scale) {
         double clampedScale = clamp(scale, SCALE_MIN, SCALE_MAX);
         double mappedScale = Math.round(clampedScale / SCALE_STEP) * SCALE_STEP;
 

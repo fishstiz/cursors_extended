@@ -142,7 +142,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onChangeScale(double scale) {
-        CONFIG.getGlobal().setScale(scale);
+        CONFIG.getGlobal().setScale((float) scale);
         if (CONFIG.getGlobal().isScaleActive()) {
             setScale(currentCursor, (float) scale);
         }
@@ -313,7 +313,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             this.renderRuler(guiGraphics, mouseX, mouseY);
             this.renderBorder(guiGraphics);
 
-            updateMouseMoved();
             if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
         }
 

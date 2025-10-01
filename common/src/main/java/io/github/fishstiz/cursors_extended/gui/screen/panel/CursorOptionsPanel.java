@@ -238,7 +238,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
     private void onChangeScale(double scale) {
         setScale(cursor, (float) scale);
-        this.settings.setScale(scale);
+        this.settings.setScale((float) scale);
         this.refreshGuiScaleButton(scale);
         this.refreshDefaultsButton();
     }
@@ -298,7 +298,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void resetToDefaults() {
-        if (restoreNonGlobalSettings(Objects.requireNonNull(this.cursor))) {
+        if (restoreNonGlobalSettings(this.cursor)) {
             this.refreshCursors.run();
             if (this.enableToggler != null) {
                 this.setFocused(this.enableToggler);

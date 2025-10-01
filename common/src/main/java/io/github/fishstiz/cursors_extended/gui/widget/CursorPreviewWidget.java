@@ -26,7 +26,6 @@ public class CursorPreviewWidget extends CursorWidget {
     private static final int DEFAULT_BUTTON_SIZE = 20;
     private final @Nullable Button button;
     private final Font font;
-    private boolean mouseEntered;
 
     public CursorPreviewWidget(@NotNull Cursor cursor, @NotNull Font font, @Nullable Button button) {
         super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
@@ -52,17 +51,6 @@ public class CursorPreviewWidget extends CursorWidget {
         }
     }
 
-    protected void updateMouseMoved() {
-        if (this.isHovered()) {
-            if (!mouseEntered && getCursor().getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
-                animatedCursorTexture.restartAnimation();
-            }
-            mouseEntered = true;
-        } else {
-            mouseEntered = false;
-        }
-    }
-
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Cursor cursor = this.getCursor();
@@ -81,7 +69,6 @@ public class CursorPreviewWidget extends CursorWidget {
 
         this.renderBorder(guiGraphics);
 
-        updateMouseMoved();
         if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
     }
 
@@ -115,6 +102,9 @@ public class CursorPreviewWidget extends CursorWidget {
     public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean doubleClicked) {
         if (this.button != null && this.button.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y())) {
             this.button.mouseClicked(mouseButtonEvent, doubleClicked);
+            if (this.getCursor().getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
+                animatedCursorTexture.restartAnimation();
+            }
         }
         return false;
     }

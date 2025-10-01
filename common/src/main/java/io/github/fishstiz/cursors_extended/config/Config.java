@@ -214,7 +214,7 @@ public class Config implements Serializable {
         CursorSettings() {
         }
 
-        public void setScale(double scale) {
+        public void setScale(float scale) {
             this.scale = sanitizeScale(scale);
         }
 
@@ -298,7 +298,7 @@ public class Config implements Serializable {
             this.yhotActive = yhotActive;
         }
 
-        public void setScale(double scale) {
+        public void setScale(float scale) {
             this.scale = sanitizeScale(scale);
         }
 
