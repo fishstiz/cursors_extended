@@ -14,10 +14,8 @@ import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
@@ -120,7 +118,6 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
                         cursor.setTexture(texture);
                         minecraft.execute(() -> minecraft.getTextureManager().release(path));
-                        LOGGER.info("[cursors_extended] Loaded cursor type: {}", cursor.cursorType());
                         return true;
                     } catch (Exception e) {
                         LOGGER.error("[cursors_extended] Failed to load cursor texture for '{}'. ", cursor.cursorType(), e);
@@ -308,37 +305,45 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         return frames;
     }
 
-    private static Optional<String> getHash(ResourceManager manager) {
+    private Optional<String> getHash(ResourceManager manager) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        manager.listPacks().forEach(packResources -> {
-            try (packResources) {
-                if (!packResources.getNamespaces(PackType.CLIENT_RESOURCES).contains(DIRECTORY.getNamespace())) {
-                    return;
-                }
+        for (Cursor cursor : registry.getInternalCursors()) {
+            ResourceLocation path = getExpectedPath(cursor.cursorType());
+            manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE)).ifPresent(resource -> {
+                try {
+                    CursorMetadata metadata = JsonLoader.fromResource(CursorMetadata.class, resource, "");
+                    out.write(resource.sourcePackId().getBytes(StandardCharsets.UTF_8));
+                    if (metadata == null) return;
 
-                MutableBoolean listed = new MutableBoolean(false);
-                packResources.listResources(PackType.CLIENT_RESOURCES, MOD_ID, DIRECTORY.getPath(),
-                        (resourceLocation, ioSupplier) -> {
-                            try (InputStream in = ioSupplier.get()) {
-                                if (listed.isFalse()) {
-                                    try {
-                                        out.write(packResources.location().id().getBytes(StandardCharsets.UTF_8));
-                                        listed.setTrue();
-                                    } catch (IOException ignore) {
-                                    }
-                                }
-                                if (resourceLocation.getPath().endsWith(CursorMetadata.FILE_TYPE)) {
-                                    try {
-                                        in.transferTo(out);
-                                    } catch (IOException ignore) {
-                                    }
-                                }
-                            } catch (IOException ignore) {
-                            }
-                        });
-            }
-        });
+                    Config.CursorSettings cs = metadata.getCursorSettings();
+                    out.write(Float.toString(cs.getScale()).getBytes(StandardCharsets.UTF_8));
+                    out.write(Integer.toString(cs.getXHot()).getBytes(StandardCharsets.UTF_8));
+                    out.write(Integer.toString(cs.getYHot()).getBytes(StandardCharsets.UTF_8));
+                    out.write(Boolean.toString(cs.isEnabled()).getBytes(StandardCharsets.UTF_8));
+                    if (cs.isAnimated() != null) {
+                        out.write(Boolean.toString(cs.isAnimated()).getBytes(StandardCharsets.UTF_8));
+                    }
+
+                    CursorMetadata.Animation anim = metadata.getAnimation();
+                    if (anim != null) {
+                        out.write(anim.mode.name().getBytes(StandardCharsets.UTF_8));
+                        out.write(Integer.toString(anim.getFrametime()).getBytes(StandardCharsets.UTF_8));
+                        if (anim.getWidth() != null) {
+                            out.write(Integer.toString(anim.getWidth()).getBytes(StandardCharsets.UTF_8));
+                        }
+                        if (anim.getHeight() != null) {
+                            out.write(Integer.toString(anim.getHeight()).getBytes(StandardCharsets.UTF_8));
+                        }
+                        for (CursorMetadata.Animation.Frame f : anim.getFrames()) {
+                            out.write(Integer.toString(f.getIndex()).getBytes(StandardCharsets.UTF_8));
+                            out.write(Integer.toString(f.getTime(anim)).getBytes(StandardCharsets.UTF_8));
+                        }
+                    }
+                } catch (Exception ignore) {
+                }
+            });
+        }
 
         return out.size() == 0
                 ? Optional.empty()

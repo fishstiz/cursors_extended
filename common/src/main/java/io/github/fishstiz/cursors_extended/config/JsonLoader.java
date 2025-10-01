@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
 import net.minecraft.server.packs.resources.Resource;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -22,20 +23,24 @@ public class JsonLoader {
     private JsonLoader() {
     }
 
-    public static <T extends Serializable> T fromResource(Class<T> clazz, Resource resource, String failMessage) {
+    public static <T extends Serializable> T fromResource(Class<T> clazz, Resource resource, @Nullable String failMessage) {
         try (InputStream stream = resource.open()) {
             return fromStream(clazz, stream, failMessage);
         } catch (IOException e) {
-            CursorsExtended.LOGGER.error("[cursors-extended] Failed to open resource: {}", failMessage);
+            if (failMessage != null) {
+                CursorsExtended.LOGGER.error("[cursors-extended] Failed to open resource: {}", failMessage);
+            }
             return null;
         }
     }
 
-    public static <T extends Serializable> T fromStream(Class<T> clazz, InputStream stream, String failMessage) {
+    public static <T extends Serializable> T fromStream(Class<T> clazz, InputStream stream, @Nullable String failMessage) {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             return GSON.fromJson(reader, clazz);
         } catch (IOException e) {
-            CursorsExtended.LOGGER.error("[cursors-extended] Failed to load file: {}", failMessage);
+            if (failMessage != null) {
+                CursorsExtended.LOGGER.error("[cursors-extended] Failed to load file: {}", failMessage);
+            }
             return null;
         }
     }
