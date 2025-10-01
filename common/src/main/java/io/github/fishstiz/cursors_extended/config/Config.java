@@ -205,7 +205,7 @@ public class Config implements Serializable {
         this.showHotspotGuide = showHotspotGuide;
     }
 
-    public static class CursorSettings extends AbstractCursorSettings<CursorSettings> implements Serializable {
+    public static class CursorSettings extends AbstractCursorSettings implements Serializable {
         protected boolean enabled = ENABLED;
         protected Boolean animated = ANIMATED;
         private transient boolean stale = false;
@@ -259,7 +259,6 @@ public class Config implements Serializable {
             mergeCommon(metadata);
         }
 
-        @Override
         public CursorSettings copy() {
             CursorSettings settings = new CursorSettings();
             settings.scale = this.scale;
@@ -271,7 +270,7 @@ public class Config implements Serializable {
         }
     }
 
-    public static class GlobalSettings extends AbstractCursorSettings<GlobalSettings> implements Serializable {
+    public static class GlobalSettings extends AbstractCursorSettings implements Serializable {
         private boolean scaleActive = false;
         private boolean xhotActive = false;
         private boolean yhotActive = false;
@@ -349,20 +348,8 @@ public class Config implements Serializable {
             throw new UnsupportedOperationException("GlobalSettings does not have an animated setting");
         }
 
-        @Override
-        public GlobalSettings copy() {
-            GlobalSettings globalSettings = new GlobalSettings();
-            globalSettings.scale = this.scale;
-            globalSettings.xhot = this.xhot;
-            globalSettings.yhot = this.yhot;
-            globalSettings.scaleActive = this.scaleActive;
-            globalSettings.xhotActive = this.xhotActive;
-            globalSettings.yhotActive = this.yhotActive;
-            return globalSettings;
-        }
-
-        public <T extends AbstractCursorSettings<T>> T apply(T settings) {
-            T copied = settings.copy();
+        public CursorSettings apply(CursorSettings settings) {
+            CursorSettings copied = settings.copy();
             copied.scale = this.isScaleActive() ? this.scale() : copied.scale();
             copied.xhot = this.isXHotActive() ? this.xhot() : copied.xhot();
             copied.yhot = this.isYHotActive() ? this.yhot() : copied.yhot();
@@ -370,7 +357,7 @@ public class Config implements Serializable {
         }
     }
 
-    public abstract static class AbstractCursorSettings<T extends AbstractCursorSettings<T>> implements CursorProperties {
+    public abstract static class AbstractCursorSettings implements CursorProperties {
         protected float scale = SCALE;
         protected int xhot = X_HOT;
         protected int yhot = Y_HOT;
@@ -386,7 +373,5 @@ public class Config implements Serializable {
         public int yhot() {
             return yhot;
         }
-
-        public abstract T copy();
     }
 }

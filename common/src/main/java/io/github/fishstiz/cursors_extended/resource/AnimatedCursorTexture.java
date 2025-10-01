@@ -28,9 +28,9 @@ public final class AnimatedCursorTexture implements CursorTexture {
     private boolean animated;
 
     public AnimatedCursorTexture(
-            int initialFrameIndex,
             Frame baseFrame,
             List<Frame> frames,
+            AnimationState animationState,
             NativeImage image,
             ResourceLocation path,
             CursorMetadata metadata,
@@ -45,7 +45,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
         this.enabled = settings.enabled();
         this.animated = settings.animated() == null || settings.animated();
         this.metadata = metadata;
-        this.animationState = AnimationState.of(animation.mode(), initialFrameIndex);
+        this.animationState = animationState;
         this.frames = List.copyOf(animation.mode().isReversed() ? frames.reversed() : frames);
         this.baseFrame = baseFrame;
         this.path = path;
@@ -160,6 +160,10 @@ public final class AnimatedCursorTexture implements CursorTexture {
             return frames.getFirst();
         }
         return frames.get(index);
+    }
+
+    public AnimationState getAnimationState() {
+        return animationState;
     }
 
     public void restartAnimation() {

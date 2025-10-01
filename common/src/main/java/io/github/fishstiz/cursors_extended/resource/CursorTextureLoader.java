@@ -8,6 +8,7 @@ import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
+import io.github.fishstiz.cursors_extended.cursor.AnimationState;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
@@ -145,6 +146,8 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                         assertImageSize(image.getWidth(), image.getHeight());
 
                         CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
+                        CursorMetadata.Animation animation = metadata.animation();
+
                         CursorProperties merged = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
                         CursorProperties sanitized = new CursorMetadata.CursorSettings(
                                 merged.enabled(),
@@ -154,8 +157,8 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                                 merged.animated()
                         );
 
-                        CursorTexture texture = metadata.animation() != null
-                                ? createAnimated(0, image, path, metadata, sanitized)
+                        CursorTexture texture = animation != null
+                                ? createAnimated(AnimationState.of(animation.mode()), image, path, metadata, sanitized)
                                 : createBasic(image, path, metadata, sanitized);
 
                         cursor.setTexture(texture);
@@ -211,7 +214,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                 case BasicCursorTexture ignore ->
                         createBasic(image, texture.texturePath(), texture.metadata(), settings);
                 case AnimatedCursorTexture animated ->
-                        createAnimated(animated.currentFrame().index(), image, texture.texturePath(), texture.metadata(), settings);
+                        createAnimated(animated.getAnimationState(), image, texture.texturePath(), texture.metadata(), settings);
             };
 
             cursor.setTexture(updatedTexture);
@@ -281,7 +284,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     private static AnimatedCursorTexture createAnimated(
-            int initialFrameIndex,
+            AnimationState animationState,
             NativeImage image,
             ResourceLocation path,
             CursorMetadata metadata,
@@ -311,7 +314,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
             AnimatedCursorTexture.Frame baseFrame = new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.frametime());
             List<AnimatedCursorTexture.Frame> frames = createAnimationFrames(animation, textures, availableFrames);
-            return new AnimatedCursorTexture(initialFrameIndex, baseFrame, frames, image, path, metadata, settings);
+            return new AnimatedCursorTexture(baseFrame, frames, animationState, image, path, metadata, settings);
         } catch (Exception e) {
             textures.forEach(BasicCursorTexture::close);
             throw e;
