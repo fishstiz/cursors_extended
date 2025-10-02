@@ -6,4 +6,4 @@
 - Fixed internal cursors sometimes being detected as external.
 - Fixed reset to defaults not resetting the enabled option.
 - Fixed scale slider stopping the animation of the current cursor.
-- Preview widget no longer restarts the cursor animation, but clicking on the inner button will.
+- Clicking on the inner button of the preview widget will restart the cursor animation.

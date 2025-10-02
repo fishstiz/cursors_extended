@@ -40,6 +40,9 @@ public abstract class WindowMixin {
             }
             return true;
         }
+        if (CursorsExtended.CONFIG.isAggressiveCursor()) {
+            return true;
+        }
         return cursor.handle() != cursors_extended$currentCursorHandle;
     }
 

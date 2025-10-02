@@ -100,12 +100,13 @@ public class CursorPreviewWidget extends CursorWidget {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean doubleClicked) {
-        if (this.button != null && this.button.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y())) {
-            this.button.mouseClicked(mouseButtonEvent, doubleClicked);
-            if (this.getCursor().getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
+        if (this.button != null &&
+            this.button.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y()) &&
+            this.button.mouseClicked(mouseButtonEvent, doubleClicked) &&
+            this.getCursor().getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
                 animatedCursorTexture.restartAnimation();
             }
-        }
+
         return false;
     }
 
