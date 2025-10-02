@@ -72,10 +72,8 @@ public class CursorDisplay implements ClientStartedListener {
         return CursorType.DEFAULT;
     }
 
-    public void setVisibleScreen(Screen visibleScreen) {
-        if (minecraft == null || minecraft.screen == null) {
-            this.visibleScreen = visibleScreen;
-        }
+    public void setVisibleScreen(@Nullable Screen visibleScreen) {
+        this.visibleScreen = visibleScreen;
     }
 
     public @Nullable Screen getVisibleScreen() {
