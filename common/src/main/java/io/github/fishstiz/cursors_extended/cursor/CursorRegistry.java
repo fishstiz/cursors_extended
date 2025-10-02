@@ -37,11 +37,11 @@ public class CursorRegistry implements ClientStartedListener {
     }
 
     public void register(CursorType cursorType) {
-        registry.put(cursorType.toString(), new Cursor(cursorType));
+        registry.putIfAbsent(cursorType.toString(), new Cursor(cursorType));
     }
 
     public void registerAlias(CursorType cursorType, CursorType alias) {
-        registry.put(alias.toString(), get(cursorType));
+        registry.putIfAbsent(alias.toString(), get(cursorType));
     }
 
     public Cursor get(CursorType cursorType) {
