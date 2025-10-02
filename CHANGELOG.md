@@ -1,6 +1,9 @@
-- Changed pack hash generation to fix inconsistencies. Will reset your config.
-- Cursors are now lazily loaded.
-- Fixed cursor flickering when configuring sliders in the config screen if hold cursor option is disabled.
-- **NeoForge** port. The default resource pack is not optional as the API has no way to make it optional and enabled by
-  default.
-- Full v4.0.0 Changelog here: https://github.com/fishstiz/cursors_extended/issues/1
+- Optimized animated cursor textures.
+- Fixed cursor settings not updating completely when changing resource packs due to lazy loading.
+- Fixed animated cursors rendering the incorrect frames when in virtual mode.
+- Fixed screen getting cached leading to unexpected cursor changes.
+- Fixed random animation mode using random cycle logic.
+- Fixed internal cursors sometimes being detected as external.
+- Fixed reset to defaults not resetting the enabled option.
+- Fixed scale slider stopping the animation of the current cursor.
+- Preview widget no longer restarts the cursor animation, but clicking on the inner button will.
