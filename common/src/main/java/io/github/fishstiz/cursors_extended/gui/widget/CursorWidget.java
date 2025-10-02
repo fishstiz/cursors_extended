@@ -2,7 +2,7 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

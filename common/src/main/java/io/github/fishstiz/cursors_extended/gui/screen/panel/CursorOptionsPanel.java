@@ -7,7 +7,8 @@ import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogItem;
 import io.github.fishstiz.cursors_extended.gui.widget.*;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
-import io.github.fishstiz.cursors_extended.resource.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.github.fishstiz.cursors_extended.util.CursorTypeUtil.*;
+import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
 public class CursorOptionsPanel extends AbstractOptionsPanel {
@@ -46,7 +47,6 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private final Cursor cursor;
     private GridLayout layout;
     private OptionsList optionsList;
-    private ToggleWidget enableToggler;
     private SliderWidget scaleSlider;
     private ButtonWidget guiScaleButton;
     private SliderWidget xhotSlider;
@@ -84,7 +84,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     private @NotNull LayoutElement setupFirstColumnWidgets() {
         this.optionsList = new OptionsList(this.getMinecraft(), Button.DEFAULT_HEIGHT, this.getSpacing());
 
-        this.enableToggler = this.optionsList.addOption(new ToggleWidget(
+        this.optionsList.addOption(new ToggleWidget(
                 this.cursor.isTextureEnabled(),
                 ENABLE_TEXT,
                 this::onToggleEnable
@@ -216,7 +216,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onToggleEnable(ToggleWidget target, boolean enabled) {
-        if (!this.cursor.hasTexture() && this.loadCursor(this.cursor)) {
+        if (!this.cursor.hasTexture() && loadCursor(this.cursor)) {
             this.cursor.setEnabled(true);
             this.settings.setEnabled(true);
             this.refreshCursors.run();
@@ -294,12 +294,37 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void resetToDefaults() {
-        if (restoreNonGlobalSettings(this.cursor)) {
-            this.refreshCursors.run();
-            if (this.enableToggler != null) {
-                this.setFocused(this.enableToggler);
-            }
+        CursorTexture texture = cursor.getTexture();
+        if (texture == null) {
+            return;
         }
+
+        Config.CursorSettings defaults = getDefaults();
+        cursor.setEnabled(defaults.enabled());
+        CONFIG.putCursorSettings(cursor, defaults);
+        CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(defaults));
+
+        this.refreshCursors.run();
+    }
+
+    private Config.CursorSettings getDefaults() {
+        Config.CursorSettings defaultSettings = new Config.CursorSettings();
+
+        if (cursor.getTexture() != null) {
+            defaultSettings.mergeAll(cursor.getTexture().metadata().cursor());
+        }
+
+        if (CONFIG.getGlobal().isScaleActive()) {
+            defaultSettings.setScale(settings.scale());
+        }
+        if (CONFIG.getGlobal().isXHotActive()) {
+            defaultSettings.setXHot(cursor, settings.xhot());
+        }
+        if (CONFIG.getGlobal().isYHotActive()) {
+            defaultSettings.setYHot(cursor, settings.yhot());
+        }
+
+        return defaultSettings;
     }
 
     private void onScaleMouseEvent(SliderWidget target, MouseEvent mouseEvent, double mappedValue) {

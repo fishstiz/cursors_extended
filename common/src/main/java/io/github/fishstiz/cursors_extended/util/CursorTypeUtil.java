@@ -5,9 +5,7 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -54,33 +52,5 @@ public class CursorTypeUtil {
             return widget.visible && (widget.isHovered() || widget.isMouseOver(mouseX, mouseY));
         }
         return guiEventListener.isMouseOver(mouseX, mouseY);
-    }
-
-    public static void setScale(Cursor cursor, float scale) {
-        CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
-            CursorsExtended.getInstance().getLoader().updateTexture(cursor, scale, texture.xhot(), texture.yhot());
-        }
-    }
-
-    public static void setXHot(Cursor cursor, int xhot) {
-        CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
-            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, texture.yhot());
-        }
-    }
-
-    public static void setYHot(Cursor cursor, int yhot) {
-        CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
-            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), texture.xhot(), yhot);
-        }
-    }
-
-    public static void setHotspots(Cursor cursor, int xhot, int yhot) {
-        CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
-            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, yhot);
-        }
     }
 }

@@ -210,9 +210,6 @@ public class Config implements Serializable {
         protected Boolean animated = ANIMATED;
         private transient boolean stale = false;
 
-        private CursorSettings() {
-        }
-
         public void setScale(float scale) {
             this.scale = sanitizeScale(scale);
         }

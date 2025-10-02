@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.datafixers.util.Pair;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
@@ -10,7 +11,8 @@ import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.CursorPreviewWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.SliderWidget;
-import io.github.fishstiz.cursors_extended.resource.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.gui.Font;
@@ -26,7 +28,6 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
-import static io.github.fishstiz.cursors_extended.util.CursorTypeUtil.*;
 
 public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static final Component TITLE = Component.translatable("cursors_extended.options.global.title");
@@ -210,7 +211,17 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void resetCursorSettings() {
-        SettingsUtil.restoreCursorSettings();
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getCursors()) {
+            CursorTexture texture = cursor.getTexture();
+            if (texture != null) {
+                Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+                settings.mergeAll(texture.metadata().cursor());
+                cursor.setEnabled(settings.enabled());
+                CONFIG.putCursorSettings(cursor, settings);
+                CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
+            }
+        }
+
         this.refreshCursors.run();
         this.refreshWidgets();
         this.repositionElements();

@@ -2,8 +2,9 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.mixin.WindowAccess;
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -82,9 +83,13 @@ public sealed interface CursorRenderer {
             this.spriteHeight = texture.spriteHeight();
             this.vOffset = texture.spriteVOffset();
 
-            float scale = SettingsUtil.getAutoScale(texture.scale());
-            this.xhot = texture.xhot() * scale;
-            this.yhot = texture.yhot() * scale;
+            CursorProperties properties = texture instanceof CursorTexture.Stateful stateful
+                    ? stateful
+                    : texture.metadata().cursor();
+
+            float scale = SettingsUtil.getAutoScale(properties.scale());
+            this.xhot = properties.xhot() * scale;
+            this.yhot = properties.yhot() * scale;
             this.drawWidth = this.spriteWidth * scale;
             this.drawHeight = this.spriteHeight * scale;
         }

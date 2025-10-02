@@ -3,7 +3,8 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogBrowserScreen;
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.network.chat.Component;
@@ -48,7 +49,7 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
         return Math.max(0, this.getHeight() - (top - this.getY()));
     }
 
-    protected boolean loadCursor(@NotNull Cursor deferredCursor) {
+    static boolean loadCursor(@NotNull Cursor deferredCursor) {
         CursorTexture texture = deferredCursor.getTexture();
         if (texture != null) {
             throw new IllegalStateException("Cursor is already loaded");
@@ -56,13 +57,31 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
         if (CursorsExtended.getInstance().getLoader().loadTexture(deferredCursor)) {
             return true;
         }
-        this.getMinecraft().getToastManager().addToast(SystemToast.multiline(
-                this.getMinecraft(),
+        Minecraft.getInstance().getToastManager().addToast(SystemToast.multiline(
+                Minecraft.getInstance(),
                 SystemToast.SystemToastId.PACK_LOAD_FAILURE,
                 Component.translatable("resourcePack.load_fail"),
                 Component.translatable("cursors_extended.options.global.deferred_loading.fail", deferredCursor.text())
         ));
         return false;
+    }
+
+    static void setScale(Cursor cursor, float scale) {
+        if (cursor.getTexture() instanceof CursorTexture.Stateful texture) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, scale, texture.xhot(), texture.yhot());
+        }
+    }
+
+    static void setXHot(Cursor cursor, int xhot) {
+        if (cursor.getTexture() instanceof CursorTexture.Stateful texture) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, texture.yhot());
+        }
+    }
+
+    static void setYHot(Cursor cursor, int yhot) {
+        if (cursor.getTexture() instanceof CursorTexture.Stateful texture) {
+            CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), texture.xhot(), yhot);
+        }
     }
 
     protected void refreshWidgets() {

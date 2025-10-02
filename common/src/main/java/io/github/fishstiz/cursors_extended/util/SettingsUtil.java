@@ -1,11 +1,8 @@
 package io.github.fishstiz.cursors_extended.util;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.config.Config;
-import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.network.chat.Component;
@@ -14,8 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Objects;
-
-import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
@@ -138,49 +133,6 @@ public class SettingsUtil {
             return equal;
         }
         return false;
-    }
-
-    public static boolean restoreNonGlobalSettings(@NotNull Cursor cursor) {
-        CursorTexture texture = cursor.getTexture();
-        if (texture == null) {
-            return false;
-        }
-
-        CONFIG.putCursorSettings(cursor, mergeIfGlobal(cursor, texture.metadata().cursor()));
-        Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
-
-        cursor.setEnabled(settings.enabled());
-        CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
-        return true;
-    }
-
-    public static void restoreCursorSettings() {
-        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getCursors()) {
-            CursorTexture texture = cursor.getTexture();
-            if (texture != null) {
-                Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
-                settings.mergeSelective(texture.metadata().cursor());
-                CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
-            }
-        }
-    }
-
-    private static Config.CursorSettings mergeIfGlobal(@NotNull Cursor source, @NotNull CursorMetadata.CursorSettings target) {
-        Config.CursorSettings sourceSettings = CONFIG.getOrCreateSettings(source);
-        Config.CursorSettings targetSettings = sourceSettings.copy();
-
-        targetSettings.mergeAll(target);
-
-        if (CONFIG.getGlobal().isScaleActive()) {
-            targetSettings.setScale(sourceSettings.scale());
-        }
-        if (CONFIG.getGlobal().isXHotActive()) {
-            targetSettings.setXHot(source, sourceSettings.xhot());
-        }
-        if (CONFIG.getGlobal().isYHotActive()) {
-            targetSettings.setYHot(source, sourceSettings.yhot());
-        }
-        return targetSettings;
     }
 
     public static <T> T getOrDefault(@Nullable T value, T defaultValue) {

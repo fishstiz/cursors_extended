@@ -12,22 +12,19 @@ import io.github.fishstiz.cursors_extended.cursor.AnimationState;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
-import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
+import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.BasicCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -37,7 +34,6 @@ import static io.github.fishstiz.cursors_extended.CursorsExtended.*;
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
 public class CursorTextureLoader implements PreparableReloadListener, ClientStartedListener {
-    private static final int RGBA_BYTES_PER_PIXEL = 4;
     private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors");
     private final Map<String, CursorMetadata> preparedMetadata = new Object2ObjectOpenHashMap<>();
     private final CursorRegistry registry;
@@ -60,6 +56,8 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             PreparationBarrier preparationBarrier,
             Executor gameExecutor
     ) {
+        prepared = false;
+
         return CompletableFuture.runAsync(() -> prepare(sharedState.resourceManager()), backgroundExecutor)
                 .thenCompose(preparationBarrier::wait);
     }
@@ -140,42 +138,30 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         if (!prepared) return false;
 
         ResourceLocation path = getExpectedPath(cursor.cursorType());
-        boolean loaded = manager.getResource(path)
-                .map(resource -> {
-                    try (InputStream in = resource.open(); NativeImage image = NativeImage.read(in)) {
-                        assertImageSize(image.getWidth(), image.getHeight());
+        boolean loaded = false;
 
-                        CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
-                        CursorMetadata.Animation animation = metadata.animation();
+        try {
+            var resource = manager.getResource(path).orElse(null);
+            if (resource != null) {
+                try (InputStream in = resource.open(); NativeImage image = NativeImage.read(in)) {
+                    assertImageSize(image.getWidth(), image.getHeight());
 
-                        CursorProperties merged = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
-                        CursorProperties sanitized = new CursorMetadata.CursorSettings(
-                                merged.enabled(),
-                                sanitizeScale(merged.scale()),
-                                sanitizeHotspot(merged.xhot(), image.getWidth()),
-                                sanitizeHotspot(merged.yhot(), image.getHeight()),
-                                merged.animated()
-                        );
+                    CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
+                    CursorProperties settings = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
+                    CursorTexture texture = metadata.animation() != null
+                            ? new AnimatedCursorTexture(AnimationState.of(metadata.animation().mode()), image, path, metadata, settings)
+                            : new BasicCursorTexture(image, path, metadata, settings);
 
-                        CursorTexture texture = animation != null
-                                ? createAnimated(AnimationState.of(animation.mode()), image, path, metadata, sanitized)
-                                : createBasic(image, path, metadata, sanitized);
+                    cursor.setTexture(texture);
+                    minecraft.execute(() -> minecraft.getTextureManager().release(path));
+                    loaded = true;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("[cursors_extended] Failed to load cursor texture for '{}'. ", cursor.cursorType(), e);
+        }
 
-                        cursor.setTexture(texture);
-                        minecraft.execute(() -> minecraft.getTextureManager().release(path));
-
-                        return true;
-                    } catch (Exception e) {
-                        LOGGER.error("[cursors_extended] Failed to load cursor texture for '{}'. ", cursor.cursorType(), e);
-                        releaseTexture(cursor);
-                        return false;
-                    }
-                })
-                .orElseGet(() -> {
-                    releaseTexture(cursor);
-                    return false;
-                });
-
+        if (!loaded) releaseTexture(cursor);
         cursor.reloaded();
         return loaded;
     }
@@ -196,39 +182,24 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
     public void updateTexture(Cursor cursor, float scale, int xhot, int yhot) {
         CursorTexture texture = cursor.getTexture();
-        if (texture == null) {
-            return;
-        }
+        if (texture == null) return;
 
-        Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
+        Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor).copy();
         settings.setScale(scale);
         settings.setXHot(cursor, xhot);
         settings.setYHot(cursor, yhot);
 
-        NativeImage image = null;
-
         try {
-            image = NativeImage.read(texture.pixels());
-
-            CursorTexture updatedTexture = switch (texture) {
-                case BasicCursorTexture ignore ->
-                        createBasic(image, texture.texturePath(), texture.metadata(), settings);
-                case AnimatedCursorTexture animated ->
-                        createAnimated(animated.getAnimationState(), image, texture.texturePath(), texture.metadata(), settings);
-            };
-
+            CursorTexture updatedTexture = texture.recreate(settings);
             cursor.setTexture(updatedTexture);
             texture.close();
         } catch (Exception e) {
-            LOGGER.error("[cursors_extended] Failed to update texture of cursor '{}'", cursor.cursorType(), e);
+            LOGGER.error("[cursors_extended] Failed to update texture of cursor '{}'.", cursor.cursorType(), e);
             cursor.setTexture(texture);
-            if (image != null) {
-                image.close();
-            }
         }
     }
 
-    public void updateTexture(Cursor cursor, Config.CursorSettings settings) {
+    public void updateTexture(Cursor cursor, CursorProperties settings) {
         updateTexture(cursor, settings.scale(), settings.xhot(), settings.yhot());
     }
 
@@ -237,119 +208,8 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                 .stream()
                 .filter(metadata -> metadata.sourcePackId().equals(source))
                 .findFirst()
-                .map(metadata -> JsonLoader.fromResource(CursorMetadata.class, metadata, "Cursor Metadata at  " + location))
+                .map(metadata -> JsonLoader.fromResource(CursorMetadata.class, metadata))
                 .orElse(new CursorMetadata());
-    }
-
-    private static BasicCursorTexture createBasic(
-            NativeImage image,
-            ResourceLocation path,
-            CursorMetadata metadata,
-            CursorProperties settings
-    ) throws IOException {
-        float trueScale = getAutoScale(settings.scale());
-        int scaledXHot = settings.scale() == 1 ? settings.xhot() : Math.round(settings.xhot() * trueScale);
-        int scaledYHot = settings.scale() == 1 ? settings.yhot() : Math.round(settings.yhot() * trueScale);
-
-        ByteBuffer pixels = null;
-        NativeImage scaledImage = null;
-
-        try {
-            if (settings.scale() != 1) {
-                scaledImage = NativeImageUtil.scaleImage(image, trueScale);
-            }
-
-            GLFWImage glfwImage = GLFWImage.create();
-            NativeImage validImage = scaledImage != null ? scaledImage : image;
-
-            pixels = MemoryUtil.memAlloc(validImage.getWidth() * validImage.getHeight() * RGBA_BYTES_PER_PIXEL);
-            NativeImageUtil.writePixelsRGBA(validImage, pixels);
-
-            glfwImage.set(validImage.getWidth(), validImage.getHeight(), pixels);
-
-            long handle = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
-            if (handle == MemoryUtil.NULL) {
-                throw new IOException("Could not create GLFW Cursor");
-            }
-
-            return new BasicCursorTexture(handle, image, path, metadata, settings);
-        } finally {
-            if (scaledImage != null) {
-                scaledImage.close();
-            }
-            if (pixels != null) {
-                MemoryUtil.memFree(pixels);
-            }
-        }
-    }
-
-    private static AnimatedCursorTexture createAnimated(
-            AnimationState animationState,
-            NativeImage image,
-            ResourceLocation path,
-            CursorMetadata metadata,
-            CursorProperties settings
-    ) throws IOException {
-        CursorMetadata.Animation animation = metadata.requireAnimation();
-
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-
-        int preferredFrameSize = Math.min(imageWidth, imageHeight);
-
-        int frameWidth = Math.min(Math.abs(getOrDefault(animation.width(), preferredFrameSize)), imageWidth);
-        int frameHeight = Math.min(Math.abs(getOrDefault(animation.height(), preferredFrameSize)), imageHeight);
-        assertImageSize(frameWidth, frameHeight);
-
-        int availableFrames = image.getHeight() / frameHeight;
-
-        List<BasicCursorTexture> textures = new ObjectArrayList<>(availableFrames);
-        try {
-            for (int i = 0; i < availableFrames; i++) {
-                int yOffset = i * frameHeight;
-                try (NativeImage croppedImage = NativeImageUtil.cropImage(image, 0, yOffset, frameWidth, frameHeight)) {
-                    textures.add(createBasic(croppedImage, path, metadata, settings));
-                }
-            }
-
-            AnimatedCursorTexture.Frame baseFrame = new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.frametime());
-            List<AnimatedCursorTexture.Frame> frames = createAnimationFrames(animation, textures, availableFrames);
-            return new AnimatedCursorTexture(baseFrame, frames, animationState, image, path, metadata, settings);
-        } catch (Exception e) {
-            textures.forEach(BasicCursorTexture::close);
-            throw e;
-        }
-    }
-
-    private static List<AnimatedCursorTexture.Frame> createAnimationFrames(
-            CursorMetadata.Animation animation,
-            List<BasicCursorTexture> textures,
-            int availableFrames
-    ) {
-        List<AnimatedCursorTexture.Frame> frames = new ObjectArrayList<>();
-
-        if (animation.frames().isEmpty()) {
-            for (int i = 0; i < availableFrames; i++) {
-                frames.add(new AnimatedCursorTexture.Frame(textures.get(i), i, animation.frametime()));
-            }
-            return frames;
-        }
-
-        for (CursorMetadata.Animation.Frame frame : animation.frames()) {
-            int index = frame.index();
-            if (index < 0 || index >= availableFrames) {
-                LOGGER.warn("[cursors_extended] Sprite does not exist on index {}.", index);
-                continue;
-            }
-            frames.add(new AnimatedCursorTexture.Frame(textures.get(index), index, frame.clampedTime(animation)));
-        }
-
-        if (frames.isEmpty()) {
-            LOGGER.warn("[cursors_extended] No valid frames found, using first frame as fallback");
-            frames.add(new AnimatedCursorTexture.Frame(textures.getFirst(), 0, animation.frametime()));
-        }
-
-        return frames;
     }
 
     private static void writeBytes(ByteArrayOutputStream out, CursorMetadata metadata) throws IOException {

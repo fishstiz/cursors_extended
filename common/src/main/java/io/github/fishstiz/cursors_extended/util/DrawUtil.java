@@ -3,7 +3,7 @@ package io.github.fishstiz.cursors_extended.util;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.renderstate.GuiColoredRectRenderState;
 import io.github.fishstiz.cursors_extended.platform.Services;
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

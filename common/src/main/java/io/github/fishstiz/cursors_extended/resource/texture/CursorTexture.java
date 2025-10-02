@@ -1,23 +1,20 @@
-package io.github.fishstiz.cursors_extended.resource;
+package io.github.fishstiz.cursors_extended.resource.texture;
 
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.system.NativeResource;
 
-public sealed interface CursorTexture extends CursorProperties, ClientAsset.Texture, AutoCloseable permits BasicCursorTexture, AnimatedCursorTexture {
-    void toggle();
+import java.io.IOException;
 
+public interface CursorTexture extends ClientAsset.Texture, NativeResource {
     long handle();
 
     int textureWidth();
 
     int textureHeight();
-
-    byte[] pixels();
 
     CursorMetadata metadata();
 
@@ -38,16 +35,17 @@ public sealed interface CursorTexture extends CursorProperties, ClientAsset.Text
         return 0;
     }
 
-    default void setEnabled(boolean enabled) {
-        if (enabled != enabled()) {
-            toggle();
-        }
+    default CursorTexture recreate(CursorProperties properties) throws IOException {
+        throw new IOException("This cursor texture cannot be recreated");
     }
 
-    @Override
-    default void close() {
-        if (handle() != MemoryUtil.NULL) {
-            GLFW.glfwDestroyCursor(handle());
+    interface Stateful extends CursorTexture, CursorProperties {
+        void toggle();
+
+        default void setEnabled(boolean enabled) {
+            if (enabled != enabled()) {
+                toggle();
+            }
         }
     }
 }

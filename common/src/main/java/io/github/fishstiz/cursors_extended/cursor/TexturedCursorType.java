@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.cursor;
 
-import io.github.fishstiz.cursors_extended.resource.CursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import org.jetbrains.annotations.Nullable;
 
 public interface TexturedCursorType {

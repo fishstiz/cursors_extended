@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.resource;
+package io.github.fishstiz.cursors_extended.resource.texture;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
@@ -10,7 +10,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 
-public final class BasicCursorTexture implements CursorTexture {
+public final class BasicCursorTexture extends AbstractCursorTexture implements CursorTexture.Stateful {
     private final float scale;
     private final int xhot;
     private final int yhot;
@@ -20,16 +20,14 @@ public final class BasicCursorTexture implements CursorTexture {
     private final ResourceLocation texturePath;
     private final CursorMetadata metadata;
     private boolean enabled;
-    private long handle;
 
     public BasicCursorTexture(
-            long handle,
             NativeImage image,
             ResourceLocation texturePath,
             CursorMetadata metadata,
             CursorProperties settings
     ) throws IOException {
-        this.handle = handle;
+        super(image, settings);
         this.enabled = settings.enabled();
         this.scale = settings.scale();
         this.xhot = settings.xhot();
@@ -53,7 +51,7 @@ public final class BasicCursorTexture implements CursorTexture {
 
     @Override
     public long handle() {
-        return enabled ? handle : MemoryUtil.NULL;
+        return enabled ? super.handle() : MemoryUtil.NULL;
     }
 
     @Override
@@ -87,11 +85,6 @@ public final class BasicCursorTexture implements CursorTexture {
     }
 
     @Override
-    public byte[] pixels() {
-        return pixels;
-    }
-
-    @Override
     public CursorMetadata metadata() {
         return metadata;
     }
@@ -102,8 +95,16 @@ public final class BasicCursorTexture implements CursorTexture {
     }
 
     @Override
-    public void close() {
-        CursorTexture.super.close();
-        this.handle = MemoryUtil.NULL;
+    public CursorTexture recreate(CursorProperties properties) throws IOException {
+        NativeImage image = null;
+        try {
+            image = NativeImage.read(pixels);
+            return new BasicCursorTexture(image, texturePath, metadata, properties);
+        } catch (Exception e) {
+            if (image != null) {
+                image.close();
+            }
+            throw e;
+        }
     }
 }
