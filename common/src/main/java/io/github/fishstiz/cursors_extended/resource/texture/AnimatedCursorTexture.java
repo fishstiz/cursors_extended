@@ -222,15 +222,15 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
     }
 
     public final class Sprite extends AbstractCursorTexture {
-        private final int textureWidth;
-        private final int textureHeight;
+        private final int spriteWidth;
+        private final int spriteHeight;
         private final int spriteVOffset;
 
         public Sprite(int vOffset, NativeImage image, CursorProperties properties) throws IOException {
             super(image, properties);
+            this.spriteWidth = image.getWidth();
+            this.spriteHeight = image.getHeight();
             this.spriteVOffset = vOffset;
-            this.textureWidth = image.getWidth();
-            this.textureHeight = image.getHeight();
         }
 
         @Override
@@ -241,6 +241,16 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
         @Override
         public int textureHeight() {
             return textureHeight;
+        }
+
+        @Override
+        public int spriteWidth() {
+            return spriteWidth;
+        }
+
+        @Override
+        public int spriteHeight() {
+            return spriteHeight;
         }
 
         @Override

@@ -47,7 +47,7 @@ public abstract class CursorTypeMixin implements TexturedCursorType {
             select(cursorDisplay.getWindow());
         }
 
-        if (previousTexture != null) {
+        if (previousTexture != null && previousTexture != texture) {
             previousTexture.close();
         }
     }
