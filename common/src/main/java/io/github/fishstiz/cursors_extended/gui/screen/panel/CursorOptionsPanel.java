@@ -466,16 +466,6 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             }
 
             @Override
-            public void setX(int x) {
-                this.optionWidget.setX(x);
-            }
-
-            @Override
-            public void setY(int y) {
-                this.optionWidget.setY(y);
-            }
-
-            @Override
             public void visitChildren(@NotNull Consumer<LayoutElement> visitor) {
                 visitor.accept(this.optionWidget);
             }
