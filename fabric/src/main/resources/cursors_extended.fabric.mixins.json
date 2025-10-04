@@ -9,7 +9,8 @@
     "defaultRequire": 1
   },
   "client": [
+    "compat.modmenu.ModListEntryMixin",
     "compat.modmenu.ModsScreenDescriptionEntryMixin",
-    "compat.modmenu.ModsScreenMixin"
+    "compat.modmenu.ParentEntryMixin"
   ]
 }
