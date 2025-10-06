@@ -1,9 +1,3 @@
-- Optimized animated cursor textures.
-- Fixed cursor settings not updating completely when changing resource packs due to lazy loading.
-- Fixed animated cursors rendering the incorrect frames when in virtual mode.
-- Fixed screen getting cached leading to unexpected cursor changes.
-- Fixed random animation mode using random cycle logic.
-- Fixed internal cursors sometimes being detected as external.
-- Fixed reset to defaults not resetting the enabled option.
-- Fixed scale slider stopping the animation of the current cursor.
-- Clicking on the inner button of the preview widget will restart the cursor animation.
+- Fixed the Aggressive Cursor option not functioning. 
+- Fixed cursor options being unclickable when a mod that modifies list widget behavior (e.g., smooth scrolling) is installed. 
+- Fixed a memory leak when updating cursor settings.
