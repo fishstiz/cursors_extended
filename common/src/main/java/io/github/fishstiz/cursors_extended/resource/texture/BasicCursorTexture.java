@@ -96,15 +96,8 @@ public final class BasicCursorTexture extends AbstractCursorTexture implements C
 
     @Override
     public CursorTexture recreate(CursorProperties properties) throws IOException {
-        NativeImage image = null;
-        try {
-            image = NativeImage.read(pixels);
+        try (NativeImage image = NativeImage.read(pixels)) {
             return new BasicCursorTexture(image, texturePath, metadata, properties);
-        } catch (Exception e) {
-            if (image != null) {
-                image.close();
-            }
-            throw e;
         }
     }
 }

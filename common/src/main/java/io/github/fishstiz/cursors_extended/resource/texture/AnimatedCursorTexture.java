@@ -209,15 +209,8 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
 
     @Override
     public CursorTexture recreate(CursorProperties properties) throws IOException {
-        NativeImage image = null;
-        try {
-            image = NativeImage.read(pixels);
+        try (NativeImage image = NativeImage.read(pixels)) {
             return new AnimatedCursorTexture(animationState, image, texturePath, metadata, properties);
-        } catch (Exception e) {
-            if (image != null) {
-                image.close();
-            }
-            throw e;
         }
     }
 
