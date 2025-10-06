@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Pseudo
-@Mixin(ModListEntry.class)
+@Mixin(value = ModListEntry.class, remap = false)
 public abstract class ModListEntryMixin extends ObjectSelectionList.Entry<ModListEntry> implements CursorProvider {
     @Shadow
     @Final
