@@ -134,8 +134,4 @@ public class SettingsUtil {
         }
         return false;
     }
-
-    public static <T> T getOrDefault(@Nullable T value, T defaultValue) {
-        return value != null ? value : defaultValue;
-    }
 }

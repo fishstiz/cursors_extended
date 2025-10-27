@@ -13,6 +13,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public final class AnimatedCursorTexture implements CursorTexture.Stateful {
     private final AnimationState animationState;
@@ -42,8 +43,8 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
         int imageHeight = image.getHeight();
 
         int preferredFrameSize = Math.min(imageWidth, imageHeight);
-        int frameWidth = Math.min(Math.abs(SettingsUtil.getOrDefault(animation.width(), preferredFrameSize)), imageWidth);
-        int frameHeight = Math.min(Math.abs(SettingsUtil.getOrDefault(animation.height(), preferredFrameSize)), imageHeight);
+        int frameWidth = Math.min(Math.abs(Objects.requireNonNullElse(animation.width(), preferredFrameSize)), imageWidth);
+        int frameHeight = Math.min(Math.abs(Objects.requireNonNullElse(animation.height(), preferredFrameSize)), imageHeight);
 
         SettingsUtil.assertImageSize(frameWidth, frameHeight);
         int availableFrames = imageHeight / frameHeight;
@@ -70,9 +71,9 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
         this.metadata = metadata;
         this.animationState = animationState;
         this.texturePath = path;
-        this.scale = settings.scale();
-        this.xhot = settings.xhot();
-        this.yhot = settings.yhot();
+        this.scale = SettingsUtil.sanitizeScale(settings.scale());
+        this.xhot = SettingsUtil.sanitizeHotspot(settings.xhot(), image.getWidth());
+        this.yhot = SettingsUtil.sanitizeHotspot(settings.yhot(), image.getHeight());
         this.textureWidth = imageWidth;
         this.textureHeight = imageHeight;
         this.pixels = NativeImageUtil.getBytes(image);

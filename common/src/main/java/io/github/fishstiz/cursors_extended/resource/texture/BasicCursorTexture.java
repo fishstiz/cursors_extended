@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
+import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
@@ -29,9 +30,9 @@ public final class BasicCursorTexture extends AbstractCursorTexture implements C
     ) throws IOException {
         super(image, settings);
         this.enabled = settings.enabled();
-        this.scale = settings.scale();
-        this.xhot = settings.xhot();
-        this.yhot = settings.yhot();
+        this.scale = SettingsUtil.sanitizeScale(settings.scale());
+        this.xhot = SettingsUtil.sanitizeHotspot(settings.xhot(), image.getWidth());
+        this.yhot = SettingsUtil.sanitizeHotspot(settings.yhot(), image.getHeight());
         this.textureWidth = image.getWidth();
         this.textureHeight = image.getHeight();
         this.pixels = NativeImageUtil.getBytes(image);
