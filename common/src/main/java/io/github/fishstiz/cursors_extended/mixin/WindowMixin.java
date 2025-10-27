@@ -80,7 +80,7 @@ public abstract class WindowMixin {
             return requestedCursor;
         }
         if (CursorsExtended.CONFIG.isLegacyMode()) {
-            CursorType cursorType = CursorsExtended.getInstance().getDisplay().inspectGui((Window) (Object) this);
+            CursorType cursorType = CursorsExtended.getInstance().getDisplay().getCursorAt((Window) (Object) this);
             if (CursorTypeUtil.nonDefault(cursorType)) {
                 return cursorType;
             }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
-import io.github.fishstiz.cursors_extended.cursor.AnimationState;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

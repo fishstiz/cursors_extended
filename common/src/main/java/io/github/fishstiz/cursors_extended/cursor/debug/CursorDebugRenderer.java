@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.cursor.inspector;
+package io.github.fishstiz.cursors_extended.cursor.debug;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,18 +8,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public interface InspectorDebugRenderer {
-    InspectorDebugRenderer NOP = new InspectorDebugRenderer() {
+public interface CursorDebugRenderer {
+    CursorDebugRenderer NOP = new CursorDebugRenderer() {
     };
 
-    static InspectorDebugRenderer create() {
-        return new InspectorDebugRendererImpl();
+    static CursorDebugRenderer create() {
+        return new CursorDebugRendererImpl();
     }
 
-    default void destroy() {
-    }
-
-    default void onInspect(GuiEventListener inspected, double mouseX, double mouseY) {
+    default void setLastCursorAt(GuiEventListener inspected, double mouseX, double mouseY) {
     }
 
     default void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphics guiGraphics, double mouseX, double mouseY) {

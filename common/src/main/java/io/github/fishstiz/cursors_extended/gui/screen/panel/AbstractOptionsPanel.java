@@ -4,11 +4,11 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogBrowserScreen;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentPanel {
@@ -22,7 +22,7 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
     private StringWidget titleWidget;
 
     protected AbstractOptionsPanel(Component title) {
-        this.title = withBold(title);
+        this.title = title.copy().withStyle(ChatFormatting.BOLD);
     }
 
     protected abstract void initContents();
@@ -92,9 +92,5 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
     @Override
     protected void added() {
         this.refreshWidgets();
-    }
-
-    private static MutableComponent withBold(Component text) {
-        return text.copy().withStyle(style -> style.withBold(true));
     }
 }

@@ -8,7 +8,7 @@ import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
-import io.github.fishstiz.cursors_extended.cursor.AnimationState;
+import io.github.fishstiz.cursors_extended.resource.texture.AnimationState;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
@@ -72,8 +72,10 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
         for (Cursor cursor : hashableCursors) {
             ResourceLocation path = getExpectedPath(cursor.cursorType());
-            manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE)).ifPresent(resource -> {
+            manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE)).ifPresentOrElse(resource -> {
                 try {
+                    // this is bugged, the resource should be the image, not the metadata, so that the image source and metadata source are the same.
+                    // fixing this will reset configs
                     CursorMetadata metadata = loadMetadata(manager, path, resource.sourcePackId());
                     preparedMetadata.put(cursor.name(), metadata);
 
@@ -81,7 +83,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
                     writeBytes(out, metadata);
                 } catch (Exception ignore) {
                 }
-            });
+            }, () -> preparedMetadata.put(cursor.name(), new CursorMetadata()));
         }
 
         return out.size() == 0
@@ -105,7 +107,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             CONFIG.setHash("");
         });
 
-        registry.getCursors().forEach(cursor -> {
+        for (Cursor cursor : registry.getCursors()) {
             cursor.prepareReload();
 
             CursorMetadata metadata = preparedMetadata.computeIfAbsent(cursor.name(), type -> {
@@ -118,7 +120,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             if (CONFIG.isStale(cursor)) {
                 CONFIG.getOrCreateSettings(cursor).mergeSelective(metadata.cursor());
             }
-        });
+        }
 
         prepared = true;
         CONFIG.save();

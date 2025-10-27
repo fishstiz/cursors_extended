@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.cursor.inspector;
+package io.github.fishstiz.cursors_extended.cursor.debug;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.platform.Services;
@@ -20,7 +20,7 @@ import org.joml.Matrix3x2fStack;
 
 import java.util.function.Supplier;
 
-class InspectorDebugRendererImpl implements InspectorDebugRenderer {
+class CursorDebugRendererImpl implements CursorDebugRenderer {
     private static final float TEXT_SCALE = 0.75f;
     private final Component screenLabel = Component.literal("S: ").withColor(0xFF339BFF); // blue
     private final Component deepestLabel = Component.literal("D: ").withColor(0xFF00FF00); // green
@@ -35,13 +35,7 @@ class InspectorDebugRendererImpl implements InspectorDebugRenderer {
     }
 
     @Override
-    public void destroy() {
-        this.inspectedBounds = null;
-        this.inspectedElement = null;
-    }
-
-    @Override
-    public void onInspect(GuiEventListener inspected, double mouseX, double mouseY) {
+    public void setLastCursorAt(GuiEventListener inspected, double mouseX, double mouseY) {
         if (CursorTypeUtil.isHovered(inspected, mouseX, mouseY)) {
             this.inspectedBounds = getBounds(inspected);
             this.inspectedElement = getClassName(inspected);

@@ -1,6 +1,6 @@
-package io.github.fishstiz.cursors_extended.cursor;
+package io.github.fishstiz.cursors_extended.resource.texture;
 
-import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
 import net.minecraft.Util;
 
 import java.util.Random;

@@ -16,7 +16,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public sealed interface CursorRenderer {
     CursorRegistry registry();
 
-    void setCursor(Window window);
+    void applyCursor(Window window);
 
     void resetCursor(Window window);
 
@@ -28,7 +28,7 @@ public sealed interface CursorRenderer {
 
     record Native(CursorRegistry registry) implements CursorRenderer {
         @Override
-        public void setCursor(Window window) {
+        public void applyCursor(Window window) {
             getCurrentCursor(window).cursorType().select(window);
         }
 
@@ -66,7 +66,7 @@ public sealed interface CursorRenderer {
         }
 
         @Override
-        public void setCursor(Window window) {
+        public void applyCursor(Window window) {
             Cursor cursor = getCurrentCursor(window);
             cursor.cursorType().select(window);
 
