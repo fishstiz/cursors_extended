@@ -67,8 +67,8 @@ public class CursorDisplay implements ClientStartedListener {
                 debugRenderer.onInspect(element, mouseX, mouseY);
                 return provider.cursors_extended$cursorType(mouseX, mouseY);
             }
+            debugRenderer.onInspect(element, mouseX, mouseY);
         }
-        debugRenderer.onInspect(element, mouseX, mouseY);
         return CursorType.DEFAULT;
     }
 
