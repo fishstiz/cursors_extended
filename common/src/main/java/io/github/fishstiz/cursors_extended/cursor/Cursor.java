@@ -9,7 +9,6 @@ import org.lwjgl.system.MemoryUtil;
 public final class Cursor {
     private final CursorType cursorType;
     private boolean lazy = true;
-    private boolean enabled = true;
 
     public Cursor(CursorType cursorType) {
         this.cursorType = cursorType;
@@ -41,14 +40,12 @@ public final class Cursor {
 
     public boolean isEnabled() {
         if (getTexture() instanceof CursorTexture.Stateful statefulTexture) {
-            return statefulTexture.enabled() && enabled;
+            return statefulTexture.enabled();
         }
-        return enabled;
+        return true;
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-
         if (getTexture() instanceof CursorTexture.Stateful statefulTexture) {
             statefulTexture.setEnabled(enabled);
         }
