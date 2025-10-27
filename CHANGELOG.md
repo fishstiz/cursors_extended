@@ -1,3 +1,2 @@
-- Fixed the Aggressive Cursor option not functioning. 
-- Fixed cursor options being unclickable when a mod that modifies list widget behavior (e.g., smooth scrolling) is installed. 
-- Fixed a memory leak when updating cursor settings.
+- Reduced hovered element false positives in legacy mode
+- Fixed mismatch in cursor settings and actual applied settings if the resource pack cursor settings was sanitized.
