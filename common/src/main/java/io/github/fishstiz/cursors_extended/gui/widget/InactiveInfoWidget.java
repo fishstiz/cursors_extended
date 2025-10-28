@@ -37,7 +37,7 @@ public class InactiveInfoWidget extends ButtonWidget {
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.refreshPosition();
         this.refreshVisibility();
 

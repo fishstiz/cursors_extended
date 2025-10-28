@@ -43,13 +43,13 @@ publishMods {
                 "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar")
         )
     }
-    def neoforgeOptions = publishOptions {
-        displayName = "${mod_name} for NeoForge v${mod_version}"
-        file project(":neoforge")
-        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
-        )
-    }
+//    def neoforgeOptions = publishOptions {
+//        displayName = "${mod_name} for NeoForge v${mod_version}"
+//        file project(":neoforge")
+//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar")
+//        )
+//    }
 
     def githubOptions = githubOptions {
         accessToken = secrets.getProperty("GITHUB_TOKEN")
@@ -62,12 +62,12 @@ publishMods {
         additionalFiles.from(project(":fabric").layout.buildDirectory.file(
                 "libs/${project(":fabric").base.archivesName.get()}-${mod_version}-sources.jar"
         ))
-        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
-        ))
-        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
-                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
-        ))
+//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}.jar"
+//        ))
+//        additionalFiles.from(project(":neoforge").layout.buildDirectory.file(
+//                "libs/${project(":neoforge").base.archivesName.get()}-${mod_version}-sources.jar"
+//        ))
     }
     def modrinthOptions = modrinthOptions {
         accessToken = secrets.getProperty("MODRINTH_TOKEN")
@@ -94,7 +94,7 @@ publishMods {
         optional("modmenu")
     }
     modrinth("modrinthNeoForge") {
-        from modrinthOptions, neoforgeOptions
+        from modrinthOptions
         modLoaders.add("neoforge")
     }
 
@@ -107,12 +107,12 @@ publishMods {
         optional("modmenu")
     }
     curseforge("curseforgeNeoForge") {
-        from curseforgeOptions, neoforgeOptions
+        from curseforgeOptions
         modLoaders.add("neoforge")
         clientRequired = true
     }
 }
 
-tasks.named("publishGithub") {
-    mustRunAfter(":neoforge:jar")
-}
+//tasks.named("publishGithub") {
+//    mustRunAfter(":neoforge:jar")
+//}

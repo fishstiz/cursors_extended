@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.widget;
 
-import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ButtonWidget extends Button {
+public class ButtonWidget extends Button.Plain {
     private static final int DEFAULT_SPRITE_SIZE = 16;
     private static final int DISABLED_SPRITE_COLOR = 0x80A0A0A0; // 50% gray
     private @Nullable ResourceLocation sprite;
@@ -66,15 +66,15 @@ public class ButtonWidget extends Button {
     }
 
     @Override
-    protected void renderScrollingString(@NotNull GuiGraphics guiGraphics, @NotNull Font font, int width, int color) {
+    protected void renderDefaultLabel(ActiveTextCollector activeTextCollector) {
         if (this.sprite == null) {
-            super.renderScrollingString(guiGraphics, font, width, color);
+            super.renderDefaultLabel(activeTextCollector);
         }
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+    protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.sprite != null) {
             int spriteWidth = Math.min(this.getWidth(), this.textureWidth);
@@ -87,7 +87,7 @@ public class ButtonWidget extends Button {
                     RenderPipelines.GUI_TEXTURED,
                     this.sprite,
                     spriteX, spriteY,
-                    0,0,
+                    0, 0,
                     this.textureWidth, this.textureHeight,
                     spriteWidth, spriteHeight,
                     this.textureWidth, this.textureHeight,

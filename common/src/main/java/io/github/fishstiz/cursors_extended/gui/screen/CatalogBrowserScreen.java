@@ -117,9 +117,7 @@ public abstract class CatalogBrowserScreen extends Screen {
 
     @Override
     public void onClose() {
-        if (this.minecraft != null) {
-            this.minecraft.setScreen(this.previous);
-        }
+        this.minecraft.setScreen(this.previous);
     }
 
     @Override
@@ -725,13 +723,13 @@ public abstract class CatalogBrowserScreen extends Screen {
             this.onClick = Objects.requireNonNull(onClick);
         }
 
-      @Override
+        @Override
         public void onPress(InputWithModifiers inputWithModifiers) {
             this.onClick.accept(this);
         }
 
         @Override
-        protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             int prefixWidth = this.item.prefix() != null
                     ? this.item.prefix().render(guiGraphics, this.font, this.item, this, this.spacing, mouseX, mouseY, partialTick)
                     : 0;

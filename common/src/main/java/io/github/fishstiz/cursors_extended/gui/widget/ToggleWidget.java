@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class ToggleWidget extends Button {
+public class ToggleWidget extends Button.Plain {
     private final BiConsumer<ToggleWidget, Boolean> listener;
     private final Component prefix;
     private boolean value;
@@ -53,7 +53,7 @@ public class ToggleWidget extends Button {
     }
 
     private void updateMessage() {
-        this.setMessage(this.prefix.copy().append(": ").append(value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF));
+        this.setMessage(CommonComponents.optionNameValue(this.prefix, value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF));
     }
 
     @Override
