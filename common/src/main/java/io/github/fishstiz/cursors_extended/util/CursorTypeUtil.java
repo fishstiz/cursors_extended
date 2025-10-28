@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -24,7 +25,9 @@ public class CursorTypeUtil {
     }
 
     public static boolean canShift() {
-        return CursorsExtended.getInstance().getRegistry().get(CursorTypesExt.SHIFT).isTextureEnabled() &&
+        Cursor shiftCursor = CursorsExtended.getInstance().getRegistry().get(CursorTypesExt.SHIFT);
+        return shiftCursor.isEnabled() &&
+               CursorsExtended.CONFIG.getOrCreateSettings(shiftCursor).enabled() &&
                (InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                 InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_RIGHT_SHIFT));
     }
