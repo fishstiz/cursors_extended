@@ -21,8 +21,6 @@ public class Config implements Serializable {
     private boolean stonecutterRecipesEnabled = true;
     private boolean loomPatternsEnabled = true;
     private boolean advancementTabsEnabled = true;
-    private boolean worldIconEnabled = true;
-    private boolean serverIconEnabled = true;
     private boolean pointerScrollbarEnabled = true;
     private boolean resizeScrollbarEnabled = true;
     private boolean heldCursorsEnabled = true;
@@ -120,14 +118,6 @@ public class Config implements Serializable {
         this.loomPatternsEnabled = loomPatternsEnabled;
     }
 
-    public boolean isWorldIconEnabled() {
-        return worldIconEnabled;
-    }
-
-    public void setWorldIconEnabled(boolean worldIconEnabled) {
-        this.worldIconEnabled = worldIconEnabled;
-    }
-
     public boolean isItemSlotEnabled() {
         return itemSlotEnabled;
     }
@@ -150,14 +140,6 @@ public class Config implements Serializable {
 
     public void setAdvancementTabsEnabled(boolean advancementTabsEnabled) {
         this.advancementTabsEnabled = advancementTabsEnabled;
-    }
-
-    public boolean isServerIconEnabled() {
-        return serverIconEnabled;
-    }
-
-    public void setServerIconEnabled(boolean serverIconEnabled) {
-        this.serverIconEnabled = serverIconEnabled;
     }
 
     public boolean isAggressiveCursor() {

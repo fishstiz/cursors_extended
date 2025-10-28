@@ -31,8 +31,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Component STONECUTTER = Component.translatable("cursors_extended.options.adapt.stonecutter");
     private static final Component LOOM = Component.translatable("cursors_extended.options.adapt.loom");
     private static final Component ADVANCEMENTS = Component.translatable("cursors_extended.options.adapt.advancements");
-    private static final Component WORLD = Component.translatable("cursors_extended.options.adapt.world");
-    private static final Component SERVER = Component.translatable("cursors_extended.options.adapt.server");
     private static final int CURSOR_SIZE_STEP = 8;
     private final Runnable refreshCursors;
     private OptionsListWidget optionsList;
@@ -57,8 +55,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorTypes.POINTING_HAND);
         this.addOption(CONFIG.isLoomPatternsEnabled(), CONFIG::setLoomPatternsEnabled, LOOM, CursorTypes.POINTING_HAND);
         this.addOption(CONFIG.isAdvancementTabsEnabled(), CONFIG::setAdvancementTabsEnabled, ADVANCEMENTS, CursorTypes.POINTING_HAND);
-        this.addOption(CONFIG.isWorldIconEnabled(), CONFIG::setWorldIconEnabled, WORLD, CursorTypes.POINTING_HAND);
-        this.addOption(CONFIG.isServerIconEnabled(), CONFIG::setServerIconEnabled, SERVER, CursorTypes.POINTING_HAND);
 
         this.optionsList.search(this.getSearch());
 
