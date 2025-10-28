@@ -49,7 +49,12 @@ public class CursorTypeUtil {
 
     public static boolean isHovered(GuiEventListener guiEventListener, double mouseX, double mouseY) {
         if (guiEventListener instanceof AbstractWidget widget) {
-            return widget.visible && widget.isHovered() && widget.isMouseOver(mouseX, mouseY);
+            return widget.visible &&
+                   widget.isHovered() &&
+                   mouseX >= widget.getX() &&
+                   mouseY >= widget.getY() &&
+                   mouseX < widget.getRight() &&
+                   mouseY < widget.getBottom();
         }
         return guiEventListener.isMouseOver(mouseX, mouseY);
     }

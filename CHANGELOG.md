@@ -1,2 +1,1 @@
-- Reduced hovered element false positives in legacy mode
-- Fixed mismatch in cursor settings and actual applied settings if the resource pack cursor settings was sanitized.
+- Hotfix: Fixed disabled widgets no longer being detected in legacy mode.
