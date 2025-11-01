@@ -1,9 +1,8 @@
 package io.github.fishstiz.cursors_extended.platform;
 
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import net.neoforged.fml.loading.FMLLoader;
 import org.objectweb.asm.tree.ClassNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
-    private static final Logger LOGGER = LoggerFactory.getLogger("cursors_extended | Mixin");
     private static final String MIXIN_PACKAGE = "io.github.fishstiz.cursors_extended.mixin";
     private static final String OWO_PACKAGE = MIXIN_PACKAGE + ".compat.owo";
 
@@ -30,11 +28,13 @@ public class NeoForgeMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.startsWith(OWO_PACKAGE) && isModLoaded("owo")) {
-            LOGGER.info("[cursors_extended] Applying compatibility with owo-lib.");
-            return true;
+        if (mixinClassName.startsWith(OWO_PACKAGE)) {
+            if (isModLoaded("owo") && CursorsExtended.CONFIG.isWorkaroundsEnabled()) {
+                CursorsExtended.LOGGER.info("[cursors_extended] Applying compatibility with owo-lib.");
+                return true;
+            }
+            return false;
         }
-
         return false;
     }
 

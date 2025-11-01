@@ -67,8 +67,10 @@
   "cursors_extended.options.resource_pack.reset.tooltip": "Matches your cursor settings with the resource pack settings.",
 
   "cursors_extended.options.compat": "Compatibility",
+  "cursors_extended.options.compat.workarounds": "State Tracking Workarounds",
+  "cursors_extended.options.compat.workarounds.info": "Tracks the standard and custom cursors created by other mods.\n\nRequires restart to apply.",
   "cursors_extended.options.compat.remap_cursors": "Remap Standard Cursors",
-  "cursors_extended.options.compat.remap_cursors.info": "Remaps standard system cursors created by other mods.\n\nWARNING: Disabling may cause compatibility issues.",
+  "cursors_extended.options.compat.remap_cursors.info": "Remaps standard system cursors created by other mods.",
   "cursors_extended.options.compat.aggressive_cursor": "Aggressive cursor updates",
   "cursors_extended.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.",
   "cursors_extended.options.compat.virtual_mode": "Virtual Mode",

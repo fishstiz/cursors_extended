@@ -17,6 +17,8 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip VIRTUAL_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.virtual_mode.info"));
     private static final Component REMAP_TEXT = Component.translatable("cursors_extended.options.compat.remap_cursors");
     private static final Tooltip REMAP_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.remap_cursors.info"));
+    private static final Component WORKAROUNDS_TEXT = Component.translatable("cursors_extended.options.compat.workarounds");
+    private static final Tooltip WORKAROUNDS_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.workarounds.info"));
     private static final Component LEGACY_MODE_TEXT = Component.translatable("cursors_extended.options.compat.legacy_mode");
     private static final Tooltip LEGACY_MODE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.legacy_mode.info"));
     private OptionsListWidget optionsList;
@@ -32,19 +34,30 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
         final Config defaults = Config.defaults();
 
         this.optionsList.addToggle(
-                CONFIG.isAggressiveCursor(),
-                defaults.isAggressiveCursor(),
-                CONFIG::setAggressiveCursor,
-                this.index(AGGRESSIVE_TEXT),
-                AGGRESSIVE_INFO,
+                CONFIG.isWorkaroundsEnabled(),
+                defaults.isWorkaroundsEnabled(),
+                CONFIG::setWorkarounds,
+                this.index(WORKAROUNDS_TEXT),
+                WORKAROUNDS_INFO,
                 true
         );
         this.optionsList.addToggle(
                 CONFIG.isRemapStandardCursors(),
                 defaults.isRemapStandardCursors(),
-                CONFIG::setRemapStandardCursors,
+                value -> {
+                    CONFIG.setRemapStandardCursors(value);
+                    CursorsExtended.getInstance().getDisplay().applyCursor(this.getMinecraft().getWindow());
+                },
                 this.index(REMAP_TEXT),
                 REMAP_INFO,
+                CONFIG::isWorkaroundsEnabled
+        );
+        this.optionsList.addToggle(
+                CONFIG.isAggressiveCursor(),
+                defaults.isAggressiveCursor(),
+                CONFIG::setAggressiveCursor,
+                this.index(AGGRESSIVE_TEXT),
+                AGGRESSIVE_INFO,
                 true
         );
         this.optionsList.addToggle(

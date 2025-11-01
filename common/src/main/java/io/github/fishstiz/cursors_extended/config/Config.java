@@ -30,6 +30,7 @@ public class Config implements Serializable {
     private boolean legacyMode = true;
     private boolean showHotspotGuide = true;
     private boolean remapStandardCursors = true;
+    private boolean workarounds = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Object2ObjectOpenHashMap<String, CursorSettings> cursors = new Object2ObjectOpenHashMap<>();
     private transient boolean stale = false;
@@ -202,11 +203,19 @@ public class Config implements Serializable {
     }
 
     public boolean isRemapStandardCursors() {
-        return remapStandardCursors;
+        return workarounds && remapStandardCursors;
     }
 
     public void setRemapStandardCursors(boolean remapStandardCursors) {
         this.remapStandardCursors = remapStandardCursors;
+    }
+
+    public boolean isWorkaroundsEnabled() {
+        return workarounds;
+    }
+
+    public void setWorkarounds(boolean workarounds) {
+        this.workarounds = workarounds;
     }
 
     public static class CursorSettings extends AbstractCursorSettings implements Serializable {
