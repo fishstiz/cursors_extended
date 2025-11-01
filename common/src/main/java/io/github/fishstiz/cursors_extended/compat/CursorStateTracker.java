@@ -5,27 +5,18 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import org.jetbrains.annotations.Nullable;
 
-public interface CursorStateTracker {
-    CursorStateTracker DEFAULT = new CursorStateTracker() {
-    };
+public sealed interface CursorStateTracker permits CursorStateTrackerImpl, CursorStateTrackerImpl.DefaultTracker {
+    void trackCursor(ModCursor cursor);
 
-    default void trackCursor(ModCursor cursor) {
-        CursorStateTrackerImpl.get().trackCursor(cursor);
-    }
+    void resetCursor(long window, String source);
+
+    void setCursor(long window, ModCursor cursor);
 
     default void untrackCursor(ModCursor cursor) {
     }
 
     default boolean isTracking() {
         return false;
-    }
-
-    default void resetCursor(long window, String source) {
-        CursorStateTrackerImpl.get().resetCursor(window, source);
-    }
-
-    default void setCursor(long window, ModCursor cursor) {
-        CursorStateTrackerImpl.get().setCursor(window, cursor);
     }
 
     default @Nullable ModCursor getCursor(long handle) {
