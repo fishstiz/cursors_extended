@@ -8,6 +8,16 @@ public record ModCursor(long handle, String source, CursorType cursorType, boole
     }
 
     public static ModCursor ofUnknownType(long handle, String source) {
-        return new ModCursor(handle, source, new CursorType("cursors_extended/unknown_cursor/" + handle, handle), true);
+        return new ModCursor(handle, source, new UnknownType(source, handle), true);
+    }
+
+    public static boolean isUnknown(CursorType cursorType) {
+        return cursorType instanceof UnknownType;
+    }
+
+    private static final class UnknownType extends CursorType {
+        public UnknownType(String source, long handle) {
+            super("cursors_extended/unknown_cursor/" + source + "/" + handle, handle);
+        }
     }
 }

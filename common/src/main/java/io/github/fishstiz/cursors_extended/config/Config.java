@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.config;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.compat.ModCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -8,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
@@ -33,6 +35,7 @@ public class Config implements Serializable {
     private boolean workarounds = true;
     private final GlobalSettings global = new GlobalSettings();
     private final Object2ObjectOpenHashMap<String, CursorSettings> cursors = new Object2ObjectOpenHashMap<>();
+    private transient Map<String, CursorSettings> unknownCursors;
     private transient boolean stale = false;
 
     Config() {
@@ -43,7 +46,25 @@ public class Config implements Serializable {
     }
 
     public CursorSettings getOrCreateSettings(Cursor cursor) {
-        return cursors.computeIfAbsent(cursor.name(), k -> new CursorSettings());
+        String name = cursor.name();
+        CursorSettings settings = cursors.get(name);
+
+        if (settings != null) {
+            return settings;
+        }
+        if (unknownCursors != null && (settings = unknownCursors.get(name)) != null) {
+            return settings;
+        }
+
+        settings = new CursorSettings();
+        if (ModCursor.isUnknown(cursor.cursorType())) {
+            if (unknownCursors == null) unknownCursors = new Object2ObjectOpenHashMap<>();
+            unknownCursors.put(name, settings);
+        } else {
+            cursors.put(name, settings);
+        }
+
+        return settings;
     }
 
     public boolean isStale(Cursor cursor) {
