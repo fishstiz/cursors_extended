@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.fishstiz.cursors_extended.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "compat.owo.CursorAdapterMixin"
+  ],
+  "plugin": "io.github.fishstiz.cursors_extended.platform.NeoForgeMixinConfigPlugin",
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -178,6 +178,12 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         }
     }
 
+    public void lazyLoadTexture(Cursor cursor) {
+        if (cursor.isEnabled() && cursor.isLazy()) {
+            loadTexture(cursor);
+        }
+    }
+
     public void loadTextures(Collection<Cursor> cursors) {
         loadTextures(minecraft.getResourceManager(), cursors);
     }

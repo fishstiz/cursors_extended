@@ -3,28 +3,35 @@ package io.github.fishstiz.cursors_extended.mixin;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.compat.CursorStateTracker;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(Window.class)
 public abstract class WindowMixin {
     @Shadow
-    private CursorType currentCursor;
+    @Final
+    private long handle;
+
+    @Shadow
+    public CursorType currentCursor;
 
     @Shadow
     private boolean allowCursorChanges;
+
     @Unique
     private long cursors_extended$currentCursorHandle;
 
@@ -46,16 +53,21 @@ public abstract class WindowMixin {
         return cursor.handle() != cursors_extended$currentCursorHandle;
     }
 
-    @WrapMethod(method = "selectCursor")
-    private void resolveSelectedCursor(CursorType requestedCursorType, Operation<Void> original) {
-        CursorType cursorType = cursors_extended$resolveCursor(requestedCursorType);
-        Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
-
-        if (cursor.isEnabled() && cursor.isLazy()) {
-            CursorsExtended.getInstance().getLoader().loadTexture(cursor);
+    @ModifyVariable(method = "selectCursor", at = @At("HEAD"), argsOnly = true)
+    private CursorType resolveSelected(CursorType value) {
+        CursorStateTracker tracker = CursorStateTracker.get();
+        if (tracker.isTracking()) {
+            CursorType currentTrackedCursor = tracker.getCurrentCursor(this.handle);
+            if (CursorTypeUtil.nonDefault(currentTrackedCursor)) {
+                value = currentTrackedCursor;
+            }
         }
 
-        original.call(cursor.isEnabled() ? cursorType : CursorType.DEFAULT);
+        CursorType cursorType = cursors_extended$resolveCursor(value);
+        Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
+        CursorsExtended.getInstance().getLoader().lazyLoadTexture(cursor);
+
+        return cursor.isEnabled() ? cursorType : CursorType.DEFAULT;
     }
 
     @WrapOperation(method = "selectCursor", at = @At(

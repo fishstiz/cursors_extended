@@ -7,7 +7,6 @@
   "client": [
     "CursorTypeMixin",
     "GameRendererMixin",
-    "WindowAccess",
     "WindowMixin",
     "cursorprovider.AbstractButtonMixin",
     "cursorprovider.AbstractScrollAreaMixin",

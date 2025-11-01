@@ -216,8 +216,6 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             if (texture != null) {
                 Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
                 settings.mergeAll(texture.metadata().cursor());
-                cursor.setEnabled(settings.enabled());
-                CONFIG.putCursorSettings(cursor, settings);
                 CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
             }
         }

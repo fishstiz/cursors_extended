@@ -107,10 +107,9 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
             if (cursor.cursorType() == CursorType.DEFAULT) continue;
 
             if (adaptive && cursor.getTexture() == null) {
-                this.loadCursor(cursor);
+                loadCursor(cursor);
             }
 
-            cursor.setEnabled(adaptive);
             CONFIG.getOrCreateSettings(cursor).setEnabled(adaptive);
         }
 

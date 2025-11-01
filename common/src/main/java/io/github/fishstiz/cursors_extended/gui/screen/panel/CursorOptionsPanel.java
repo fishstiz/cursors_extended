@@ -217,14 +217,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
 
     private void onToggleEnable(ToggleWidget target, boolean enabled) {
         if (!this.cursor.hasTexture() && loadCursor(this.cursor)) {
-            this.cursor.setEnabled(true);
             this.settings.setEnabled(true);
             this.refreshCursors.run();
             return;
         }
 
         if (this.cursor.hasTexture()) {
-            this.cursor.setEnabled(enabled);
             this.settings.setEnabled(enabled);
             this.refreshCursors.run();
         } else {
@@ -300,8 +298,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         }
 
         Config.CursorSettings defaults = getDefaults();
-        cursor.setEnabled(defaults.enabled());
-        CONFIG.putCursorSettings(cursor, defaults);
+        this.settings.mergeAll(defaults);
         CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(defaults));
 
         this.refreshCursors.run();

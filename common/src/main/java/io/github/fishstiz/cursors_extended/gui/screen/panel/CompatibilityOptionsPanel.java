@@ -15,6 +15,8 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip AGGRESSIVE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.aggressive_cursor.info"));
     private static final Component VIRTUAL_TEXT = Component.translatable("cursors_extended.options.compat.virtual_mode");
     private static final Tooltip VIRTUAL_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.virtual_mode.info"));
+    private static final Component REMAP_TEXT = Component.translatable("cursors_extended.options.compat.remap_cursors");
+    private static final Tooltip REMAP_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.remap_cursors.info"));
     private static final Component LEGACY_MODE_TEXT = Component.translatable("cursors_extended.options.compat.legacy_mode");
     private static final Tooltip LEGACY_MODE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.legacy_mode.info"));
     private OptionsListWidget optionsList;
@@ -35,6 +37,14 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 CONFIG::setAggressiveCursor,
                 this.index(AGGRESSIVE_TEXT),
                 AGGRESSIVE_INFO,
+                true
+        );
+        this.optionsList.addToggle(
+                CONFIG.isRemapStandardCursors(),
+                defaults.isRemapStandardCursors(),
+                CONFIG::setRemapStandardCursors,
+                this.index(REMAP_TEXT),
+                REMAP_INFO,
                 true
         );
         this.optionsList.addToggle(

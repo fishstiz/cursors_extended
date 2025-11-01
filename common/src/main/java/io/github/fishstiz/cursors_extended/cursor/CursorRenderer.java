@@ -2,8 +2,6 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
-import io.github.fishstiz.cursors_extended.config.CursorProperties;
-import io.github.fishstiz.cursors_extended.mixin.WindowAccess;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
@@ -23,7 +21,7 @@ public sealed interface CursorRenderer {
     void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY);
 
     default Cursor getCurrentCursor(Window window) {
-        return registry().get(((WindowAccess) (Object) window).cursors_extended$getCurrentCursor());
+        return registry().get(window.currentCursor);
     }
 
     record Native(CursorRegistry registry) implements CursorRenderer {
@@ -83,13 +81,9 @@ public sealed interface CursorRenderer {
             this.spriteHeight = texture.spriteHeight();
             this.vOffset = texture.spriteVOffset();
 
-            CursorProperties properties = texture instanceof CursorTexture.Stateful stateful
-                    ? stateful
-                    : texture.metadata().cursor();
-
-            float scale = SettingsUtil.getAutoScale(properties.scale());
-            this.xhot = properties.xhot() * scale;
-            this.yhot = properties.yhot() * scale;
+            float scale = SettingsUtil.getAutoScale(texture.scale());
+            this.xhot = texture.xhot() * scale;
+            this.yhot = texture.yhot() * scale;
             this.drawWidth = this.spriteWidth * scale;
             this.drawHeight = this.spriteHeight * scale;
         }

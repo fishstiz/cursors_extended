@@ -57,6 +57,8 @@
   "cursors_extended.options.resource_pack.reset.tooltip": "Сбрасывает пользовательские настройки до значений из ресурспака (или стандартных).",
 
   "cursors_extended.options.compat": "Совместимость",
+  "cursors_extended.options.compat.remap_cursors": "Переназначить системные курсоры (GLFW)",
+  "cursors_extended.options.compat.remap_cursors.info": "Сопоставляет системные курсоры с эквивалентами из Minecraft Cursor.\n\nВНИМАНИЕ: Отключение может вызвать проблемы с некоторыми модами.",
   "cursors_extended.options.compat.aggressive_cursor": "Активное обновление",
   "cursors_extended.options.compat.aggressive_cursor.info": "Постоянно обновляет курсор вместо обновления только при изменениях.\n\nПо умолчанию отключено.",
 

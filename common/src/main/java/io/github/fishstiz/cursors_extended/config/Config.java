@@ -3,12 +3,11 @@ package io.github.fishstiz.cursors_extended.config;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.platform.Services;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
@@ -30,8 +29,10 @@ public class Config implements Serializable {
     private boolean virtualMode = false;
     private boolean legacyMode = true;
     private boolean showHotspotGuide = true;
+    private boolean remapStandardCursors = true;
     private final GlobalSettings global = new GlobalSettings();
-    private final Map<String, CursorSettings> cursors = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, CursorSettings> cursors = new Object2ObjectOpenHashMap<>();
+    private transient boolean stale = false;
 
     Config() {
     }
@@ -44,17 +45,12 @@ public class Config implements Serializable {
         return cursors.computeIfAbsent(cursor.name(), k -> new CursorSettings());
     }
 
-    public void putCursorSettings(Cursor cursor, CursorSettings settings) {
-        this.cursors.put(cursor.name(), settings);
-    }
-
     public boolean isStale(Cursor cursor) {
-        CursorSettings settings = cursors.get(cursor.name());
-        return settings == null || settings.stale;
+        return stale || !cursors.containsKey(cursor.name());
     }
 
     public void markSettingsStale() {
-        cursors.values().forEach(settings -> settings.stale = true);
+        this.stale = true;
     }
 
     public @Nullable String getHash() {
@@ -205,10 +201,17 @@ public class Config implements Serializable {
         this.showHotspotGuide = showHotspotGuide;
     }
 
+    public boolean isRemapStandardCursors() {
+        return remapStandardCursors;
+    }
+
+    public void setRemapStandardCursors(boolean remapStandardCursors) {
+        this.remapStandardCursors = remapStandardCursors;
+    }
+
     public static class CursorSettings extends AbstractCursorSettings implements Serializable {
         protected boolean enabled = ENABLED;
         protected Boolean animated = ANIMATED;
-        private transient boolean stale = false;
 
         public void setScale(float scale) {
             this.scale = sanitizeScale(scale);
@@ -238,20 +241,20 @@ public class Config implements Serializable {
             this.animated = animated;
         }
 
-        private void mergeCommon(CursorMetadata.CursorSettings metadata) {
+        private void mergeCommon(CursorProperties metadata) {
             this.scale = sanitizeScale(metadata.scale());
             this.xhot = sanitizeHotspot(metadata.xhot(), Integer.MAX_VALUE);
             this.yhot = sanitizeHotspot(metadata.yhot(), Integer.MAX_VALUE);
             this.animated = metadata.animated();
         }
 
-        public void mergeSelective(CursorMetadata.CursorSettings metadata) {
+        public void mergeSelective(CursorProperties metadata) {
             // pack settings should not enable the cursor back on. https://github.com/fishstiz/minecraft-cursor/issues/29
             if (this.enabled) this.enabled = metadata.enabled();
             mergeCommon(metadata);
         }
 
-        public void mergeAll(CursorMetadata.CursorSettings metadata) {
+        public void mergeAll(CursorProperties metadata) {
             this.enabled = metadata.enabled();
             mergeCommon(metadata);
         }

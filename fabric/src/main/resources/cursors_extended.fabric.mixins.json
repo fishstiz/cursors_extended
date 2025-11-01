@@ -4,11 +4,13 @@
   "package": "io.github.fishstiz.cursors_extended.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "io.github.fishstiz.cursors_extended.platform.CursorsExtendedFabricMixinConfigPlugin",
+  "plugin": "io.github.fishstiz.cursors_extended.platform.FabricMixinConfigPlugin",
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
+    "compat.glfw.internal.CursorTypeMixin",
+    "compat.glfw.internal.NativeImageUtilMixin",
     "compat.modmenu.ModListEntryMixin",
     "compat.modmenu.ModsScreenDescriptionEntryMixin",
     "compat.modmenu.ParentEntryMixin"

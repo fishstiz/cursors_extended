@@ -33,6 +33,24 @@ neoForge {
     }
 }
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+    compileOnly "maven.modrinth:owo-lib:$owo_version"
+}
+
 processResources {
     // NeoForge doesn't have a way to enable a pack by default without making it required
     def defaultPack = "${sourceSets.main.output.resourcesDir}/resourcepacks/default"

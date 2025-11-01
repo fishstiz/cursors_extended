@@ -1,6 +1,7 @@
 package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -15,9 +16,11 @@ public final class Cursor {
     }
 
     public long handle() {
-        CursorTexture texture = getTexture();
-        if (texture != null && texture.handle() != MemoryUtil.NULL) {
-            return texture.handle();
+        if (isEnabled()) {
+            CursorTexture texture = getTexture();
+            if (texture != null && texture.handle() != MemoryUtil.NULL) {
+                return texture.handle();
+            }
         }
         return cursorType.handle;
     }
@@ -39,16 +42,7 @@ public final class Cursor {
     }
 
     public boolean isEnabled() {
-        if (getTexture() instanceof CursorTexture.Stateful statefulTexture) {
-            return statefulTexture.enabled();
-        }
-        return true;
-    }
-
-    public void setEnabled(boolean enabled) {
-        if (getTexture() instanceof CursorTexture.Stateful statefulTexture) {
-            statefulTexture.setEnabled(enabled);
-        }
+        return CursorsExtended.CONFIG.getOrCreateSettings(this).enabled();
     }
 
     public boolean isTextureEnabled() {

@@ -67,19 +67,22 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
     }
 
     static void setScale(Cursor cursor, float scale) {
-        if (cursor.getTexture() instanceof CursorTexture.Stateful texture) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, scale, texture.xhot(), texture.yhot());
         }
     }
 
     static void setXHot(Cursor cursor, int xhot) {
-        if (cursor.getTexture() instanceof CursorTexture.Stateful texture) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, texture.yhot());
         }
     }
 
     static void setYHot(Cursor cursor, int yhot) {
-        if (cursor.getTexture() instanceof CursorTexture.Stateful texture) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), texture.xhot(), yhot);
         }
     }

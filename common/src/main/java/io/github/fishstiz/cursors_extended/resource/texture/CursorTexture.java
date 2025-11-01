@@ -5,18 +5,26 @@ import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.NativeResource;
 
 import java.io.IOException;
 
-public interface CursorTexture extends ClientAsset.Texture, NativeResource {
+public interface CursorTexture extends ClientAsset.Texture, AutoCloseable {
     long handle();
+
+    int xhot();
+
+    int yhot();
+
+    float scale();
 
     int textureWidth();
 
     int textureHeight();
 
     CursorMetadata metadata();
+
+    @Override
+    void close();
 
     @Override
     default @NotNull ResourceLocation id() {
@@ -37,15 +45,5 @@ public interface CursorTexture extends ClientAsset.Texture, NativeResource {
 
     default CursorTexture recreate(CursorProperties properties) throws IOException {
         throw new IOException("This cursor texture cannot be recreated");
-    }
-
-    interface Stateful extends CursorTexture, CursorProperties {
-        void toggle();
-
-        default void setEnabled(boolean enabled) {
-            if (enabled != enabled()) {
-                toggle();
-            }
-        }
     }
 }

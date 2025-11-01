@@ -57,6 +57,8 @@
   "cursors_extended.options.resource_pack.reset.tooltip": "Kişisel imleç ayarlarını kaynak paketi (veya yerleşik varsayılan) ile eşleşecek şekilde sıfırlar.",
 
   "cursors_extended.options.compat": "Mod Uyumluluğu",
+  "cursors_extended.options.compat.remap_cursors": "Sistem İmleçlerini Yeniden Eşle (GLFW)",
+  "cursors_extended.options.compat.remap_cursors.info": "Sistem imleçlerini Minecraft imleçleriyle yeniden eşleştirir.\n\nUYARI: Devre dışı bırakmak bazı modlarla uyumsuzluk yaratabilir.",
   "cursors_extended.options.compat.aggressive_cursor": "Agresif İmleç Güncellemeleri",
   "cursors_extended.options.compat.aggressive_cursor.info": "İmleci sadece değiştiğinde değil, sürekli olarak günceller.\n\nVarsayılan olarak devre dışı.",
 

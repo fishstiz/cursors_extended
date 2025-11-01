@@ -9,13 +9,12 @@ import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-public final class AnimatedCursorTexture implements CursorTexture.Stateful {
+public final class AnimatedCursorTexture implements CursorTexture {
     private final AnimationState animationState;
     private final Frame fallback;
     private final Frame[] frames;
@@ -27,7 +26,6 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
     private final int textureWidth;
     private final int textureHeight;
     private final byte[] pixels;
-    private boolean enabled;
     private boolean animated;
 
     public AnimatedCursorTexture(
@@ -66,7 +64,6 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
             throw e;
         }
 
-        this.enabled = settings.enabled();
         this.animated = settings.animated() == null || settings.animated();
         this.metadata = metadata;
         this.animationState = animationState;
@@ -101,21 +98,9 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
         return frames;
     }
 
-
-    @Override
-    public boolean enabled() {
-        return enabled;
-    }
-
-    @Override
-    public void toggle() {
-        this.enabled = !enabled;
-        restartAnimation();
-    }
-
     @Override
     public long handle() {
-        return enabled() ? currentFrame().sprite.handle() : MemoryUtil.NULL;
+        return currentFrame().sprite.handle();
     }
 
     @Override
@@ -133,7 +118,6 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
         return yhot;
     }
 
-    @Override
     public @NotNull Boolean animated() {
         return animated;
     }
@@ -178,10 +162,10 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
     }
 
     @Override
-    public void free() {
-        fallback.sprite.free();
+    public void close() {
+        fallback.sprite.close();
         for (Frame frame : frames) {
-            frame.sprite.free();
+            frame.sprite.close();
         }
     }
 
@@ -194,7 +178,7 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
     }
 
     public Frame getFrame(int index) {
-        if (!animated || !enabled || frames.length == 0) {
+        if (!animated || frames.length == 0) {
             return fallback;
         }
         if (index < 0 || index >= frames.length) {
@@ -224,6 +208,21 @@ public final class AnimatedCursorTexture implements CursorTexture.Stateful {
             this.spriteWidth = image.getWidth();
             this.spriteHeight = image.getHeight();
             this.spriteVOffset = vOffset;
+        }
+
+        @Override
+        public int xhot() {
+            return xhot;
+        }
+
+        @Override
+        public int yhot() {
+            return yhot;
+        }
+
+        @Override
+        public float scale() {
+            return scale;
         }
 
         @Override

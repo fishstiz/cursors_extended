@@ -7,11 +7,10 @@ import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 
-public final class BasicCursorTexture extends AbstractCursorTexture implements CursorTexture.Stateful {
+public final class BasicCursorTexture extends AbstractCursorTexture {
     private final float scale;
     private final int xhot;
     private final int yhot;
@@ -20,7 +19,6 @@ public final class BasicCursorTexture extends AbstractCursorTexture implements C
     private final byte[] pixels;
     private final ResourceLocation texturePath;
     private final CursorMetadata metadata;
-    private boolean enabled;
 
     public BasicCursorTexture(
             NativeImage image,
@@ -29,7 +27,6 @@ public final class BasicCursorTexture extends AbstractCursorTexture implements C
             CursorProperties settings
     ) throws IOException {
         super(image, settings);
-        this.enabled = settings.enabled();
         this.scale = SettingsUtil.sanitizeScale(settings.scale());
         this.xhot = SettingsUtil.sanitizeHotspot(settings.xhot(), image.getWidth());
         this.yhot = SettingsUtil.sanitizeHotspot(settings.yhot(), image.getHeight());
@@ -38,21 +35,6 @@ public final class BasicCursorTexture extends AbstractCursorTexture implements C
         this.pixels = NativeImageUtil.getBytes(image);
         this.texturePath = texturePath;
         this.metadata = metadata;
-    }
-
-    @Override
-    public boolean enabled() {
-        return enabled;
-    }
-
-    @Override
-    public void toggle() {
-        this.enabled = !enabled;
-    }
-
-    @Override
-    public long handle() {
-        return enabled ? super.handle() : MemoryUtil.NULL;
     }
 
     @Override
@@ -68,11 +50,6 @@ public final class BasicCursorTexture extends AbstractCursorTexture implements C
     @Override
     public int yhot() {
         return yhot;
-    }
-
-    @Override
-    public Boolean animated() {
-        return false;
     }
 
     @Override

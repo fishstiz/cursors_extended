@@ -21,15 +21,10 @@ public abstract class AbstractCursorTexture implements CursorTexture {
     }
 
     @Override
-    public final void free() {
+    public void close() {
         if (handle != MemoryUtil.NULL) {
             GLFW.glfwDestroyCursor(handle);
             handle = MemoryUtil.NULL;
         }
-    }
-
-    @Override
-    public final void close() {
-        this.free();
     }
 }

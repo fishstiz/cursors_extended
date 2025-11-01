@@ -58,6 +58,8 @@
   "cursors_extended.options.resource_pack.reset.tooltip": "Скидає налаштування особистого курсору відповідно до налаштувань, наданих пакетами ресурсів (або вбудованим усталено).",
 
   "cursors_extended.options.compat": "Сумісність модів",
+  "cursors_extended.options.compat.remap_cursors": "Змінити стандартні курсори (GLFW)",
+  "cursors_extended.options.compat.remap_cursors.info": "Змінює стандартні курсори на еквівалентний курсор Minecraft.\n\nУВАГА: вимкнення може спричинити проблеми сумісности з певними модами.",
   "cursors_extended.options.compat.aggressive_cursor": "Агресивні оновлення курсору",
   "cursors_extended.options.compat.aggressive_cursor.info": "Агресивно оновлює курсор, а не лише коли він змінюється.\n\nВимкнено усталено.",
   "cursors_extended.options.compat.virtual_mode": "Віртуальний режим",

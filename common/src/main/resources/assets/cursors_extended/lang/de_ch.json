@@ -41,5 +41,8 @@
   "cursors_extended.options.adapt.server": "Spielstart-Schaltfläche für Server-Symbol",
 
   "cursors_extended.options.resource_pack.reset": "Cursor-Einstellungen zurücksetzen",
-  "cursors_extended.options.resource_pack.reset.tooltip": "Setzt persönliche Cursor-Einstellungen zurück, sodass sie den Einstellungen aus Ressourcenpaketen (oder den Standardwerten) entsprechen."
+  "cursors_extended.options.resource_pack.reset.tooltip": "Setzt persönliche Cursor-Einstellungen zurück, sodass sie den Einstellungen aus Ressourcenpaketen (oder den Standardwerten) entsprechen.",
+
+  "cursors_extended.options.compat.remap_cursors": "Standard-Cursor neu zuweisen (GLFW)",
+  "cursors_extended.options.compat.remap_cursors.info": "Weist Standard-Cursor den entsprechenden Minecraft-Cursor zu.\n\nWARNUNG: Deaktivieren kann zu Kompatibilitätsproblemen mit bestimmten Mods führen."
 }
