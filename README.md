@@ -46,7 +46,8 @@ Already have one on v3? Convert it with the [**V3 Converter**](https://fishstiz.
 Get started here: https://fishstiz.github.io/cursors_extended-wiki/resource-pack/getting-started
 
 ## 🔗 Compatibility
-- If the cursor does not change from the system cursor, it is likely a compatibility issue. Workarounds exist but aren’t foolproof.
-  - **Fabric**: look out for a warning log indicating that the workarounds could not be applied due to GLFW being loaded early.
+- If the cursor does not change from the system cursor, it is likely a compatibility issue. Workarounds exist but aren't foolproof.
+  - Workarounds include mod cursor tracking and remapping. Can be disabled in case it causes issues. 
+  - **Fabric**: check for a warning log indicating that the workarounds could not be applied due to GLFW being loaded early.
   - **NeoForge**: report the issue for a possible workaround or patch for the incompatible mod.
-  - You may also try **Aggressive Cursor** and/or **Virtual Mode** as workarounds, these options can also help diagnose the issue.   
+  - You may also try **Aggressive Cursor** and/or **Virtual Mode** as workarounds, also helps with diagnosing compatibility issues.   
