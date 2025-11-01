@@ -1,6 +1,5 @@
 package io.github.fishstiz.cursors_extended.platform;
 
-import io.github.fishstiz.cursors_extended.compat.glfw.GLFWInternal;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;
@@ -17,7 +16,6 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
     private static final Logger LOGGER = LoggerFactory.getLogger("cursors_extended | Mixin");
     private static final String MIXIN_PACKAGE = "io.github.fishstiz.cursors_extended.mixin";
     private static final String MOD_MENU_MIXIN_PACKAGE = MIXIN_PACKAGE + ".compat.modmenu";
-    private static final String GLFW_INTERNAL_MIXIN_PACKAGE = MIXIN_PACKAGE + ".compat.glfw.internal";
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -31,13 +29,7 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.startsWith(MOD_MENU_MIXIN_PACKAGE) && !FabricLoader.getInstance().isModLoaded("modmenu")) {
-            return false;
-        }
-        if (mixinClassName.startsWith(GLFW_INTERNAL_MIXIN_PACKAGE) && !GLFWInternal.isEnabled()) {
-            return false;
-        }
-        return true;
+        return !mixinClassName.startsWith(MOD_MENU_MIXIN_PACKAGE) || FabricLoader.getInstance().isModLoaded("modmenu");
     }
 
     @Override
@@ -52,12 +44,11 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
         }
 
         if (FabricLauncherBase.getLauncher().isClassLoaded("org.lwjgl.glfw.GLFW")) {
-            GLFWInternal.setEnabled(false);
             LOGGER.warn("[cursors_extended] GLFW has been loaded early, unable to apply compatibility workarounds.");
             return null;
         }
 
-        return List.of("compat.glfw.GLFWMixin");
+        return List.of("compat.glfw.GLFWMixin", "compat.glfw.internal.CursorTypeMixin", "compat.glfw.internal.NativeImageUtilMixin");
     }
 
     @Override

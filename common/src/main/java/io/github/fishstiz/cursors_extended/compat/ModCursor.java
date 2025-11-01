@@ -8,6 +8,6 @@ public record ModCursor(long handle, String source, CursorType cursorType, boole
     }
 
     public static ModCursor ofUnknownType(long handle, String source) {
-        return new ModCursor(handle, source, new CursorType("cursors_extended:unknown_cursor/" + handle, handle), true);
+        return new ModCursor(handle, source, new CursorType("cursors_extended/unknown_cursor/" + handle, handle), true);
     }
 }

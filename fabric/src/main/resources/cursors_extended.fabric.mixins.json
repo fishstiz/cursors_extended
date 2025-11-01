@@ -9,8 +9,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "compat.glfw.internal.CursorTypeMixin",
-    "compat.glfw.internal.NativeImageUtilMixin",
     "compat.modmenu.ModListEntryMixin",
     "compat.modmenu.ModsScreenDescriptionEntryMixin",
     "compat.modmenu.ParentEntryMixin"

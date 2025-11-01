@@ -23,6 +23,9 @@ import java.util.stream.Stream;
 
 @Mixin(value = GLFW.class, remap = false)
 public abstract class GLFWMixin {
+    @Unique
+    private static final int MAX_SOURCE_PACKAGE_DEPTH = 4;
+
     static {
         CursorsExtended.LOGGER.debug("[cursors_extended] Loading CursorTypes: {}", CursorTypes.class);
     }
@@ -31,41 +34,46 @@ public abstract class GLFWMixin {
     private static String cursors_extended$getSourcePackage(Stream<StackWalker.StackFrame> frames) {
         return frames.dropWhile(frame -> frame.getDeclaringClass() == GLFW.class)
                 .findFirst()
-                .map(frame -> frame.getDeclaringClass().getPackageName())
+                .map(frame -> {
+                    String packageName = frame.getDeclaringClass().getPackageName();
+                    int count = 0, index = -1;
+                    while ((index = packageName.indexOf('.', index + 1)) != -1) {
+                        if (++count == MAX_SOURCE_PACKAGE_DEPTH) return packageName.substring(0, index);
+                    }
+                    return packageName;
+                })
                 .orElse("placeholder");
     }
 
     @WrapMethod(method = "glfwCreateStandardCursor")
     private static long trackStandardCursor(int shape, Operation<Long> original) {
-        synchronized (GLFWInternal.class) {
-            long handle = original.call(shape);
-            if (GLFWInternal.isReentrantCall()) {
-                return handle;
-            }
+        long handle = original.call(shape);
 
-            CursorType mapped = CursorTypeUtil.mapStandardCursor(shape);
-            if (mapped != null) {
-                String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
-                CursorStateTracker.get().trackCursor(new ModCursor(handle, sourcePackage, mapped));
-            }
-
+        if (GLFWInternal.isInternalCall() || CursorStateTracker.get().getCursor(handle) != null) {
             return handle;
         }
+
+        String mapped = CursorTypeUtil.mapStandardCursorName(shape);
+        if (mapped != null) {
+            String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
+            CursorStateTracker.get().trackCursor(new ModCursor(handle, sourcePackage, new CursorType(mapped, handle)));
+        }
+
+        return handle;
     }
 
     @WrapMethod(method = "nglfwCreateCursor")
     private static long trackCustomCursor(long image, int xhot, int yhot, Operation<Long> original) {
-        synchronized (GLFWInternal.class) {
-            long handle = original.call(image, xhot, yhot);
+        long handle = original.call(image, xhot, yhot);
 
-            if (GLFWInternal.isReentrantCall()) {
-                return handle;
-            }
-
-            String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
-            CursorStateTracker.get().trackCursor(ModCursor.ofUnknownType(handle, sourcePackage));
+        if (GLFWInternal.isInternalCall() || GLFWInternal.consumeInternalImage(image)) {
             return handle;
         }
+
+        String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
+        CursorStateTracker.get().trackCursor(ModCursor.ofUnknownType(handle, sourcePackage));
+        CursorsExtended.LOGGER.info("[cursors_extended] Tracking custom cursor from '{}'", sourcePackage);
+        return handle;
     }
 
     @Inject(method = "glfwDestroyCursor", at = @At("RETURN"))
@@ -78,43 +86,42 @@ public abstract class GLFWMixin {
 
     @WrapMethod(method = "glfwSetCursor")
     private static void setMappedCursor(long window, long cursor, Operation<Void> original) {
-        synchronized (GLFWInternal.class) {
-            CursorStateTracker tracker = CursorStateTracker.get();
-            if (GLFWInternal.isReentrantCall() || !tracker.isTracking()) {
-                original.call(window, cursor);
-                return;
-            }
+        CursorStateTracker tracker = CursorStateTracker.get();
 
-            CursorRegistry registry = CursorsExtended.getInstance().getRegistry();
-            if (cursor == MemoryUtil.NULL) {
-                tracker.resetCursor(window, CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage));
-                original.call(window, CursorsExtended.CONFIG.isRemapStandardCursors() ? registry.get(CursorType.DEFAULT).handle() : MemoryUtil.NULL);
-                CursorStateTracker.syncWithMinecraft(window, CursorType.DEFAULT);
-                return;
-            }
-
-            ModCursor modCursor = tracker.getCursor(cursor);
-            if (modCursor == null) {
-                modCursor = ModCursor.ofUnknownType(cursor, CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage));
-                tracker.trackCursor(modCursor);
-            }
-
-            tracker.setCursor(window, modCursor);
-
-            if (modCursor.custom() || !CursorsExtended.CONFIG.isRemapStandardCursors()) {
-                original.call(window, cursor);
-                CursorStateTracker.syncWithMinecraft(window, modCursor.cursorType());
-                return;
-            }
-
-            Cursor mapped = registry.get(modCursor.cursorType());
-            if (!mapped.isEnabled()) {
-                mapped = registry.get(CursorType.DEFAULT);
-            }
-
-            CursorsExtended.getInstance().getLoader().lazyLoadTexture(mapped);
-            original.call(window, mapped.handle());
-            CursorStateTracker.syncWithMinecraft(window, mapped.cursorType());
+        if (GLFWInternal.isInternalCall() || !tracker.isTracking()) {
+            original.call(window, cursor);
+            return;
         }
+
+        CursorRegistry registry = CursorsExtended.getInstance().getRegistry();
+        if (cursor == MemoryUtil.NULL) {
+            tracker.resetCursor(window, CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage));
+            original.call(window, CursorsExtended.CONFIG.isRemapStandardCursors() ? registry.get(CursorType.DEFAULT).handle() : MemoryUtil.NULL);
+            CursorStateTracker.syncWithMinecraft(window, CursorType.DEFAULT);
+            return;
+        }
+
+        ModCursor modCursor = tracker.getCursor(cursor);
+        if (modCursor == null) {
+            original.call(window, cursor);
+            return;
+        }
+
+        tracker.setCursor(window, modCursor);
+
+        if (modCursor.custom() || !CursorsExtended.CONFIG.isRemapStandardCursors()) {
+            original.call(window, cursor);
+            CursorStateTracker.syncWithMinecraft(window, modCursor.cursorType());
+            return;
+        }
+
+        Cursor mapped = registry.get(modCursor.cursorType());
+        if (!mapped.isEnabled()) {
+            mapped = registry.get(CursorType.DEFAULT);
+        }
+
+        CursorsExtended.getInstance().getLoader().lazyLoadTexture(mapped);
+        original.call(window, mapped.handle());
+        CursorStateTracker.syncWithMinecraft(window, mapped.cursorType());
     }
 }

@@ -78,4 +78,20 @@ public class CursorTypeUtil {
             default -> null;
         };
     }
+
+    public static @Nullable String mapStandardCursorName(int shape) {
+        return switch (shape) {
+            case GLFW.GLFW_ARROW_CURSOR -> "default";
+            case GLFW.GLFW_POINTING_HAND_CURSOR -> "pointing_hand";
+            case GLFW.GLFW_IBEAM_CURSOR -> "ibeam";
+            case GLFW.GLFW_CROSSHAIR_CURSOR -> "crosshair";
+            case GLFW.GLFW_RESIZE_EW_CURSOR -> "resize_ew";
+            case GLFW.GLFW_RESIZE_NS_CURSOR -> "resize_ns";
+            case GLFW.GLFW_RESIZE_NWSE_CURSOR -> "resize_nwse";
+            case GLFW.GLFW_RESIZE_NESW_CURSOR -> "resize_nesw";
+            case GLFW.GLFW_RESIZE_ALL_CURSOR -> "resize_all";
+            case GLFW.GLFW_NOT_ALLOWED_CURSOR -> "not_allowed";
+            default -> null;
+        };
+    }
 }

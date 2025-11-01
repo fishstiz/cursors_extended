@@ -15,6 +15,13 @@ public abstract class NativeImageUtilMixin {
             target = "Lorg/lwjgl/glfw/GLFW;glfwCreateCursor(Lorg/lwjgl/glfw/GLFWImage;II)J"
     ))
     private static long createCursorInternal(GLFWImage image, int xhot, int yhot) {
-        return GLFWInternal.createCursor(image, xhot, yhot);
+        long imageAddress = image.address();
+
+        GLFWInternal.trackInternalImage(imageAddress);
+        try {
+            return GLFWInternal.createCursor(image, xhot, yhot);
+        } finally {
+            GLFWInternal.consumeInternalImage(imageAddress);
+        }
     }
 }

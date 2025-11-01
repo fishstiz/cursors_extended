@@ -55,14 +55,6 @@ public abstract class WindowMixin {
 
     @ModifyVariable(method = "selectCursor", at = @At("HEAD"), argsOnly = true)
     private CursorType resolveSelected(CursorType value) {
-        CursorStateTracker tracker = CursorStateTracker.get();
-        if (tracker.isTracking()) {
-            CursorType currentTrackedCursor = tracker.getCurrentCursor(this.handle);
-            if (CursorTypeUtil.nonDefault(currentTrackedCursor)) {
-                value = currentTrackedCursor;
-            }
-        }
-
         CursorType cursorType = cursors_extended$resolveCursor(value);
         Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
         CursorsExtended.getInstance().getLoader().lazyLoadTexture(cursor);
@@ -82,6 +74,13 @@ public abstract class WindowMixin {
 
     @Unique
     private CursorType cursors_extended$resolveCursor(CursorType requestedCursor) {
+        CursorStateTracker tracker = CursorStateTracker.get();
+        if (tracker.isTracking()) {
+            CursorType currentTrackedCursor = tracker.getCurrentCursor(this.handle);
+            if (CursorTypeUtil.nonDefault(currentTrackedCursor)) {
+                return currentTrackedCursor;
+            }
+        }
         if (!allowCursorChanges) {
             return CursorType.DEFAULT;
         }

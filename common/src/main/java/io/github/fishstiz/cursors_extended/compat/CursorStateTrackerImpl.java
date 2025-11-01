@@ -38,12 +38,16 @@ class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public void trackCursor(ModCursor modCursor) {
-        cursors.put(modCursor.handle(), modCursor);
+        synchronized (cursors) {
+            cursors.put(modCursor.handle(), modCursor);
+        }
     }
 
     @Override
     public void untrackCursor(ModCursor modCursor) {
-        cursors.remove(modCursor.handle());
+        synchronized (cursors) {
+            cursors.remove(modCursor.handle());
+        }
     }
 
     @Override
@@ -53,7 +57,9 @@ class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public @Nullable ModCursor getCursor(long handle) {
-        return cursors.get(handle);
+        synchronized (cursors) {
+            return cursors.get(handle);
+        }
     }
 
     private void setCursor(String source, long window, CursorType cursorType, boolean custom) {
@@ -93,8 +99,10 @@ class CursorStateTrackerImpl implements CursorStateTracker {
             return other.getTimestamp() > current.getTimestamp();
         }
 
-        if (!CursorTypeUtil.nonDefault(other.getCursorType()) == !CursorTypeUtil.nonDefault(current.getCursorType())) { // replace if non-default
-            return !CursorTypeUtil.nonDefault(other.getCursorType());
+        boolean currentDefault = !CursorTypeUtil.nonDefault(current.getCursorType());
+        boolean otherDefault = !CursorTypeUtil.nonDefault(other.getCursorType());
+        if (currentDefault != otherDefault) { // replace if non-default
+            return !otherDefault;
         }
 
         return other.getTimestamp() > current.getTimestamp(); // replace if timestamp is more recent
