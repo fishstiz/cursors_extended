@@ -84,6 +84,7 @@ public class CursorDisplay implements ClientStartedListener {
     public void toggleVirtual() {
         cursorRenderer.resetCursor(minecraft.getWindow());
         cursorRenderer = isVirtual() ? new CursorRenderer.Native(registry) : new CursorRenderer.Virtual(registry);
+        cursorRenderer.applyCursor(minecraft.getWindow());
     }
 
     public void renderCursor(Window window, GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -95,8 +96,7 @@ public class CursorDisplay implements ClientStartedListener {
     }
 
     public void toggleDebugger() {
-        boolean debugging = isDebugging();
-        debugRenderer = debugging ? CursorDebugRenderer.NOP : CursorDebugRenderer.create();
+        debugRenderer = debugRenderer.isActive() ? CursorDebugRenderer.NOP : CursorDebugRenderer.create();
     }
 
     public void renderDebugger(GuiGraphics guiGraphics, int mouseX, int mouseY) {
