@@ -34,7 +34,6 @@ import static io.github.fishstiz.cursors_extended.CursorsExtended.*;
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
 public class CursorTextureLoader implements PreparableReloadListener, ClientStartedListener {
-    private static final ResourceLocation DIRECTORY = CursorsExtended.loc("textures/gui/sprites/cursors");
     private final Map<String, CursorMetadata> preparedMetadata = new Object2ObjectOpenHashMap<>();
     private final CursorRegistry registry;
     private Minecraft minecraft;
@@ -248,10 +247,10 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     private static ResourceLocation getExpectedPath(CursorType cursorType) {
-        return DIRECTORY.withSuffix("/" + cursorType.toString() + ".png");
+        return getDir().withSuffix("/" + cursorType.toString() + ".png");
     }
 
     public static ResourceLocation getDir() {
-        return DIRECTORY;
+        return CursorsExtended.loc("textures/gui/sprites/cursors");
     }
 }
