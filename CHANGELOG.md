@@ -1,2 +1,1 @@
-- Fixed incompatibility with Ixeris (and possibly other similar mods) ([#5](https://github.com/fishstiz/cursors_extended/issues/5))
-- Added option to forcibly disable compatibility workarounds. Requires restart to apply.
+- Fixed crash with mixins to `ResourceLocation` (Fixed crash with filament [#6](https://github.com/fishstiz/cursors_extended/issues/6))
