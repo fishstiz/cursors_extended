@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class CursorsExtended implements ClientStartedListener {
-    private static final CursorsExtended INSTANCE = new CursorsExtended();
     public static final String MOD_ID = "cursors_extended";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final Config CONFIG = Config.load();
@@ -22,15 +21,19 @@ public final class CursorsExtended implements ClientStartedListener {
     private CursorsExtended() {
     }
 
+    @Override
     public void onClientStarted(Minecraft minecraft) {
         registry.onClientStarted(minecraft);
         textureLoader.onClientStarted(minecraft);
         display.onClientStarted(minecraft);
+    }
 
+    private static final class Holder {
+        private static final CursorsExtended INSTANCE = new CursorsExtended();
     }
 
     public static CursorsExtended getInstance() {
-        return INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public CursorRegistry getRegistry() {
