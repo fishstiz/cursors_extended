@@ -1,6 +1,10 @@
 {
   "modmenu.descriptionTranslation.cursors_extended": "Кращий курсор для Minecraft",
 
+  "cursors_extended.resource-pack.default": "Розширені курсори",
+  "cursors_extended.resource-pack.default.auto": "Розширені курсори (Авто)",
+  "cursors_extended.resource-pack.legacy": "Старі курсори",
+
   "cursors_extended.options": "Налаштування курсору",
   "cursors_extended.options.enabled": "Стан",
   "cursors_extended.options.scale": "Розмір",
@@ -13,6 +17,7 @@
   "cursors_extended.options.animate-reset": "Скинути анімацію",
   "cursors_extended.options.reset-defaults": "Скинути до усталених",
   "cursors_extended.options.preview": "Попередній перегляд",
+  "cursors_extended.options.image_too_large": "Зображення занадто велике!",
 
   "cursors_extended.options.search": "Пошук…",
   "cursors_extended.options.search.clear": "Очистити",
@@ -27,6 +32,7 @@
   "cursors_extended.options.cursor-type.shift": "Shift",
   "cursors_extended.options.cursor-type.busy": "Зайнятий",
   "cursors_extended.options.cursor-type.crosshair": "Приціл",
+  "cursors_extended.options.cursor-type.resize_all": "Зміна розміру усіх",
   "cursors_extended.options.cursor-type.resize_ew": "Зміна розміру EW",
   "cursors_extended.options.cursor-type.resize_ns": "Зміна розміру NS",
   "cursors_extended.options.cursor-type.resize_nwse": "Зміна розміру NWSE",
@@ -44,8 +50,11 @@
 
   "cursors_extended.options.adapt": "Адаптивний курсор",
   "cursors_extended.options.adapt.tooltip": "Оновлює увімкнене налаштування для всіх курсорів, крім звичайного курсору.",
+  "cursors_extended.options.adapt.hold": "Allow holding of certain cursors",
+  "cursors_extended.options.adapt.hold.tooltip": "Some elements keep their cursor while the mouse button is held, even if the mouse moves away.",
   "cursors_extended.options.adapt.item_slot": "Слот предмета в інвентарі",
   "cursors_extended.options.adapt.item_grab": "Хапання предмета в інвентарі",
+  "cursors_extended.options.adapt.scrollbar": "Scrollbar %1$s",
   "cursors_extended.options.adapt.creative_tabs": "Вкладки творчого інвентарю",
   "cursors_extended.options.adapt.enchantments": "Кнопка зачарування",
   "cursors_extended.options.adapt.stonecutter": "Кнопка рецепту каменеріза",
@@ -55,15 +64,19 @@
   "cursors_extended.options.adapt.server": "Кнопка гри на значку сервера",
 
   "cursors_extended.options.resource_pack.reset": "Скинути налаштування курсору",
-  "cursors_extended.options.resource_pack.reset.tooltip": "Скидає налаштування особистого курсору відповідно до налаштувань, наданих пакетами ресурсів (або вбудованим усталено).",
+  "cursors_extended.options.resource_pack.reset.tooltip": "Зіставляє ваші налаштування курсора з налаштуваннями пакета ресурсів.",
 
   "cursors_extended.options.compat": "Сумісність модів",
-  "cursors_extended.options.compat.remap_cursors": "Змінити стандартні курсори (GLFW)",
-  "cursors_extended.options.compat.remap_cursors.info": "Змінює стандартні курсори на еквівалентний курсор Minecraft.\n\nУВАГА: вимкнення може спричинити проблеми сумісности з певними модами.",
+  "cursors_extended.options.compat.workarounds": "Обхідні шляхи відстеження стану",
+  "cursors_extended.options.compat.workarounds.info": "Відстежує стандартні та власні курсори, створені іншими модами.\n\nДля застосування потрібен перезапуск.",
+  "cursors_extended.options.compat.remap_cursors": "Змінити стандартні курсори",
+  "cursors_extended.options.compat.remap_cursors.info": "Змінює стандартну систему курсорів створену іншими модами.",
   "cursors_extended.options.compat.aggressive_cursor": "Агресивні оновлення курсору",
-  "cursors_extended.options.compat.aggressive_cursor.info": "Агресивно оновлює курсор, а не лише коли він змінюється.\n\nВимкнено усталено.",
+  "cursors_extended.options.compat.aggressive_cursor.info": "Агресивно оновлює курсор, а не лише коли він змінюється.",
   "cursors_extended.options.compat.virtual_mode": "Віртуальний режим",
-  "cursors_extended.options.compat.virtual_mode.info": "Промальовує курсор вручну замість використання GLFW.\n\nПОПЕРЕДЖЕННЯ: може вирішити деякі проблеми, але також викликати інші.",
+  "cursors_extended.options.compat.virtual_mode.info": "Промальовує курсор безпосередньо в грі, а не дозволяє операційній системі його обробляти.",
+  "cursors_extended.options.compat.legacy_mode": "Старий режим курсору",
+  "cursors_extended.options.compat.legacy_mode.info": "Покращена логіка курсору, перетинає ієрархію інтерфейсу, щоб визначити курсор.\n\nІнші старі параметри можна перемикати з адаптивних налаштувань курсору.",
 
   "cursors_extended.options.debug": "Налагодження",
   "cursors_extended.options.debug.inspect": "Перевірити елемент",
