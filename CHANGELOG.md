@@ -1,1 +1,4 @@
-- Fixed crash with mixins to `ResourceLocation` (Fixed crash with filament [#6](https://github.com/fishstiz/cursors_extended/issues/6))
+- Updated Ukrainian Translation ([#7](https://github.com/fishstiz/cursors_extended/pull/7) by StarmanMine142)
+- Improved stability of cursor state tracking for other mods when cursor operations are called off main thread.
+- Fixed cursor getting stuck to one shape when no resource pack is selected and a mod wraps GLFW operations off main thread (Ixeris). 
+- Fixed delayed loading of default cursor if adaptive cursor is disabled.
