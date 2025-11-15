@@ -46,38 +46,38 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     protected void initContents() {
         this.optionsList = new OptionsListWidget(this.getMinecraft(), this.getFont(), Button.DEFAULT_HEIGHT, this.getSpacing());
 
-        boolean adaptive = isAdaptive();
-        this.optionsList.addToggle(adaptive, this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, true);
-        this.addOption(CONFIG.isHeldCursorsEnabled(), CONFIG::setHeldCursorsEnabled, HOLD_CURSORS, HOLD_CURSORS_INFO, null, adaptive);
-        this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypesExt.GRABBING, adaptive);
-        this.addOption(CONFIG.isPointerScrollbarEnabled(), CONFIG::setPointerScrollbarEnabled, SCROLLBAR_POINTER, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isResizeScrollbarEnabled(), CONFIG::setResizeScrollbarEnabled, SCROLLBAR_RESIZE, CursorTypes.RESIZE_NS, adaptive);
-        this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isLoomPatternsEnabled(), CONFIG::setLoomPatternsEnabled, LOOM, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isAdvancementTabsEnabled(), CONFIG::setAdvancementTabsEnabled, ADVANCEMENTS, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isWorldIconEnabled(), CONFIG::setWorldIconEnabled, WORLD, CursorTypes.POINTING_HAND, adaptive);
-        this.addOption(CONFIG.isServerIconEnabled(), CONFIG::setServerIconEnabled, SERVER, CursorTypes.POINTING_HAND, adaptive);
+        this.optionsList.addToggle(isAdaptiveTexturesEnabled(), this::toggleAdaptive, ENABLE_TEXT, ADAPTIVE_INFO, CONFIG.hasResourcePack());
+        this.addOption(CONFIG.isHeldCursorsEnabled(), CONFIG::setHeldCursorsEnabled, HOLD_CURSORS, HOLD_CURSORS_INFO, null);
+        this.addOption(CONFIG.isItemSlotEnabled(), CONFIG::setItemSlotEnabled, ITEM_SLOT, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypesExt.GRABBING);
+        this.addOption(CONFIG.isPointerScrollbarEnabled(), CONFIG::setPointerScrollbarEnabled, SCROLLBAR_POINTER, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isResizeScrollbarEnabled(), CONFIG::setResizeScrollbarEnabled, SCROLLBAR_RESIZE, CursorTypes.RESIZE_NS);
+        this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isLoomPatternsEnabled(), CONFIG::setLoomPatternsEnabled, LOOM, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isAdvancementTabsEnabled(), CONFIG::setAdvancementTabsEnabled, ADVANCEMENTS, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isWorldIconEnabled(), CONFIG::setWorldIconEnabled, WORLD, CursorTypes.POINTING_HAND);
+        this.addOption(CONFIG.isServerIconEnabled(), CONFIG::setServerIconEnabled, SERVER, CursorTypes.POINTING_HAND);
 
         this.optionsList.search(this.getSearch());
 
         this.addRenderableWidget(this.optionsList);
     }
 
-    private void addOption(boolean value, Consumer<Boolean> consumer, Component label, CursorType cursorType, boolean active) {
-        this.addOption(value, consumer, label, null, cursorType, active);
+    private void addOption(boolean value, Consumer<Boolean> consumer, Component label, CursorType cursorType) {
+        this.addOption(value, consumer, label, null, cursorType);
     }
 
-    private void addOption(boolean value, Consumer<Boolean> consumer, Component label, Tooltip tooltip, CursorType cursorType, boolean active) {
-        this.optionsList.addToggle(value && active, consumer, this.index(label), prefixCursor(cursorType), tooltip, active);
+    private void addOption(boolean value, Consumer<Boolean> consumer, Component label, Tooltip tooltip, CursorType cursorType) {
+        this.optionsList.addToggle(value, consumer, this.index(label), prefixCursor(cursorType), tooltip, true);
     }
 
     private OptionsListWidget.Prefix prefixCursor(CursorType cursorType) {
         if (cursorType == null) return null;
 
         Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
+        if (!cursor.hasTexture()) return null;
 
         return (guiGraphics, font, x, y, height) -> {
             int adjustedHeight = height - (height % CURSOR_SIZE_STEP);
@@ -106,7 +106,7 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
             if (cursor.cursorType() == CursorType.DEFAULT) continue;
 
-            if (adaptive && cursor.getTexture() == null) {
+            if (adaptive && cursor.getTexture() == null && CONFIG.hasResourcePack()) {
                 loadCursor(cursor);
             }
 
@@ -118,7 +118,7 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.repositionElements();
     }
 
-    private boolean isAdaptive() {
+    private boolean isAdaptiveTexturesEnabled() {
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
             if (CursorTypeUtil.nonDefault(cursor.cursorType()) && cursor.isTextureEnabled()) {
                 return true;

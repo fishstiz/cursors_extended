@@ -58,6 +58,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     protected void initItems() {
         this.addGlobalItems();
         this.addAdaptiveItems();
+        this.addCategory(CURSORS_CATEGORY, true, !CursorsExtended.CONFIG.hasResourcePack());
         this.addCursorItems();
         this.addCompatibilityItems();
         this.addDebugItems();
@@ -93,7 +94,9 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     private void addAdaptiveItems() {
-        this.addCategoryOnly(new CatalogItem("adaptive", ADAPTIVE_TEXT), new AdaptiveOptionsPanel(ADAPTIVE_TEXT, this::refreshCursors));
+        CatalogItem category = new CatalogItem("adaptive", ADAPTIVE_TEXT);
+        this.defaultItem = category;
+        this.addCategoryOnly(category, new AdaptiveOptionsPanel(ADAPTIVE_TEXT, this::refreshCursors));
     }
 
     private void addCompatibilityItems() {
@@ -102,7 +105,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
 
     private void addCursorItems() {
         for (CatalogItem cursorItem : this.createCursorItems()) {
-            if (CursorType.DEFAULT.toString().equals(cursorItem.id())) {
+            if (CursorType.DEFAULT.toString().equals(cursorItem.id()) && CursorsExtended.CONFIG.hasResourcePack()) {
                 this.defaultItem = cursorItem;
             }
 

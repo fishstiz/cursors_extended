@@ -61,6 +61,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 this.getFont(),
                 new ButtonWidget(CommonComponents.EMPTY, this::cycleOnPreviewPress).withSize(PREVIEW_BUTTON_SIZE)
         );
+        this.previewWidget.active = CONFIG.hasResourcePack();
 
         this.optionList = new OptionsListWidget(this.getMinecraft(), this.getFont(), Button.DEFAULT_HEIGHT, this.getSpacing());
         this.optionList.addToggleableSlider(
@@ -118,12 +119,10 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 ANIMATIONS_INFO,
                 this.hasAnimationAny()
         );
-        this.optionList.addWidget(
-                new ButtonWidget(
-                        this.index(RESET_TEXT),
-                        this::resetCursorSettings
-                ).withTooltip(RESET_INFO)
-        );
+
+        ButtonWidget resetButton = new ButtonWidget(this.index(RESET_TEXT), this::resetCursorSettings).withTooltip(RESET_INFO);
+        resetButton.active = CONFIG.hasResourcePack();
+        this.optionList.addWidget(resetButton);
 
         this.optionList.search(this.getSearch());
 
