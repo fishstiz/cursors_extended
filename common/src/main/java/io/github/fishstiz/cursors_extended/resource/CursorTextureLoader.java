@@ -94,16 +94,20 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     private void prepare(ResourceManager manager) {
         preparedMetadata.clear();
 
-        prepareMetadataHash(manager, registry.getInternalCursors()).ifPresentOrElse(hash -> {
-            if (!Objects.equals(CONFIG.getHash(), hash)) {
+        boolean dirty = prepareMetadataHash(manager, registry.getInternalCursors()).map(hash -> {
+            boolean changed = !Objects.equals(CONFIG.getHash(), hash);
+            if (changed) {
                 LOGGER.info("[cursors_extended] Resource pack hash has changed, updating config...");
                 CONFIG.setHash(hash);
                 CONFIG.getGlobal().setActiveAll(false);
                 CONFIG.markSettingsStale();
             }
-        }, () -> {
+            return changed;
+        }).orElseGet(() -> {
+            boolean changed = CONFIG.getHash() != null && !CONFIG.getHash().isEmpty();
             LOGGER.info("[cursors_extended] No resource pack detected.");
             CONFIG.setHash("");
+            return changed;
         });
 
         for (Cursor cursor : registry.getCursors()) {
@@ -118,11 +122,12 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
             if (CONFIG.isStale(cursor)) {
                 CONFIG.getOrCreateSettings(cursor).mergeSelective(metadata.cursor());
+                dirty = true;
             }
         }
 
         prepared = true;
-        CONFIG.save();
+        if (dirty) CONFIG.save();
     }
 
     public void releaseTexture(Cursor cursor) {
