@@ -83,6 +83,11 @@ public class Config implements Serializable {
         _hash = hash;
     }
 
+    public boolean hasResourcePack() {
+        String hash = _hash;
+        return hash != null && !hash.isEmpty();
+    }
+
     public static Config load() {
         return JsonLoader.loadOrDefault(Config.class, Services.PLATFORM.getConfigDir().resolve(CursorsExtended.MOD_ID), Config::new);
     }

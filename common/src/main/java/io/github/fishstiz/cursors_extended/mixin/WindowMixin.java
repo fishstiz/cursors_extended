@@ -59,7 +59,7 @@ public abstract class WindowMixin {
         Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
         CursorsExtended.getInstance().getLoader().lazyLoadTexture(cursor);
 
-        return cursor.isEnabled() ? cursorType : CursorType.DEFAULT;
+        return !cursor.isTextureEnabled() && CursorsExtended.CONFIG.hasResourcePack() ? CursorType.DEFAULT : cursorType;
     }
 
     @WrapOperation(method = "selectCursor", at = @At(
