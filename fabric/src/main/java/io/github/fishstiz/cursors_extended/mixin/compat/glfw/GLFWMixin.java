@@ -50,6 +50,7 @@ public abstract class GLFWMixin {
         long handle = original.call(shape);
 
         if (GLFWInternal.isCreatingStandardCursor() || CursorStateTracker.get().getCursor(handle) != null) {
+            GLFWInternal.trackInternalCursor(handle);
             return handle;
         }
 
@@ -67,6 +68,7 @@ public abstract class GLFWMixin {
         long handle = original.call(image, xhot, yhot);
 
         if (GLFWInternal.isCreatingCursor()) {
+            GLFWInternal.trackInternalCursor(handle);
             return handle;
         }
 
@@ -78,6 +80,7 @@ public abstract class GLFWMixin {
 
     @Inject(method = "glfwDestroyCursor", at = @At("RETURN"))
     private static void untrackCursor(long cursor, CallbackInfo ci) {
+        GLFWInternal.untrackInternalCursor(cursor);
         ModCursor modCursor = CursorStateTracker.get().getCursor(cursor);
         if (modCursor != null) {
             CursorStateTracker.get().untrackCursor(modCursor);
@@ -88,7 +91,7 @@ public abstract class GLFWMixin {
     private static void setMappedCursor(long window, long cursor, Operation<Void> original) {
         CursorStateTracker tracker = CursorStateTracker.get();
 
-        if (GLFWInternal.isSettingCursor() || !tracker.isTracking()) {
+        if (GLFWInternal.isSettingCursor() || GLFWInternal.isInternalCursor(cursor) || !tracker.isTracking()) {
             original.call(window, cursor);
             return;
         }
