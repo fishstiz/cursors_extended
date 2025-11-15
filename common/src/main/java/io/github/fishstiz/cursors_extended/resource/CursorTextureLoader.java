@@ -178,6 +178,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     public void lazyLoadTexture(Cursor cursor) {
+        cursor = cursor.isEnabled() ? cursor : registry.get(CursorType.DEFAULT);
         if (cursor.isEnabled() && cursor.isLazy()) {
             loadTexture(cursor);
         }
