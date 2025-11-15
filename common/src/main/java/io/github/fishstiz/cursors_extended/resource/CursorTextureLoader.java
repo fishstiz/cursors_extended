@@ -143,6 +143,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     private boolean loadTexture(ResourceManager manager, Cursor cursor) {
         if (!prepared) return false;
 
+        CursorTexture previousTexture = cursor.getTexture();
         ResourceLocation path = getExpectedPath(cursor.cursorType());
         boolean loaded = false;
 
@@ -165,6 +166,10 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             }
         } catch (Exception e) {
             LOGGER.error("[cursors_extended] Failed to load cursor texture for '{}'. ", cursor.cursorType(), e);
+        } finally {
+            if (previousTexture != null) {
+                previousTexture.close();
+            }
         }
 
         if (!loaded) releaseTexture(cursor);
