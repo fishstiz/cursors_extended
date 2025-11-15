@@ -1,4 +1,6 @@
-- Updated Ukrainian Translation ([#7](https://github.com/fishstiz/cursors_extended/pull/7) by StarmanMine142)
 - Improved stability of cursor state tracking for other mods when cursor operations are called off main thread.
-- Fixed cursor getting stuck to one shape when no resource pack is selected and a mod wraps GLFW operations off main thread (Ixeris). 
+    - Fixed cursor getting stuck to one shape if no resource pack is detected.
+- Adaptive Cursor options are no longer disabled if adaptive cursor is disabled.
+- Fixed cursor changes getting disabled if adaptive cursor is disabled and no resource pack is detected.
 - Fixed delayed loading of default cursor if adaptive cursor is disabled.
+- Updated Ukrainian Translation ([#7](https://github.com/fishstiz/cursors_extended/pull/7) by StarmanMine142)
