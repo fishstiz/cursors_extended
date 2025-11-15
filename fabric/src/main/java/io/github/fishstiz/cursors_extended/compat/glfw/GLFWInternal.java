@@ -1,58 +1,54 @@
 package io.github.fishstiz.cursors_extended.compat.glfw;
 
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GLFWInternal {
-    private static final ThreadLocal<Boolean> INTERNAL_CALL = new ThreadLocal<>();
-    private static final Set<Long> IMAGES = new LongOpenHashSet();
+    private static final AtomicInteger IS_CREATE_STANDARD_CURSOR = new AtomicInteger(0);
+    private static final AtomicInteger IS_CREATE_CURSOR = new AtomicInteger(0);
+    private static final AtomicInteger IS_SET_CURSOR = new AtomicInteger(0);
 
     private GLFWInternal() {
     }
 
-    public static boolean isInternalCall() {
-        return Boolean.TRUE.equals(INTERNAL_CALL.get());
+    public static boolean isCreatingStandardCursor() {
+        return IS_CREATE_STANDARD_CURSOR.get() > 0;
     }
 
-    public static boolean consumeInternalImage(long image) {
-        synchronized (IMAGES) {
-            return IMAGES.remove(image);
-        }
+    public static boolean isCreatingCursor() {
+        return IS_CREATE_CURSOR.get() > 0;
     }
 
-    public static void trackInternalImage(long image) {
-        synchronized (IMAGES) {
-            IMAGES.add(image);
-        }
+    public static boolean isSettingCursor() {
+        return IS_SET_CURSOR.get() > 0;
     }
 
     public static long createStandardCursor(int shape) {
+        IS_CREATE_STANDARD_CURSOR.incrementAndGet();
         try {
-            INTERNAL_CALL.set(true);
             return GLFW.glfwCreateStandardCursor(shape);
         } finally {
-            INTERNAL_CALL.remove();
+            IS_CREATE_STANDARD_CURSOR.decrementAndGet();
         }
     }
 
     public static long createCursor(GLFWImage glfwImage, int xhot, int yhot) {
+        IS_CREATE_CURSOR.incrementAndGet();
         try {
-            INTERNAL_CALL.set(true);
             return GLFW.nglfwCreateCursor(glfwImage.address(), xhot, yhot);
         } finally {
-            INTERNAL_CALL.remove();
+            IS_CREATE_CURSOR.decrementAndGet();
         }
     }
 
     public static void setCursor(long window, long cursor) {
+        IS_SET_CURSOR.incrementAndGet();
         try {
-            INTERNAL_CALL.set(true);
             GLFW.glfwSetCursor(window, cursor);
         } finally {
-            INTERNAL_CALL.remove();
+            IS_SET_CURSOR.decrementAndGet();
         }
     }
 }

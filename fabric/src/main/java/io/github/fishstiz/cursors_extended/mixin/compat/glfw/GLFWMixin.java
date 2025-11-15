@@ -49,7 +49,7 @@ public abstract class GLFWMixin {
     private static long trackStandardCursor(int shape, Operation<Long> original) {
         long handle = original.call(shape);
 
-        if (GLFWInternal.isInternalCall() || CursorStateTracker.get().getCursor(handle) != null) {
+        if (GLFWInternal.isCreatingStandardCursor() || CursorStateTracker.get().getCursor(handle) != null) {
             return handle;
         }
 
@@ -66,7 +66,7 @@ public abstract class GLFWMixin {
     private static long trackCustomCursor(long image, int xhot, int yhot, Operation<Long> original) {
         long handle = original.call(image, xhot, yhot);
 
-        if (GLFWInternal.isInternalCall() || GLFWInternal.consumeInternalImage(image)) {
+        if (GLFWInternal.isCreatingCursor()) {
             return handle;
         }
 
@@ -88,7 +88,7 @@ public abstract class GLFWMixin {
     private static void setMappedCursor(long window, long cursor, Operation<Void> original) {
         CursorStateTracker tracker = CursorStateTracker.get();
 
-        if (GLFWInternal.isInternalCall() || !tracker.isTracking()) {
+        if (GLFWInternal.isSettingCursor() || !tracker.isTracking()) {
             original.call(window, cursor);
             return;
         }
@@ -120,8 +120,9 @@ public abstract class GLFWMixin {
             mapped = registry.get(CursorType.DEFAULT);
         }
 
-        CursorsExtended.getInstance().getLoader().lazyLoadTexture(mapped);
-        original.call(window, mapped.handle());
-        CursorStateTracker.syncWithMinecraft(window, mapped.cursorType());
+        if (window != CursorsExtended.getInstance().getDisplay().getWindow().handle()) {
+            CursorsExtended.getInstance().getLoader().lazyLoadTexture(mapped);
+            original.call(window, mapped.handle());
+        }
     }
 }
