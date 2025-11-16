@@ -146,7 +146,9 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         if (texture != null) {
             texture.close();
             cursor.setTexture(null);
-            minecraft.execute(() -> minecraft.getTextureManager().release(texture.texturePath()));
+            if (minecraft != null) {
+                minecraft.execute(() -> minecraft.getTextureManager().release(texture.texturePath()));
+            }
         }
     }
 

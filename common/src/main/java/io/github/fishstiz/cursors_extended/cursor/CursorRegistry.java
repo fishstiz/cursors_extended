@@ -3,24 +3,21 @@ package io.github.fishstiz.cursors_extended.cursor;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
 
-public class CursorRegistry implements ClientStartedListener {
+public class CursorRegistry {
     private final Map<String, Cursor> registry = new Object2ObjectLinkedOpenHashMap<>();
     private volatile Map<String, Cursor> external;
     private Map<String, Cursor> custom;
 
-    @Override
-    public void onClientStarted(Minecraft minecraft) {
+    public void onInitRenderSystem() {
         register(CursorType.DEFAULT);
         registerAlias(CursorType.DEFAULT, CursorTypes.ARROW);
         register(CursorTypes.POINTING_HAND);

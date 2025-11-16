@@ -5,27 +5,35 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class GLFWInternal {
-    private static final AtomicInteger IS_CREATE_STANDARD_CURSOR = new AtomicInteger(0);
-    private static final AtomicInteger IS_CREATE_CURSOR = new AtomicInteger(0);
-    private static final AtomicInteger IS_SET_CURSOR = new AtomicInteger(0);
+    private static final ThreadLocal<Boolean> IS_CREATE_STANDARD_CURSOR = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> IS_CREATE_CURSOR = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> IS_SET_CURSOR = new ThreadLocal<>();
     private static final Map<Long, Long> REENTRY_CURSORS = new Long2LongOpenHashMap();
 
     private GLFWInternal() {
     }
 
+    private static boolean get(ThreadLocal<Boolean> threadLocal) {
+        Boolean value = threadLocal.get();
+        if (value == null) {
+            threadLocal.remove();
+            return false;
+        }
+        return value;
+    }
+
     public static boolean isCreatingStandardCursor() {
-        return IS_CREATE_STANDARD_CURSOR.get() > 0;
+        return get(IS_CREATE_STANDARD_CURSOR);
     }
 
     public static boolean isCreatingCursor() {
-        return IS_CREATE_CURSOR.get() > 0;
+        return get(IS_CREATE_CURSOR);
     }
 
     public static boolean isSettingCursor() {
-        return IS_SET_CURSOR.get() > 0;
+        return get(IS_SET_CURSOR);
     }
 
     public static boolean consumeReentryCursor(long window, long cursor) {
@@ -41,29 +49,29 @@ public class GLFWInternal {
     }
 
     public static long createStandardCursor(int shape) {
-        IS_CREATE_STANDARD_CURSOR.incrementAndGet();
+        IS_CREATE_STANDARD_CURSOR.set(true);
         try {
             return GLFW.glfwCreateStandardCursor(shape);
         } finally {
-            IS_CREATE_STANDARD_CURSOR.decrementAndGet();
+            IS_CREATE_STANDARD_CURSOR.remove();
         }
     }
 
     public static long createCursor(GLFWImage glfwImage, int xhot, int yhot) {
-        IS_CREATE_CURSOR.incrementAndGet();
+        IS_CREATE_CURSOR.set(true);
         try {
             return GLFW.nglfwCreateCursor(glfwImage.address(), xhot, yhot);
         } finally {
-            IS_CREATE_CURSOR.decrementAndGet();
+            IS_CREATE_CURSOR.remove();
         }
     }
 
     public static void setCursor(long window, long cursor) {
-        IS_SET_CURSOR.incrementAndGet();
+        IS_SET_CURSOR.set(true);
         try {
             GLFW.glfwSetCursor(window, cursor);
         } finally {
-            IS_SET_CURSOR.decrementAndGet();
+            IS_SET_CURSOR.remove();
         }
     }
 }

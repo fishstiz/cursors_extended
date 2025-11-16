@@ -23,7 +23,6 @@ public final class CursorsExtended implements ClientStartedListener {
 
     @Override
     public void onClientStarted(Minecraft minecraft) {
-        registry.onClientStarted(minecraft);
         textureLoader.onClientStarted(minecraft);
         display.onClientStarted(minecraft);
     }
