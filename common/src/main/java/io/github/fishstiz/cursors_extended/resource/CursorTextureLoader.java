@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -71,6 +72,11 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
         for (Cursor cursor : hashableCursors) {
             ResourceLocation path = getExpectedPath(cursor.cursorType());
+            if (path == null) {
+                LOGGER.error("[cursors_extended] Invalid resource location path for cursor '{}' while computing hash.", cursor.name());
+                continue;
+            }
+
             manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE)).ifPresentOrElse(resource -> {
                 try {
                     // this is bugged, the resource should be the image, not the metadata, so that the image source and metadata source are the same.
@@ -117,6 +123,8 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
 
             CursorMetadata metadata = preparedMetadata.computeIfAbsent(cursor.name(), type -> {
                 ResourceLocation path = getExpectedPath(cursor.cursorType());
+                if (path == null) return new CursorMetadata();
+
                 return manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE))
                         .map(resource -> loadMetadata(manager, path, resource.sourcePackId()))
                         .orElse(new CursorMetadata());
@@ -145,8 +153,10 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     private boolean loadTexture(ResourceManager manager, Cursor cursor) {
         if (!prepared) return false;
 
-        CursorTexture previousTexture = cursor.getTexture();
         ResourceLocation path = getExpectedPath(cursor.cursorType());
+        if (path == null) return false;
+
+        CursorTexture previousTexture = cursor.getTexture();
         boolean loaded = false;
 
         try {
@@ -261,8 +271,9 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         }
     }
 
-    private static ResourceLocation getExpectedPath(CursorType cursorType) {
-        return getDir().withSuffix("/" + cursorType.toString() + ".png");
+    private static @Nullable ResourceLocation getExpectedPath(CursorType cursorType) {
+        String name = cursorType.toString();
+        return ResourceLocation.isValidPath(name) ? getDir().withSuffix("/" + name + ".png") : null;
     }
 
     public static ResourceLocation getDir() {
