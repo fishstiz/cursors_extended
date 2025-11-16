@@ -30,7 +30,7 @@ public abstract class MinecraftMixin {
             this.cursors_extended$previousGuiScale = guiScale;
 
             CursorsExtended.getInstance().getRegistry().getCursors().forEach(cursor -> {
-                if (!cursor.isEnabled()) return;
+                if (cursor.isCustom() || !CursorsExtended.CONFIG.getOrCreateSettings(cursor).enabled()) return;
 
                 CursorTexture texture = cursor.getTexture();
                 if (texture != null && SettingsUtil.isAutoScale(cursor.getTexture().scale())) {

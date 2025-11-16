@@ -52,7 +52,7 @@ public class CursorAdapterMixin {
 
         ModCursor modCursor = tracker.getCursor(cursor);
         if (modCursor == null) {
-            modCursor = ModCursor.ofUnknownType(cursor, cursors_extended$OWO);
+            modCursor = ModCursor.createCustom(cursor, cursors_extended$OWO);
             tracker.trackCursor(modCursor);
         }
 

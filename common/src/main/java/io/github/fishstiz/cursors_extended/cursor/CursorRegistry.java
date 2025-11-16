@@ -16,7 +16,8 @@ import java.util.Set;
 
 public class CursorRegistry implements ClientStartedListener {
     private final Map<String, Cursor> registry = new Object2ObjectLinkedOpenHashMap<>();
-    private final Map<String, Cursor> external = new Object2ObjectOpenHashMap<>();
+    private volatile Map<String, Cursor> external;
+    private Map<String, Cursor> custom;
 
     @Override
     public void onClientStarted(Minecraft minecraft) {
@@ -46,26 +47,43 @@ public class CursorRegistry implements ClientStartedListener {
 
     public Cursor get(CursorType cursorType) {
         Cursor cursor = registry.get(cursorType.toString());
+        if (cursor != null) return cursor;
 
-        if (cursor == null) {
-            return external.computeIfAbsent(cursorType.toString(), name -> {
+        synchronized (this) {
+            Map<String, Cursor> map;
+
+            if (((TexturedCursorType) cursorType).cursors_extended$isCustom()) {
+                map = this.custom == null ? this.custom = new Object2ObjectOpenHashMap<>() : this.custom;
+            } else {
+                map = this.external == null ? this.external = new Object2ObjectOpenHashMap<>() : this.external;
+            }
+
+            return map.computeIfAbsent(cursorType.toString(), name -> {
                 CursorsExtended.LOGGER.info("[cursors_extended] Found external cursor type: {}", cursorType);
                 return new Cursor(cursorType);
             });
         }
+    }
 
-        return cursor;
+    public void unregisterCustom(CursorType cursorType) {
+        synchronized (this) {
+            if (custom != null) {
+                custom.remove(cursorType.toString());
+            }
+        }
     }
 
     public @Nullable Cursor tryGet(String cursorType) {
         Cursor cursor = registry.get(cursorType);
-        return cursor != null ? cursor : external.get(cursorType);
+        return cursor != null || external == null ? cursor : external.get(cursorType);
     }
 
     public Set<Cursor> getCursors() {
         Set<Cursor> cursors = new ObjectOpenHashSet<>();
         cursors.addAll(registry.values());
-        cursors.addAll(external.values());
+        if (external != null) {
+            cursors.addAll(external.values());
+        }
         return cursors;
     }
 

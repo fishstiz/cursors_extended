@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.cursor;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
@@ -69,7 +70,7 @@ public sealed interface CursorRenderer {
             cursor.cursorType().select(window);
 
             CursorTexture texture = cursor.getTexture();
-            if (texture == null || !cursor.isEnabled()) {
+            if (texture == null || cursor.isCustom() || !CursorsExtended.CONFIG.getOrCreateSettings(cursor).enabled()) {
                 this.textureLocation = null;
                 return;
             }

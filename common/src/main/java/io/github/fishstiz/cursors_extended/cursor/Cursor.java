@@ -16,7 +16,7 @@ public final class Cursor {
     }
 
     public long handle() {
-        if (isEnabled()) {
+        if (!isCustom() && CursorsExtended.CONFIG.getOrCreateSettings(this).enabled()) {
             CursorTexture texture = getTexture();
             if (texture != null && texture.handle() != MemoryUtil.NULL) {
                 return texture.handle();
@@ -41,28 +41,24 @@ public final class Cursor {
         return getTexture() != null;
     }
 
-    public boolean isEnabled() {
-        return CursorsExtended.CONFIG.getOrCreateSettings(this).enabled();
-    }
-
     public boolean isTextureEnabled() {
-        return hasTexture() && isEnabled();
+        return hasTexture() && CursorsExtended.CONFIG.getOrCreateSettings(this).enabled();
     }
 
     public CursorType cursorType() {
         return cursorType;
     }
 
-    public void prepareReload() {
-        this.lazy = true;
-    }
-
-    public void reloaded() {
-        this.lazy = false;
+    public void setLazy(boolean lazy) {
+        this.lazy = lazy;
     }
 
     public boolean isLazy() {
         return lazy;
+    }
+
+    public boolean isCustom() {
+        return texturedCursorType().cursors_extended$isCustom();
     }
 
     public Component text() {

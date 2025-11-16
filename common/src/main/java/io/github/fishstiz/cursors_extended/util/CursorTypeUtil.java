@@ -27,8 +27,7 @@ public class CursorTypeUtil {
 
     public static boolean canShift() {
         Cursor shiftCursor = CursorsExtended.getInstance().getRegistry().get(CursorTypesExt.SHIFT);
-        return shiftCursor.isEnabled() &&
-               CursorsExtended.CONFIG.getOrCreateSettings(shiftCursor).enabled() &&
+        return CursorsExtended.CONFIG.getOrCreateSettings(shiftCursor).enabled() &&
                (InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                 InputConstants.isKeyDown(WINDOW, GLFW.GLFW_KEY_RIGHT_SHIFT));
     }
@@ -39,7 +38,7 @@ public class CursorTypeUtil {
 
     public static boolean isHeld(CursorType lastCursorType) {
         return CursorTypesExt.isHoldType(lastCursorType) &&
-               CursorsExtended.getInstance().getRegistry().get(lastCursorType).isEnabled() &&
+               CursorsExtended.CONFIG.getOrCreateSettings(CursorsExtended.getInstance().getRegistry().get(lastCursorType)).enabled() &&
                CursorTypeUtil.isLeftClickHeld();
     }
 

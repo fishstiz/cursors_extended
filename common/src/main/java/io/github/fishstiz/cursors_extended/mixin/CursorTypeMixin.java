@@ -13,6 +13,7 @@ import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,6 +26,9 @@ public abstract class CursorTypeMixin implements TexturedCursorType {
 
     @Unique
     private CursorTexture cursors_extended$texture;
+
+    @Unique
+    private boolean cursors_extended$custom;
 
     static {
         CursorsExtended.LOGGER.debug("[cursors_extended] Loading CursorTypes: {}", CursorTypes.class);
@@ -55,12 +59,24 @@ public abstract class CursorTypeMixin implements TexturedCursorType {
         }
     }
 
+    @Override
+    public void cursors_extended$setCustom(boolean custom) {
+        this.cursors_extended$custom = custom;
+    }
+
+    @Override
+    public boolean cursors_extended$isCustom() {
+        return this.cursors_extended$custom;
+    }
+
     @WrapOperation(method = "select", at = @At(
             value = "FIELD",
-            target = "Lcom/mojang/blaze3d/platform/cursor/CursorType;handle:J"
+            target = "Lcom/mojang/blaze3d/platform/cursor/CursorType;handle:J",
+            opcode = Opcodes.GETFIELD
     ))
     private long onSetCursor(CursorType instance, Operation<Long> original) {
-        if (cursors_extended$texture != null &&
+        if (!cursors_extended$isCustom() &&
+            cursors_extended$texture != null &&
             cursors_extended$texture.handle() != MemoryUtil.NULL &&
             CursorsExtended.CONFIG.getOrCreateSettings(cursors_extended$getKey()).enabled()) {
             return cursors_extended$texture.handle();

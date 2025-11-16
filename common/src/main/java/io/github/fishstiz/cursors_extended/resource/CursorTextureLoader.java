@@ -111,7 +111,9 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         });
 
         for (Cursor cursor : registry.getCursors()) {
-            cursor.prepareReload();
+            if (cursor.isCustom()) continue;
+
+            cursor.setLazy(true);
 
             CursorMetadata metadata = preparedMetadata.computeIfAbsent(cursor.name(), type -> {
                 ResourceLocation path = getExpectedPath(cursor.cursorType());
@@ -173,7 +175,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         }
 
         if (!loaded) releaseTexture(cursor);
-        cursor.reloaded();
+        cursor.setLazy(false);
         return loaded;
     }
 
@@ -188,8 +190,10 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     public void lazyLoadTexture(Cursor cursor) {
-        cursor = cursor.isEnabled() ? cursor : registry.get(CursorType.DEFAULT);
-        if (cursor.isEnabled() && cursor.isLazy()) {
+        if (cursor.isCustom()) return;
+
+        cursor = CONFIG.getOrCreateSettings(cursor).enabled() ? cursor : registry.get(CursorType.DEFAULT);
+        if (CONFIG.getOrCreateSettings(cursor).enabled() && cursor.isLazy()) {
             loadTexture(cursor);
         }
     }

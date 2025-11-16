@@ -73,8 +73,7 @@ public abstract class GLFWMixin {
         }
 
         String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
-        CursorStateTracker.get().trackCursor(ModCursor.ofUnknownType(handle, sourcePackage));
-        CursorsExtended.LOGGER.info("[cursors_extended] Tracking custom cursor from '{}'", sourcePackage);
+        CursorStateTracker.get().trackCursor(ModCursor.createCustom(handle, sourcePackage));
         return handle;
     }
 
@@ -84,6 +83,7 @@ public abstract class GLFWMixin {
         ModCursor modCursor = CursorStateTracker.get().getCursor(cursor);
         if (modCursor != null) {
             CursorStateTracker.get().untrackCursor(modCursor);
+            CursorsExtended.getInstance().getRegistry().unregisterCustom(modCursor.cursorType());
         }
     }
 

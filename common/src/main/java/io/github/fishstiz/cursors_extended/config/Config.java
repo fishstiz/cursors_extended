@@ -1,7 +1,6 @@
 package io.github.fishstiz.cursors_extended.config;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.compat.ModCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -46,29 +45,18 @@ public class Config implements Serializable {
     }
 
     public CursorSettings getOrCreateSettings(Cursor cursor) {
-        String name = cursor.name();
-        CursorSettings settings = cursors.get(name);
-
-        if (settings != null) {
-            return settings;
-        }
-        if (unknownCursors != null && (settings = unknownCursors.get(name)) != null) {
-            return settings;
-        }
-
-        settings = new CursorSettings();
-        if (ModCursor.isUnknown(cursor.cursorType())) {
+        if (cursor.isCustom()) {
             if (unknownCursors == null) unknownCursors = new Object2ObjectOpenHashMap<>();
-            unknownCursors.put(name, settings);
-        } else {
-            cursors.put(name, settings);
+            return unknownCursors.computeIfAbsent(cursor.name(), k -> {
+                CursorsExtended.LOGGER.error("[cursors_extended] Settings created for custom external cursor '{}'. This should not happen!", k);
+                return new CursorSettings();
+            });
         }
-
-        return settings;
+        return cursors.computeIfAbsent(cursor.name(), k -> new CursorSettings());
     }
 
     public boolean isStale(Cursor cursor) {
-        return stale || !cursors.containsKey(cursor.name());
+        return !cursor.isCustom() && (stale || !cursors.containsKey(cursor.name()));
     }
 
     public void markSettingsStale() {
