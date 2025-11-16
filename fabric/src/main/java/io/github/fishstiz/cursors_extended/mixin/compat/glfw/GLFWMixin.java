@@ -93,21 +93,17 @@ public abstract class GLFWMixin {
         boolean internal = GLFWInternal.isSettingCursor();
         boolean reentry = GLFWInternal.consumeReentryCursor(window, cursor);
 
-        if (modCursor == null || internal || reentry) {
-            // When internal calls are async-dispatched to another thread due to other mods (ixeris), isSettingCursor flag
+        if (internal || reentry || (modCursor == null && cursor != MemoryUtil.NULL)) {
+            // When internal calls are async-dispatched to another thread due to other mods (ixeris), internal flag
             // clears before the dispatched call re-enters.
             //
-            // Mark (window, cursor) pairs to identify these reentrant calls.
-            //
-            // Only mark reentry when:
-            // - isSettingCursor(): Internal call that might be async-dispatched
-            // - modCursor != null: Tracked cursor (avoids polluting map with external untracked cursors)
+            // Mark (window, cursor) pairs to identify reentrant calls.
             //
             // Stale entries are harmless since it doesn't change behavior (mostly) and is bounded by window count.
             //
             // This would NOT be necessary if these other mods used mixinextras instead to avoid recursion.
             //
-            if (!reentry && (GLFWInternal.isSettingCursor() || modCursor != null)) {
+            if (!reentry && internal) {
                 GLFWInternal.markReentryCursor(window, cursor);
             }
             original.call(window, cursor);
@@ -116,14 +112,26 @@ public abstract class GLFWMixin {
 
         CursorRegistry registry = CursorsExtended.getInstance().getRegistry();
         if (cursor == MemoryUtil.NULL) {
-            tracker.resetCursor(window, CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage));
-            CursorStateTracker.syncWithMinecraft(window, CursorType.DEFAULT);
-            original.call(window, CursorsExtended.CONFIG.isRemapStandardCursors() ? registry.get(CursorType.DEFAULT).handle() : MemoryUtil.NULL);
+            if (!CursorsExtended.CONFIG.isRemapStandardCursors()) {
+                CursorStateTracker.syncWithMinecraft(window, CursorType.DEFAULT);
+                original.call(window, cursor);
+            }
+
+            String source = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
+            tracker.resetCursor(window, source);
+            return;
+        }
+
+        boolean standard = !modCursor.custom();
+        if (standard && !CursorsExtended.CONFIG.isRemapStandardCursors()) {
+            CursorStateTracker.syncWithMinecraft(window, modCursor.cursorType());
+            original.call(window, cursor);
+            tracker.setCursor(window, modCursor);
             return;
         }
 
         Cursor mapped = registry.get(modCursor.cursorType());
-        if (!modCursor.custom() && !CursorsExtended.CONFIG.getOrCreateSettings(mapped).enabled()) {
+        if (standard && !CursorsExtended.CONFIG.getOrCreateSettings(mapped).enabled()) {
             mapped = registry.get(CursorType.DEFAULT);
             tracker.resetCursor(window, modCursor.source());
         } else {

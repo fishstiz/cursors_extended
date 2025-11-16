@@ -10,6 +10,7 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.compat.CursorStateTracker;
+import io.github.fishstiz.cursors_extended.compat.WindowCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
@@ -21,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(Window.class)
-public abstract class WindowMixin {
+public abstract class WindowMixin implements WindowCursor {
     @Shadow
     @Final
     private long handle;
@@ -72,6 +73,13 @@ public abstract class WindowMixin {
         Cursor cursor = CursorsExtended.getInstance().getRegistry().get(instance);
         cursors_extended$currentCursorHandle = cursor.handle();
         CursorsExtended.getInstance().getDisplay().applyCursor(window);
+    }
+
+    @Override
+    public void cursors_extended$setCurrentCursor(CursorType cursorType) {
+        Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
+        this.currentCursor = cursor.cursorType();
+        this.cursors_extended$currentCursorHandle = cursor.handle();
     }
 
     @Unique

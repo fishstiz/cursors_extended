@@ -1,6 +1,8 @@
 package io.github.fishstiz.cursors_extended.compat;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
+import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.TexturedCursorType;
 
 public final class ModCursor {
@@ -44,8 +46,13 @@ public final class ModCursor {
 
     public CursorType cursorType() {
         if (cursorType == null) {
-            cursorType = new CursorType(name, handle);
-            ((TexturedCursorType) cursorType).cursors_extended$setCustom(custom);
+            if (custom) {
+                cursorType = new CursorType(name, handle);
+                ((TexturedCursorType) cursorType).cursors_extended$setCustom(true);
+            } else {
+                Cursor cursor = CursorsExtended.getInstance().getRegistry().tryGet(name);
+                cursorType = cursor == null ? new CursorType(name, handle) : cursor.cursorType();
+            }
         }
         return cursorType;
     }

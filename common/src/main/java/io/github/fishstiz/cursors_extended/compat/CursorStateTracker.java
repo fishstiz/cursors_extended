@@ -38,7 +38,7 @@ public sealed interface CursorStateTracker permits CursorStateTrackerImpl, Curso
     static void syncWithMinecraft(long window, CursorType cursorType) {
         Window minecraftWindow = CursorsExtended.getInstance().getDisplay().getWindow();
         if (window == minecraftWindow.handle()) {
-            minecraftWindow.currentCursor = cursorType;
+            ((WindowCursor) (Object) minecraftWindow).cursors_extended$setCurrentCursor(cursorType);
         }
     }
 }
