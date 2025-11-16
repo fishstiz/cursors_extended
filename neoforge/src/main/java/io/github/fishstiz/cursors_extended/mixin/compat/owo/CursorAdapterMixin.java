@@ -13,7 +13,10 @@ import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.function.Consumer;
 
 @Mixin(value = CursorAdapter.class, remap = false)
 public class CursorAdapterMixin {
@@ -60,11 +63,26 @@ public class CursorAdapterMixin {
         cursors_extended$checkRemapOption(window, cursor, modCursor.cursorType(), modCursor.custom());
     }
 
+    @ModifyArg(method = "dispose", at = @At(
+            value = "INVOKE",
+            target = "Ljava/util/Collection;forEach(Ljava/util/function/Consumer;)V"
+    ))
+    private Consumer<Long> untrackCursors(Consumer<Long> consumer) {
+        return cursor -> {
+            consumer.accept(cursor);
+
+            ModCursor modCursor = CursorStateTracker.get().getCursor(cursor);
+            if (modCursor != null) {
+                CursorStateTracker.get().untrackCursor(modCursor);
+            }
+        };
+    }
+
     @Unique
     private static void cursors_extended$checkRemapOption(long window, long cursor, CursorType cursorType, boolean force) {
         if (force || !CursorsExtended.CONFIG.isRemapStandardCursors()) {
-            GLFW.glfwSetCursor(window, cursor);
             CursorStateTracker.syncWithMinecraft(window, cursorType);
+            GLFW.glfwSetCursor(window, cursor);
         }
     }
 }

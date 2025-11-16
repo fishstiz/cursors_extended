@@ -10,14 +10,12 @@ import io.github.fishstiz.cursors_extended.compat.ModCursor;
 import io.github.fishstiz.cursors_extended.compat.glfw.GLFWInternal;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
+import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.stream.Stream;
 
@@ -58,6 +56,10 @@ public abstract class GLFWMixin {
         if (name != null) {
             String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
             CursorStateTracker.get().trackCursor(new ModCursor(handle, sourcePackage, name));
+
+            if (Services.PLATFORM.isDevelopmentEnvironment()) {
+                CursorsExtended.LOGGER.info("[cursors_extended] tracking standard cursor handle: {}={}, from {}", name, handle, sourcePackage);
+            }
         }
 
         return handle;
@@ -73,11 +75,18 @@ public abstract class GLFWMixin {
 
         String sourcePackage = CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage);
         CursorStateTracker.get().trackCursor(ModCursor.createCustom(handle, sourcePackage));
+
+        if (Services.PLATFORM.isDevelopmentEnvironment()) {
+            CursorsExtended.LOGGER.info("[cursors_extended] tracking custom cursor handle: {}, from {}", handle, sourcePackage);
+        }
+
         return handle;
     }
 
-    @Inject(method = "glfwDestroyCursor", at = @At("RETURN"))
-    private static void untrackCursor(long cursor, CallbackInfo ci) {
+    @WrapMethod(method = "glfwDestroyCursor")
+    private static void untrackCursor(long cursor, Operation<Void> original) {
+        original.call(cursor);
+
         ModCursor modCursor = CursorStateTracker.get().getCursor(cursor);
         if (modCursor != null) {
             CursorStateTracker.get().untrackCursor(modCursor);

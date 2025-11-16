@@ -1,11 +1,13 @@
 package io.github.fishstiz.cursors_extended.compat;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.MemoryUtil;
 
 import java.util.Map;
 
@@ -54,6 +56,11 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public void trackCursor(ModCursor modCursor) {
+        if (modCursor.handle() == MemoryUtil.NULL) {
+            CursorsExtended.LOGGER.error("[cursors_extended] ", new NullPointerException("Cannot track null cursor handle"));
+            return;
+        }
+
         synchronized (cursors) {
             cursors.put(modCursor.handle(), modCursor);
         }
@@ -61,6 +68,17 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public void untrackCursor(ModCursor modCursor) {
+        if (!modCursor.custom()) {
+            CursorType modCursorType = modCursor.cursorType();
+            long internalHandle = CursorTypeUtil.nonDefault(modCursorType)
+                    ? CursorsExtended.getInstance().getRegistry().get(modCursorType).cursorType().handle
+                    : CursorTypes.ARROW.handle;
+
+            if (internalHandle == modCursor.handle()) {
+                return;
+            }
+        }
+
         synchronized (cursors) {
             cursors.remove(modCursor.handle());
         }
