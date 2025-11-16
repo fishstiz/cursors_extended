@@ -97,6 +97,11 @@ public abstract class GLFWMixin {
     @WrapMethod(method = "glfwSetCursor")
     private static void setMappedCursor(long window, long cursor, Operation<Void> original) {
         CursorStateTracker tracker = CursorStateTracker.get();
+        if (!tracker.isTracking()) {
+            original.call(window, cursor);
+            return;
+        }
+
         ModCursor modCursor = tracker.getCursor(cursor);
 
         boolean internal = GLFWInternal.isSettingCursor();
