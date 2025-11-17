@@ -90,13 +90,6 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
     }
 
     @Override
-    public boolean isTracking(long window) {
-        synchronized (latestStates) {
-            return latestStates.containsKey(window);
-        }
-    }
-
-    @Override
     public @Nullable ModCursor getCursor(long handle) {
         synchronized (cursors) {
             return cursors.get(handle);

@@ -97,7 +97,7 @@ public abstract class GLFWMixin {
     @WrapMethod(method = "glfwSetCursor")
     private static void setMappedCursor(long window, long cursor, Operation<Void> original) {
         CursorStateTracker tracker = CursorStateTracker.get();
-        if (!tracker.isTracking()) {
+        if (!tracker.isTracking() && cursor != MemoryUtil.NULL) {
             original.call(window, cursor);
             return;
         }
@@ -120,11 +120,11 @@ public abstract class GLFWMixin {
             if (!reentry && internal) {
                 GLFWInternal.markReentryCursor(window, cursor);
             }
-            if (!internal && cursor == MemoryUtil.NULL && tracker.isTracking(window)) {
-                if (!CursorsExtended.CONFIG.isRemapStandardCursors()) {
-                    CursorStateTracker.syncWithMinecraft(window, CursorType.DEFAULT);
-                }
+            if (!internal && cursor == MemoryUtil.NULL) {
+                boolean remap = CursorsExtended.CONFIG.isRemapStandardCursors();
+                if (!remap) CursorStateTracker.syncWithMinecraft(window, CursorType.DEFAULT);
                 tracker.resetCursor(window, CursorStateTracker.getStackWalker().walk(GLFWMixin::cursors_extended$getSourcePackage));
+                if (remap && !reentry) return;
             }
 
             original.call(window, cursor);

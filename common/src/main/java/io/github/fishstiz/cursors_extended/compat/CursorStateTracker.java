@@ -19,10 +19,6 @@ public sealed interface CursorStateTracker permits CursorStateTrackerImpl, Curso
         return false;
     }
 
-    default boolean isTracking(long window) {
-        return false;
-    }
-
     default @Nullable ModCursor getCursor(long handle) {
         return null;
     }
