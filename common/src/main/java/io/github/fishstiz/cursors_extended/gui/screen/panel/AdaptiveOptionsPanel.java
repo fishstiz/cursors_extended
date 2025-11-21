@@ -26,11 +26,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     private static final Component ITEM_GRAB = Component.translatable("cursors_extended.options.adapt.item_grab");
     private static final Component SCROLLBAR_POINTER = scrollbarText(CursorTypes.POINTING_HAND);
     private static final Component SCROLLBAR_RESIZE = scrollbarText(CursorTypes.RESIZE_NS);
-    private static final Component CREATIVE_TABS = Component.translatable("cursors_extended.options.adapt.creative_tabs");
-    private static final Component ENCHANTMENTS = Component.translatable("cursors_extended.options.adapt.enchantments");
-    private static final Component STONECUTTER = Component.translatable("cursors_extended.options.adapt.stonecutter");
-    private static final Component LOOM = Component.translatable("cursors_extended.options.adapt.loom");
-    private static final Component ADVANCEMENTS = Component.translatable("cursors_extended.options.adapt.advancements");
     private static final int CURSOR_SIZE_STEP = 8;
     private final Runnable refreshCursors;
     private OptionsListWidget optionsList;
@@ -50,11 +45,6 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
         this.addOption(CONFIG.isItemGrabbingEnabled(), CONFIG::setItemGrabbingEnabled, ITEM_GRAB, CursorTypesExt.GRABBING);
         this.addOption(CONFIG.isPointerScrollbarEnabled(), CONFIG::setPointerScrollbarEnabled, SCROLLBAR_POINTER, CursorTypes.POINTING_HAND);
         this.addOption(CONFIG.isResizeScrollbarEnabled(), CONFIG::setResizeScrollbarEnabled, SCROLLBAR_RESIZE, CursorTypes.RESIZE_NS);
-        this.addOption(CONFIG.isCreativeTabsEnabled(), CONFIG::setCreativeTabsEnabled, CREATIVE_TABS, CursorTypes.POINTING_HAND);
-        this.addOption(CONFIG.isEnchantmentsEnabled(), CONFIG::setEnchantmentsEnabled, ENCHANTMENTS, CursorTypes.POINTING_HAND);
-        this.addOption(CONFIG.isStonecutterRecipesEnabled(), CONFIG::setStonecutterRecipesEnabled, STONECUTTER, CursorTypes.POINTING_HAND);
-        this.addOption(CONFIG.isLoomPatternsEnabled(), CONFIG::setLoomPatternsEnabled, LOOM, CursorTypes.POINTING_HAND);
-        this.addOption(CONFIG.isAdvancementTabsEnabled(), CONFIG::setAdvancementTabsEnabled, ADVANCEMENTS, CursorTypes.POINTING_HAND);
 
         this.optionsList.search(this.getSearch());
 

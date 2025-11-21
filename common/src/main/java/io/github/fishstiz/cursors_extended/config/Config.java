@@ -16,11 +16,6 @@ public class Config implements Serializable {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
-    private boolean creativeTabsEnabled = true;
-    private boolean enchantmentsEnabled = true;
-    private boolean stonecutterRecipesEnabled = true;
-    private boolean loomPatternsEnabled = true;
-    private boolean advancementTabsEnabled = true;
     private boolean pointerScrollbarEnabled = true;
     private boolean resizeScrollbarEnabled = true;
     private boolean heldCursorsEnabled = true;
@@ -86,38 +81,6 @@ public class Config implements Serializable {
         return global;
     }
 
-    public boolean isCreativeTabsEnabled() {
-        return creativeTabsEnabled;
-    }
-
-    public void setCreativeTabsEnabled(boolean creativeTabsEnabled) {
-        this.creativeTabsEnabled = creativeTabsEnabled;
-    }
-
-    public boolean isEnchantmentsEnabled() {
-        return enchantmentsEnabled;
-    }
-
-    public void setEnchantmentsEnabled(boolean enchantmentsEnabled) {
-        this.enchantmentsEnabled = enchantmentsEnabled;
-    }
-
-    public boolean isStonecutterRecipesEnabled() {
-        return stonecutterRecipesEnabled;
-    }
-
-    public void setStonecutterRecipesEnabled(boolean stonecutterRecipesEnabled) {
-        this.stonecutterRecipesEnabled = stonecutterRecipesEnabled;
-    }
-
-    public boolean isLoomPatternsEnabled() {
-        return loomPatternsEnabled;
-    }
-
-    public void setLoomPatternsEnabled(boolean loomPatternsEnabled) {
-        this.loomPatternsEnabled = loomPatternsEnabled;
-    }
-
     public boolean isItemSlotEnabled() {
         return itemSlotEnabled;
     }
@@ -132,14 +95,6 @@ public class Config implements Serializable {
 
     public void setItemGrabbingEnabled(boolean itemGrabbingEnabled) {
         this.itemGrabbingEnabled = itemGrabbingEnabled;
-    }
-
-    public boolean isAdvancementTabsEnabled() {
-        return advancementTabsEnabled;
-    }
-
-    public void setAdvancementTabsEnabled(boolean advancementTabsEnabled) {
-        this.advancementTabsEnabled = advancementTabsEnabled;
     }
 
     public boolean isAggressiveCursor() {
