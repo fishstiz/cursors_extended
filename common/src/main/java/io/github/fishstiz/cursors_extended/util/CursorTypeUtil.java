@@ -47,6 +47,16 @@ public class CursorTypeUtil {
         return nameEquals(cursorType, CursorType.DEFAULT) ? CursorTypes.ARROW : cursorType;
     }
 
+    public static CursorType applyScrollbarConfig(CursorType cursorType) {
+        if (nameEquals(cursorType, CursorTypes.RESIZE_NS)) {
+            return CursorsExtended.CONFIG.isResizeScrollbarEnabled() ? CursorTypesExt.RESIZE_NS_HOLD : CursorType.DEFAULT;
+        }
+        if (nameEquals(cursorType, CursorTypes.POINTING_HAND)) {
+            return CursorsExtended.CONFIG.isPointerScrollbarEnabled() ? cursorType : CursorType.DEFAULT;
+        }
+        return cursorType;
+    }
+
     public static boolean isHovered(GuiEventListener guiEventListener, double mouseX, double mouseY) {
         if (guiEventListener instanceof AbstractWidget widget) {
             return widget.visible &&

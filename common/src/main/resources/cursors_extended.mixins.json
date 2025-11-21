@@ -20,6 +20,7 @@
     "cursorprovider.menus.CrafterScreenMixin",
     "cursorprovider.menus.CreativeModeInventoryScreenMixin",
     "cursorprovider.menus.MerchantScreenMixin",
+    "cursorprovider.menus.ScrollingMenuScreenMixin",
     "cursorprovider.menus.access.RecipeAlternativesWidgetAccessor",
     "cursorprovider.menus.access.RecipeBookResultsAccessor",
     "cursorprovider.menus.access.RecipeBookWidgetAccessor",

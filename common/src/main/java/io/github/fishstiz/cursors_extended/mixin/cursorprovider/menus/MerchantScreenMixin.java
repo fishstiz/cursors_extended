@@ -3,7 +3,9 @@ package io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,6 +16,7 @@ import net.minecraft.world.inventory.MerchantMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(MerchantScreen.class)
 public abstract class MerchantScreenMixin extends AbstractContainerScreenMixin<MerchantMenu> {
@@ -28,12 +31,23 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreenMixin<M
     private boolean setCursorOnHover(@Coerce Button instance, Operation<Boolean> original, @Local(argsOnly = true) GuiGraphics guiGraphics) {
         if (instance.isHovered()) {
             if (instance.isActive()) {
-                guiGraphics.requestCursor(CursorTypeUtil.canShift() ? CursorTypesExt.SHIFT : CursorTypes.POINTING_HAND);
+                guiGraphics.requestCursor(CursorTypeUtil.canShift() && CursorsExtended.CONFIG.isLegacyMode()
+                        ? CursorTypesExt.SHIFT
+                        : CursorTypes.POINTING_HAND
+                );
             } else {
                 guiGraphics.requestCursor(CursorTypes.NOT_ALLOWED);
             }
         }
 
         return original.call(instance);
+    }
+
+    @ModifyArg(method = "renderScroller", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphics;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
+    ))
+    private CursorType onRequestCursor(CursorType cursor) {
+        return CursorTypeUtil.applyScrollbarConfig(cursor);
     }
 }

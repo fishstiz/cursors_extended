@@ -12,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 
-import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
-
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeModeInventoryScreenMixin extends AbstractContainerScreenMixin<CreativeModeInventoryScreen.ItemPickerMenu> {
     @Shadow
@@ -45,9 +43,7 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
                     ordinal = 0
             )
     )
-    private CursorType onRequestCursorWhenScroll(CursorType cursorType) {
-        return CONFIG.isHeldCursorsEnabled() && CursorTypeUtil.nameEquals(cursorType, CursorTypesExt.RESIZE_NS_HOLD)
-                ? CursorTypesExt.RESIZE_NS_HOLD
-                : cursorType;
+    private CursorType onRequestCursor(CursorType cursorType) {
+        return CursorTypeUtil.applyScrollbarConfig(cursorType);
     }
 }
