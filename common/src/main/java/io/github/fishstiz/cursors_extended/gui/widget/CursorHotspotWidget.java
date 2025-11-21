@@ -13,14 +13,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 public class CursorHotspotWidget extends CursorWidget {
-    private static final ResourceLocation BACKGROUND_128 = CursorsExtended.loc("textures/gui/background_128.png");
+    private static final Identifier BACKGROUND_128 = CursorsExtended.id("textures/gui/background_128.png");
     private static final int BACKGROUND_DISABLED = 0xAF000000; // 70% black
     private static final int RULER_COLOR = 0xFFFF0000; // red
     private static final int OVERRIDE_RULER_COLOR = 0xFF00FF00; // green
@@ -34,9 +34,9 @@ public class CursorHotspotWidget extends CursorWidget {
     private boolean dragging = false;
 
     public CursorHotspotWidget(
-            @NotNull Cursor cursor,
-            @NotNull SliderWidget xhotSlider,
-            @NotNull SliderWidget yhotSlider,
+            @NonNull Cursor cursor,
+            @NonNull SliderWidget xhotSlider,
+            @NonNull SliderWidget yhotSlider,
             @Nullable MouseEventListener mouseEventListener
     ) {
         super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
@@ -49,7 +49,7 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.active = !this.isOverflowing() && (this.xhotSlider.isActive() || this.yhotSlider.isActive());
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
@@ -62,7 +62,7 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderBackground(@NotNull GuiGraphics guiGraphics) {
+    protected void renderBackground(@NonNull GuiGraphics guiGraphics) {
         super.renderBackground(guiGraphics);
 
         if (!this.active) {
@@ -71,12 +71,12 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderCursor(@NotNull GuiGraphics guiGraphics, @NotNull Cursor cursor) {
+    protected void renderCursor(@NonNull GuiGraphics guiGraphics, @NonNull Cursor cursor) {
         DrawUtil.drawCursor(guiGraphics, cursor, this.getX(), this.getY(), this.getWidth());
     }
 
     @Override
-    protected void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderRuler(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (this.isOverflowing()) return;
 
         boolean isGlobalX = CONFIG.getGlobal().isXHotActive();
@@ -182,6 +182,6 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     public interface MouseEventListener {
-        void onMouseEvent(@NotNull CursorHotspotWidget target, @NotNull MouseEvent mouseEvent, int xhot, int yhot);
+        void onMouseEvent(@NonNull CursorHotspotWidget target, @NonNull MouseEvent mouseEvent, int xhot, int yhot);
     }
 }

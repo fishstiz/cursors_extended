@@ -8,11 +8,9 @@ import io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access.Rec
 import io.github.fishstiz.cursors_extended.mixin.cursorprovider.menus.access.RecipeBookWidgetAccessor;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import org.spongepowered.asm.mixin.Final;
@@ -41,18 +39,8 @@ public abstract class AbstractRecipeBookScreenMixin extends AbstractContainerScr
                 return cursors_extended$getAlternatesWidgetCursor(alternatesWidget);
             }
 
-            boolean isResultHovered = recipesArea.getHoveredResultButton() != null;
-            if (isResultHovered && CursorTypeUtil.canShift()) {
-                return CursorTypesExt.SHIFT;
-            } else if (this.cursors_extended$isButtonHovered(recipeBook, recipesArea) || isResultHovered) {
-                return CursorTypes.POINTING_HAND;
-            } else if (recipeBook.getSearchField().isHovered()) {
-                return CursorTypes.IBEAM;
-            }
-
-            CursorType tabCursorType = this.cursors_extended$getTabCursor(recipeBook);
-            if (tabCursorType != CursorType.DEFAULT) {
-                return tabCursorType;
+            if (recipesArea.getHoveredResultButton() != null) {
+                return CursorTypeUtil.canShift() ? CursorTypesExt.SHIFT : CursorTypes.POINTING_HAND;
             }
         }
 
@@ -67,26 +55,5 @@ public abstract class AbstractRecipeBookScreenMixin extends AbstractContainerScr
             }
         }
         return CursorTypes.ARROW;
-    }
-
-    @Unique
-    private boolean cursors_extended$isButtonHovered(RecipeBookWidgetAccessor recipeBook, RecipeBookResultsAccessor recipesArea) {
-        StateSwitchingButton prevPageButton = recipesArea.getPrevPageButton();
-        StateSwitchingButton nextPageButton = recipesArea.getNextPageButton();
-        StateSwitchingButton toggleCraftableButton = recipeBook.getToggleCraftableButton();
-
-        return (toggleCraftableButton.visible && toggleCraftableButton.isHovered()) ||
-               (prevPageButton.visible && prevPageButton.isHovered()) ||
-               (nextPageButton.visible && nextPageButton.isHovered());
-    }
-
-    @Unique
-    private CursorType cursors_extended$getTabCursor(RecipeBookWidgetAccessor recipeBook) {
-        for (RecipeBookTabButton tabButton : recipeBook.getTabButtons()) {
-            if (tabButton.isHovered() && tabButton.isActive() && tabButton != recipeBook.getCurrentTab()) {
-                return CursorTypes.POINTING_HAND;
-            }
-        }
-        return CursorType.DEFAULT;
     }
 }

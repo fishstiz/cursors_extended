@@ -6,7 +6,7 @@ import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
 import io.github.fishstiz.cursors_extended.resource.CursorTextureLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public final class CursorsExtended implements ClientStartedListener {
         return display;
     }
 
-    public static ResourceLocation loc(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }

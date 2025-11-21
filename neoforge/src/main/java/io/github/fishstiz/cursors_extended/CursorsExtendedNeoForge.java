@@ -36,7 +36,7 @@ public class CursorsExtendedNeoForge {
 
     private static void registerCursorPack(AddPackFindersEvent event, BuiltinCursorResourcePack pack) {
         event.addPackFinders(
-                CursorsExtended.loc("resourcepacks/" + pack.getLocation().getPath()),
+                CursorsExtended.id("resourcepacks/" + pack.getLocation().getPath()),
                 PackType.CLIENT_RESOURCES,
                 pack.getDisplayName(),
                 PackSource.BUILT_IN,

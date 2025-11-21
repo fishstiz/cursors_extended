@@ -7,13 +7,13 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.gui.screen.panel.*;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -122,7 +122,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.refreshFuture != null && !this.refreshFuture.isDone()) {
@@ -158,7 +158,7 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
                 .toList();
     }
 
-    private static ChatFormatting getCursorFormat(@NotNull Cursor cursor) {
+    private static ChatFormatting getCursorFormat(Cursor cursor) {
         if (cursor.isTextureEnabled()) {
             return ChatFormatting.WHITE;
         }

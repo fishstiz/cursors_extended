@@ -5,11 +5,11 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 
 public class InactiveInfoWidget extends ButtonWidget {
-    private static final ResourceLocation ICON = ResourceLocation.withDefaultNamespace("textures/gui/sprites/icon/unseen_notification.png");
+    private static final Identifier ICON = Identifier.withDefaultNamespace("textures/gui/sprites/icon/unseen_notification.png");
     private static final int SIZE = 16;
     private static final int ICON_SIZE = 10;
     private static final int MARGIN_RIGHT = 2;
@@ -37,7 +37,7 @@ public class InactiveInfoWidget extends ButtonWidget {
     }
 
     @Override
-    protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderContents(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.refreshPosition();
         this.refreshVisibility();
 

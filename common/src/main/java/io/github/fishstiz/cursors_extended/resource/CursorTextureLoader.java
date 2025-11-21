@@ -17,11 +17,11 @@ import io.github.fishstiz.cursors_extended.resource.texture.BasicCursorTexture;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,11 +50,11 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     }
 
     @Override
-    public @NotNull CompletableFuture<Void> reload(
-            SharedState sharedState,
-            Executor backgroundExecutor,
+    public @NonNull CompletableFuture<Void> reload(
+            @NonNull SharedState sharedState,
+            @NonNull Executor backgroundExecutor,
             PreparationBarrier preparationBarrier,
-            Executor gameExecutor
+            @NonNull Executor gameExecutor
     ) {
         prepared = false;
 
@@ -71,7 +71,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         for (Cursor cursor : hashableCursors) {
-            ResourceLocation path = getExpectedPath(cursor.cursorType());
+            Identifier path = getExpectedPath(cursor.cursorType());
             if (path == null) {
                 LOGGER.error("[cursors_extended] Invalid resource location path for cursor '{}' while computing hash.", cursor.name());
                 continue;
@@ -122,7 +122,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
             cursor.setLazy(true);
 
             CursorMetadata metadata = preparedMetadata.computeIfAbsent(cursor.name(), type -> {
-                ResourceLocation path = getExpectedPath(cursor.cursorType());
+                Identifier path = getExpectedPath(cursor.cursorType());
                 if (path == null) return new CursorMetadata();
 
                 return manager.getResource(path.withSuffix(CursorMetadata.FILE_TYPE))
@@ -155,7 +155,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
     private boolean loadTexture(ResourceManager manager, Cursor cursor) {
         if (!prepared) return false;
 
-        ResourceLocation path = getExpectedPath(cursor.cursorType());
+        Identifier path = getExpectedPath(cursor.cursorType());
         if (path == null) return false;
 
         CursorTexture previousTexture = cursor.getTexture();
@@ -237,7 +237,7 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         updateTexture(cursor, settings.scale(), settings.xhot(), settings.yhot());
     }
 
-    private CursorMetadata loadMetadata(ResourceManager manager, ResourceLocation location, String source) {
+    private CursorMetadata loadMetadata(ResourceManager manager, Identifier location, String source) {
         return manager.getResourceStack(location.withSuffix(CursorMetadata.FILE_TYPE))
                 .stream()
                 .filter(metadata -> metadata.sourcePackId().equals(source))
@@ -273,12 +273,12 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         }
     }
 
-    private static @Nullable ResourceLocation getExpectedPath(CursorType cursorType) {
+    private static @Nullable Identifier getExpectedPath(CursorType cursorType) {
         String name = cursorType.toString();
-        return ResourceLocation.isValidPath(name) ? getDir().withSuffix("/" + name + ".png") : null;
+        return Identifier.isValidPath(name) ? getDir().withSuffix("/" + name + ".png") : null;
     }
 
-    public static ResourceLocation getDir() {
-        return CursorsExtended.loc("textures/gui/sprites/cursors");
+    public static Identifier getDir() {
+        return CursorsExtended.id("textures/gui/sprites/cursors");
     }
 }

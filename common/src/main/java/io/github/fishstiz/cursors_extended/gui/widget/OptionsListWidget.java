@@ -10,9 +10,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     private static final int SEARCH_HIGHLIGHT_COLOR = 0x66FFD700; // 40% yellow
     private final ElementSlidingBackground hoveredBackground = new ElementSlidingBackground(0x26FFFFFF); // 15% white
     private final Font font;
-    private @NotNull String search = "";
+    private @NonNull String search = "";
 
     public OptionsListWidget(Minecraft minecraft, Font font, int itemHeight, int spacing) {
         super(minecraft, 0, 0, 0, itemHeight, spacing);
@@ -43,8 +43,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     public void addToggle(
             boolean value,
             Boolean defaultValue,
-            @NotNull Consumer<Boolean> onToggle,
-            @NotNull Component label,
+            @NonNull Consumer<Boolean> onToggle,
+            @NonNull Component label,
             @Nullable Tooltip tooltip,
             BooleanSupplier active
     ) {
@@ -54,8 +54,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     public void addToggle(
             boolean value,
             Boolean defaultValue,
-            @NotNull Consumer<Boolean> onToggle,
-            @NotNull Component label,
+            @NonNull Consumer<Boolean> onToggle,
+            @NonNull Component label,
             @Nullable Tooltip tooltip,
             boolean active
     ) {
@@ -64,8 +64,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
 
     public void addToggle(
             boolean value,
-            @NotNull Consumer<Boolean> onToggle,
-            @NotNull Component label,
+            @NonNull Consumer<Boolean> onToggle,
+            @NonNull Component label,
             @Nullable Tooltip tooltip,
             boolean active
     ) {
@@ -74,8 +74,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
 
     public void addToggle(
             boolean value,
-            @NotNull Consumer<Boolean> onToggle,
-            @NotNull Component label,
+            @NonNull Consumer<Boolean> onToggle,
+            @NonNull Component label,
             @Nullable Prefix prefix,
             @Nullable Tooltip tooltip,
             boolean active
@@ -84,15 +84,15 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     }
 
     public void addToggleableSlider(
-            @NotNull SliderWidget slider,
+            @NonNull SliderWidget slider,
             boolean value,
-            @NotNull Consumer<Boolean> onToggle,
+            @NonNull Consumer<Boolean> onToggle,
             @Nullable Tooltip tooltip
     ) {
         this.addEntry(new ToggleableSliderEntry(slider, value, onToggle, tooltip, true));
     }
 
-    public void search(@NotNull String search) {
+    public void search(@NonNull String search) {
         this.search = search.toLowerCase();
 
         if (!this.search.isEmpty()) {
@@ -129,7 +129,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         return entry.getHeight() + BACKGROUND_PADDING_Y * 2;
     }
 
-    protected void renderSearchBackground(@NotNull GuiGraphics guiGraphics) {
+    protected void renderSearchBackground(@NonNull GuiGraphics guiGraphics) {
         if (!this.search.isEmpty()) {
             for (AbstractEntry entry : this.children()) {
                 if (entry.indexedLabel.contains(this.search)) {
@@ -144,7 +144,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
     }
 
-    protected void renderEntryBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderEntryBackground(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int minX = this.getX() - this.rowGap;
         int minY = this.getY() - BACKGROUND_PADDING_Y;
         int maxX = this.getRight() + SCROLLBAR_WIDTH;
@@ -168,18 +168,18 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     }
 
     @Override
-    public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderEntryBackground(guiGraphics, mouseX, mouseY, partialTick);
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void renderListBackground(@NotNull GuiGraphics guiGraphics) {
+    protected void renderListBackground(@NonNull GuiGraphics guiGraphics) {
         // remove background
     }
 
     @Override
-    protected void renderListSeparators(@NotNull GuiGraphics guiGraphics) {
+    protected void renderListSeparators(@NonNull GuiGraphics guiGraphics) {
         // remove separators
     }
 
@@ -194,7 +194,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             for (AbstractWidget child : this.children) {
                 child.render(guiGraphics, mouseX, mouseY, partialTick);
             }
@@ -206,12 +206,12 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        public @NotNull List<AbstractWidget> children() {
+        public @NonNull List<AbstractWidget> children() {
             return this.children;
         }
 
         @Override
-        public @NotNull List<AbstractWidget> narratables() {
+        public @NonNull List<AbstractWidget> narratables() {
             return this.children;
         }
     }
@@ -219,14 +219,14 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     private class WidgetEntry extends AbstractEntry {
         private final AbstractWidget widget;
 
-        private WidgetEntry(@NotNull AbstractWidget widget) {
+        private WidgetEntry(@NonNull AbstractWidget widget) {
             super(widget.getMessage());
 
             this.widget = this.addChild(widget);
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             this.widget.setSize(width, this.getHeight());
             this.widget.setPosition(this.getX(), this.getY());
             super.renderContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
@@ -234,7 +234,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     }
 
     private class ToggleEntry extends AbstractEntry {
-        protected static final ResourceLocation UNDO_ICON = CursorsExtended.loc("textures/gui/sprites/icon/arrow_u_turn_up_left.png");
+        protected static final Identifier UNDO_ICON = CursorsExtended.id("textures/gui/sprites/icon/arrow_u_turn_up_left.png");
         protected static final int BUTTON_WIDTH = 40;
         private static final int LABEL_COLOR = 0xFFFFFFFF; // white
         private static final int DISABLED_COLOR = 0xFFAAAAAA; // gray
@@ -249,8 +249,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         private ToggleEntry(
                 boolean value,
                 Boolean defaultValue,
-                @NotNull Consumer<Boolean> onToggle,
-                @NotNull Component label,
+                @NonNull Consumer<Boolean> onToggle,
+                @NonNull Component label,
                 @Nullable Prefix prefix,
                 @Nullable Tooltip tooltip,
                 BooleanSupplier active
@@ -291,8 +291,8 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
 
         private ToggleEntry(
                 boolean value,
-                @NotNull Consumer<Boolean> onToggle,
-                @NotNull Component label,
+                @NonNull Consumer<Boolean> onToggle,
+                @NonNull Component label,
                 @Nullable Prefix prefix,
                 @Nullable Tooltip tooltip,
                 boolean active
@@ -310,7 +310,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
             this.onToggle.accept(this.value);
         }
 
-        protected void renderLabel(@NotNull GuiGraphics guiGraphics) {
+        protected void renderLabel(@NonNull GuiGraphics guiGraphics) {
             int marginX = 0;
 
             if (this.prefix != null) {
@@ -327,7 +327,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             this.button.active = this.active.getAsBoolean();
             int right = this.getRight();
 
@@ -347,9 +347,9 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         private final SliderWidget slider;
 
         private ToggleableSliderEntry(
-                @NotNull SliderWidget slider,
+                @NonNull SliderWidget slider,
                 boolean value,
-                @NotNull Consumer<Boolean> onToggle,
+                @NonNull Consumer<Boolean> onToggle,
                 @Nullable Tooltip tooltip,
                 boolean active
         ) {
@@ -367,12 +367,12 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        protected void renderLabel(@NotNull GuiGraphics guiGraphics) {
+        protected void renderLabel(@NonNull GuiGraphics guiGraphics) {
             // remove label
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             this.slider.setWidth(width - BUTTON_WIDTH - OptionsListWidget.this.rowGap);
             this.slider.setPosition(this.getX(), this.getY());
             this.slider.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -385,6 +385,6 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         /**
          * @return width of prefix
          */
-        int render(@NotNull GuiGraphics guiGraphics, Font font, int x, int y, int height);
+        int render(@NonNull GuiGraphics guiGraphics, Font font, int x, int y, int height);
     }
 }

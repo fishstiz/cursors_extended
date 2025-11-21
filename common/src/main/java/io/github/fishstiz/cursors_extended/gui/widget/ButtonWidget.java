@@ -7,14 +7,14 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class ButtonWidget extends Button.Plain {
     private static final int DEFAULT_SPRITE_SIZE = 16;
     private static final int DISABLED_SPRITE_COLOR = 0x80A0A0A0; // 50% gray
-    private @Nullable ResourceLocation sprite;
+    private @Nullable Identifier sprite;
     private int textureWidth;
     private int textureHeight;
 
@@ -44,36 +44,36 @@ public class ButtonWidget extends Button.Plain {
         return this;
     }
 
-    public ButtonWidget withTooltip(@NotNull Component message) {
+    public ButtonWidget withTooltip(@NonNull Component message) {
         this.setTooltip(Tooltip.create(message));
         return this;
     }
 
-    public ButtonWidget spriteOnly(@NotNull ResourceLocation sprite, int textureWidth, int textureHeight) {
+    public ButtonWidget spriteOnly(@NonNull Identifier sprite, int textureWidth, int textureHeight) {
         this.sprite = sprite;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         return this;
     }
 
-    public ButtonWidget spriteOnly(@NotNull ResourceLocation sprite) {
+    public ButtonWidget spriteOnly(@NonNull Identifier sprite) {
         return this.spriteOnly(sprite, DEFAULT_SPRITE_SIZE, DEFAULT_SPRITE_SIZE);
     }
 
     @Override
-    public void onRelease(MouseButtonEvent mouseButtonEvent) {
+    public void onRelease(@NonNull MouseButtonEvent mouseButtonEvent) {
         this.setFocused(false);
     }
 
     @Override
-    protected void renderDefaultLabel(ActiveTextCollector activeTextCollector) {
+    protected void renderDefaultLabel(@NonNull ActiveTextCollector activeTextCollector) {
         if (this.sprite == null) {
             super.renderDefaultLabel(activeTextCollector);
         }
     }
 
     @Override
-    protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderContents(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.sprite != null) {

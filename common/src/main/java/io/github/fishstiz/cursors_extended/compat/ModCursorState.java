@@ -2,7 +2,7 @@ package io.github.fishstiz.cursors_extended.compat;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 
 class ModCursorState {
     private CursorType current;

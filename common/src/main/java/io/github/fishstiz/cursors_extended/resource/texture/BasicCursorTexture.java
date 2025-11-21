@@ -5,7 +5,7 @@ import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -17,12 +17,12 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
     private final int textureWidth;
     private final int textureHeight;
     private final byte[] pixels;
-    private final ResourceLocation texturePath;
+    private final Identifier texturePath;
     private final CursorMetadata metadata;
 
     public BasicCursorTexture(
             NativeImage image,
-            ResourceLocation texturePath,
+            Identifier texturePath,
             CursorMetadata metadata,
             CursorProperties settings
     ) throws IOException {
@@ -68,7 +68,7 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
     }
 
     @Override
-    public @NotNull ResourceLocation texturePath() {
+    public @NotNull Identifier texturePath() {
         return texturePath;
     }
 

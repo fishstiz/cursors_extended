@@ -9,8 +9,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.IMAGE_SIZE_GUI_MAX;
 
@@ -20,7 +20,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     private static final int BACKGROUND_SIZE = 128;
     private static final int BORDER_COLOR = 0xFF000000; // black
     private static final int FOCUSED_BORDER_COLOR = 0xFFFFFFFF; // white
-    private final ResourceLocation background128;
+    private final Identifier background128;
     private final Cursor cursor;
     private boolean renderRuler = true;
 
@@ -29,9 +29,9 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
             int y,
             int width,
             int height,
-            @NotNull Component message,
-            @NotNull Cursor cursor,
-            @NotNull ResourceLocation background128
+            @NonNull Component message,
+            @NonNull Cursor cursor,
+            @NonNull Identifier background128
     ) {
         super(x, y, width, height, message);
 
@@ -39,16 +39,16 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         this.background128 = background128;
     }
 
-    protected CursorWidget(@NotNull Component message, @NotNull Cursor cursor, @NotNull ResourceLocation background128) {
+    protected CursorWidget(@NonNull Component message, @NonNull Cursor cursor, @NonNull Identifier background128) {
         this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, cursor, background128);
     }
 
-    protected void renderCursor(@NotNull GuiGraphics guiGraphics, @NotNull Cursor cursor) {
+    protected void renderCursor(@NonNull GuiGraphics guiGraphics, @NonNull Cursor cursor) {
     }
 
-    protected abstract void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY);
+    protected abstract void renderRuler(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY);
 
-    protected void renderBackground(@NotNull GuiGraphics guiGraphics) {
+    protected void renderBackground(@NonNull GuiGraphics guiGraphics) {
         if (!this.isOverflowing()) {
             DrawUtil.drawCheckerboard(
                     guiGraphics,
@@ -64,13 +64,13 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         }
     }
 
-    protected void renderBorder(@NotNull GuiGraphics guiGraphics) {
+    protected void renderBorder(@NonNull GuiGraphics guiGraphics) {
         int color = this.isFocused() && this.active ? FOCUSED_BORDER_COLOR : BORDER_COLOR;
         DrawUtil.renderOutline(guiGraphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), color);
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.cursor.hasTexture()) {
             this.renderBackground(guiGraphics);
             this.renderCursor(guiGraphics, this.cursor);
@@ -90,7 +90,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         return renderRuler;
     }
 
-    protected @NotNull Cursor getCursor() {
+    protected @NonNull Cursor getCursor() {
         return this.cursor;
     }
 
@@ -122,7 +122,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     }
 
     @Override
-    protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput) {
         narrationElementOutput.add(NarratedElementType.TITLE, this.createNarrationMessage());
     }
 }

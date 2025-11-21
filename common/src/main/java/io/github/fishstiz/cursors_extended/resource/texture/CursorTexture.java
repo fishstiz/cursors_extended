@@ -3,8 +3,8 @@ package io.github.fishstiz.cursors_extended.resource.texture;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import net.minecraft.core.ClientAsset;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ public interface CursorTexture extends ClientAsset.Texture, AutoCloseable {
     void close();
 
     @Override
-    default @NotNull ResourceLocation id() {
+    default @NonNull Identifier id() {
         return texturePath();
     }
 

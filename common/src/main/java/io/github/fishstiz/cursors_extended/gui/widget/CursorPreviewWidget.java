@@ -11,12 +11,12 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class CursorPreviewWidget extends CursorWidget {
-    private static final ResourceLocation BACKGROUND_128 = CursorsExtended.loc("textures/gui/background_dark_128.png");
+    private static final Identifier BACKGROUND_128 = CursorsExtended.id("textures/gui/background_dark_128.png");
     private static final Component PREVIEW_TEXT = Component.translatable("cursors_extended.options.preview");
     private static final int PREVIEW_TEXT_OFFSET = 4;
     private static final int PREVIEW_TEXT_COLOR = 0x7FFFFFFF; // 50% white
@@ -27,7 +27,7 @@ public class CursorPreviewWidget extends CursorWidget {
     private final @Nullable Button button;
     private final Font font;
 
-    public CursorPreviewWidget(@NotNull Cursor cursor, @NotNull Font font, @Nullable Button button) {
+    public CursorPreviewWidget(@NonNull Cursor cursor, @NonNull Font font, @Nullable Button button) {
         super(CommonComponents.EMPTY, cursor, BACKGROUND_128);
 
         this.active = false;
@@ -35,7 +35,7 @@ public class CursorPreviewWidget extends CursorWidget {
         this.button = button;
     }
 
-    public CursorPreviewWidget(@NotNull Cursor cursor, @NotNull Font font) {
+    public CursorPreviewWidget(@NonNull Cursor cursor, @NonNull Font font) {
         this(cursor, font, Button.builder(CommonComponents.EMPTY, b -> b.setFocused(false))
                 .size(DEFAULT_BUTTON_SIZE, DEFAULT_BUTTON_SIZE)
                 .build()
@@ -43,7 +43,7 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderBackground(@NotNull GuiGraphics guiGraphics) {
+    protected void renderBackground(@NonNull GuiGraphics guiGraphics) {
         super.renderBackground(guiGraphics);
 
         if (this.isOverflowing()) {
@@ -52,7 +52,7 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Cursor cursor = this.getCursor();
 
         if (cursor.hasTexture()) {
@@ -72,7 +72,7 @@ public class CursorPreviewWidget extends CursorWidget {
         if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
     }
 
-    protected void renderPreviewText(@NotNull GuiGraphics guiGraphics) {
+    protected void renderPreviewText(@NonNull GuiGraphics guiGraphics) {
         int width = this.font.width(PREVIEW_TEXT);
         int endX = this.getRight() - PREVIEW_TEXT_OFFSET;
         int endY = this.getBottom() - PREVIEW_TEXT_OFFSET;
@@ -81,7 +81,7 @@ public class CursorPreviewWidget extends CursorWidget {
         DrawUtil.drawScrollableTextLeftAlign(guiGraphics, this.font, PREVIEW_TEXT, startX, startY, endX, endY, PREVIEW_TEXT_COLOR, false);
     }
 
-    protected void renderTestButton(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderTestButton(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.button != null) {
             int buttonX = this.getX() + (this.getWidth() / 2 - this.button.getWidth() / 2);
             int buttonY = this.getY() + (this.getHeight() / 2 - this.button.getHeight() / 2);
@@ -91,7 +91,7 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderRuler(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderRuler(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (this.isRenderRuler() && this.isMouseOver(mouseX, mouseY)) {
             guiGraphics.hLine(this.getX(), this.getRight() - 1, mouseY, RULER_COLOR);
             guiGraphics.vLine(mouseX, getY(), this.getBottom(), RULER_COLOR);
@@ -99,7 +99,7 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean doubleClicked) {
+    public boolean mouseClicked(@NonNull MouseButtonEvent mouseButtonEvent, boolean doubleClicked) {
         if (this.button != null &&
             this.button.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y()) &&
             this.button.mouseClicked(mouseButtonEvent, doubleClicked) &&

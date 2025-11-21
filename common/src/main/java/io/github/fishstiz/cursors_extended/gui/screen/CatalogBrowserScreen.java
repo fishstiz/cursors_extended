@@ -25,9 +25,9 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -37,9 +37,9 @@ public abstract class CatalogBrowserScreen extends Screen {
     private static final Component SEARCH_TEXT = Component.translatable("cursors_extended.options.search");
     private static final Tooltip CLEAR_SEARCH_INFO = Tooltip.create(Component.translatable("cursors_extended.options.search.clear"));
     private static final Tooltip REFRESH_INFO = Tooltip.create(Component.translatable("cursors_extended.options.refresh.info"));
-    private static final ResourceLocation EXIT_SPRITE = CursorsExtended.loc("textures/gui/sprites/icon/caret_right.png");
-    private static final ResourceLocation CLEAR_SPRITE = CursorsExtended.loc("textures/gui/sprites/icon/cross.png");
-    private static final ResourceLocation REFRESH_SPRITE = CursorsExtended.loc("textures/gui/sprites/icon/arrow_clockwise.png");
+    private static final Identifier EXIT_SPRITE = CursorsExtended.id("textures/gui/sprites/icon/caret_right.png");
+    private static final Identifier CLEAR_SPRITE = CursorsExtended.id("textures/gui/sprites/icon/cross.png");
+    private static final Identifier REFRESH_SPRITE = CursorsExtended.id("textures/gui/sprites/icon/arrow_clockwise.png");
     private final Screen previous;
     private final int headerHeight;
     private final int sidebarWidth;
@@ -203,21 +203,21 @@ public abstract class CatalogBrowserScreen extends Screen {
         this.repositionElements();
     }
 
-    protected CatalogItem addCategory(@NotNull CatalogItem category, boolean collapsible, boolean collapsed) {
+    protected CatalogItem addCategory(@NonNull CatalogItem category, boolean collapsible, boolean collapsed) {
         this.catalog.addCategory(Objects.requireNonNull(category), new CategoryContext(collapsible, collapsed));
         return category;
     }
 
-    protected CatalogItem addCategory(@NotNull CatalogItem category) {
+    protected CatalogItem addCategory(@NonNull CatalogItem category) {
         return this.addCategory(category, true, false);
     }
 
-    protected void addCategoryOnly(@NotNull CatalogItem category, @NotNull ContentPanel panel) {
+    protected void addCategoryOnly(@NonNull CatalogItem category, @NonNull ContentPanel panel) {
         this.addCategory(category, false, true);
         this.items.put(category, new ItemContext(category, this.initPanel(panel)));
     }
 
-    protected void addItem(@NotNull CatalogItem category, @NotNull CatalogItem item, @NotNull ContentPanel panel) {
+    protected void addItem(@NonNull CatalogItem category, @NonNull CatalogItem item, @NonNull ContentPanel panel) {
         if (this.items.containsKey(Objects.requireNonNull(category))) {
             throw new IllegalStateException("Category " + category.id() + " is already an item.");
         }
@@ -226,7 +226,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         this.catalog.addItem(category, item);
     }
 
-    protected void updateItem(@NotNull CatalogItem item, @NotNull ContentPanel contentPanel) {
+    protected void updateItem(@NonNull CatalogItem item, @NonNull ContentPanel contentPanel) {
         ItemContext oldContext = this.items.get(item);
         if (oldContext == null) {
             throw new IllegalStateException("CatalogItem " + item.id() + " has not beed added.");
@@ -260,7 +260,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
     }
 
-    protected void addOrUpdateItem(@NotNull CatalogItem category, @NotNull CatalogItem item, @NotNull ContentPanel panel) {
+    protected void addOrUpdateItem(@NonNull CatalogItem category, @NonNull CatalogItem item, @NonNull ContentPanel panel) {
         if (this.items.containsKey(item)) {
             this.updateItem(item, panel);
         } else {
@@ -307,7 +307,7 @@ public abstract class CatalogBrowserScreen extends Screen {
     }
 
     @Override
-    public boolean charTyped(CharacterEvent charEvent) {
+    public boolean charTyped(@NonNull CharacterEvent charEvent) {
         if (super.charTyped(charEvent)) {
             return true;
         }
@@ -322,7 +322,7 @@ public abstract class CatalogBrowserScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent keyEvent) {
+    public boolean keyPressed(@NonNull KeyEvent keyEvent) {
         if (super.keyPressed(keyEvent)) {
             return true;
         }
@@ -453,7 +453,7 @@ public abstract class CatalogBrowserScreen extends Screen {
             context.items().add(item);
         }
 
-        private void replaceItem(@NotNull CatalogItem category, @NotNull CatalogItem item) {
+        private void replaceItem(@NonNull CatalogItem category, @NonNull CatalogItem item) {
             int index = this.indexOf(category, item);
             if (index == -1) {
                 throw new IllegalStateException("CatalogItem " + item.id() + " has not beed added.");
@@ -461,7 +461,7 @@ public abstract class CatalogBrowserScreen extends Screen {
             this.categories.get(category).items().set(index, item);
         }
 
-        private int indexOf(@NotNull CatalogItem category, @Nullable CatalogItem item) {
+        private int indexOf(@NonNull CatalogItem category, @Nullable CatalogItem item) {
             CategoryContext context = this.categories.get(category);
             if (context != null) {
                 List<CatalogItem> items = context.items();
@@ -592,7 +592,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public void renderListItems(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void renderListItems(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderSlidingBackground(guiGraphics, mouseX, mouseY, partialTick);
             super.renderListItems(guiGraphics, mouseX, mouseY, partialTick);
         }
@@ -631,7 +631,7 @@ public abstract class CatalogBrowserScreen extends Screen {
             }
 
             @Override
-            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
                 this.button.setSize(this.getWidth(), this.getHeight());
                 this.button.setPosition(this.getX(), this.getY());
                 this.button.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -648,12 +648,12 @@ public abstract class CatalogBrowserScreen extends Screen {
             }
 
             @Override
-            public @NotNull List<ItemButton> children() {
+            public @NonNull List<ItemButton> children() {
                 return this.children;
             }
 
             @Override
-            public @NotNull List<ItemButton> narratables() {
+            public @NonNull List<ItemButton> narratables() {
                 return this.children;
             }
         }
@@ -724,12 +724,12 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public void onPress(InputWithModifiers inputWithModifiers) {
+        public void onPress(@NonNull InputWithModifiers inputWithModifiers) {
             this.onClick.accept(this);
         }
 
         @Override
-        protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderContents(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             int prefixWidth = this.item.prefix() != null
                     ? this.item.prefix().render(guiGraphics, this.font, this.item, this, this.spacing, mouseX, mouseY, partialTick)
                     : 0;
@@ -751,7 +751,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {
+        protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput) {
             narrationElementOutput.add(NarratedElementType.TITLE, this.getMessage());
         }
     }
@@ -775,7 +775,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         private Minecraft minecraft;
         private Font font;
         private CatalogBrowserScreen catalog;
-        private @NotNull String search = "";
+        private @NonNull String search = "";
 
         protected void added() {
         }
@@ -783,10 +783,10 @@ public abstract class CatalogBrowserScreen extends Screen {
         protected void removed() {
         }
 
-        protected void changed(@NotNull CatalogItem category, @NotNull CatalogItem item) {
+        protected void changed(@NonNull CatalogItem category, @NonNull CatalogItem item) {
         }
 
-        protected void searched(@NotNull String search, @Nullable Component matched) {
+        protected void searched(@NonNull String search, @Nullable Component matched) {
         }
 
         protected void repositionElements() {
@@ -807,12 +807,12 @@ public abstract class CatalogBrowserScreen extends Screen {
             }
         }
 
-        private void added(@NotNull String search) {
+        private void added(@NonNull String search) {
             this.search = search;
             this.added();
         }
 
-        private void changedItem(@NotNull String search, @NotNull CatalogItem category, @NotNull CatalogItem item) {
+        private void changedItem(@NonNull String search, @NonNull CatalogItem category, @NonNull CatalogItem item) {
             this.category = Objects.requireNonNull(category);
             this.item = Objects.requireNonNull(item);
             this.search = search;
@@ -866,12 +866,12 @@ public abstract class CatalogBrowserScreen extends Screen {
             return this.category;
         }
 
-        public @NotNull String getSearch() {
+        public @NonNull String getSearch() {
             return this.search;
         }
 
         @Override
-        public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             for (Renderable renderable : this.renderables) {
                 renderable.render(guiGraphics, mouseX, mouseY, partialTick);
             }
@@ -884,7 +884,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public @NotNull List<GuiEventListener> children() {
+        public @NonNull List<GuiEventListener> children() {
             return this.children;
         }
 
@@ -947,12 +947,12 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public @NotNull ScreenRectangle getRectangle() {
+        public @NonNull ScreenRectangle getRectangle() {
             return LayoutElement.super.getRectangle();
         }
 
         @Override
-        public void visitWidgets(Consumer<AbstractWidget> consumer) {
+        public void visitWidgets(@NonNull Consumer<AbstractWidget> consumer) {
             for (var child : this.children) {
                 if (child instanceof AbstractWidget widget) {
                     consumer.accept(widget);
@@ -961,12 +961,12 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public final @NotNull NarrationPriority narrationPriority() {
+        public final @NonNull NarrationPriority narrationPriority() {
             return this.isFocused() ? NarrationPriority.FOCUSED : NarrationPriority.NONE;
         }
 
         @Override
-        public final void updateNarration(@NotNull NarrationElementOutput narrationElementOutput) {
+        public final void updateNarration(@NonNull NarrationElementOutput narrationElementOutput) {
             List<NarratableEntry> sortedNarratables = this.narratables
                     .stream()
                     .filter(NarratableEntry::isActive)
@@ -985,7 +985,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
     }
 
-    private record CategoryContext(boolean collapsible, boolean collapsed, @NotNull List<CatalogItem> items) {
+    private record CategoryContext(boolean collapsible, boolean collapsed, @NonNull List<CatalogItem> items) {
         private CategoryContext {
             Objects.requireNonNull(items);
         }
@@ -1006,7 +1006,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
     }
 
-    private record ItemContext(@NotNull CatalogItem category, @NotNull ContentPanel contents) {
+    private record ItemContext(@NonNull CatalogItem category, @NonNull ContentPanel contents) {
         private ItemContext {
             Objects.requireNonNull(category);
             Objects.requireNonNull(contents);

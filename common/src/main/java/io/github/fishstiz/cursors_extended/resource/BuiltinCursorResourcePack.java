@@ -2,22 +2,22 @@ package io.github.fishstiz.cursors_extended.resource;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public enum BuiltinCursorResourcePack {
-    DEFAULT(CursorsExtended.loc("default"), Component.translatable("cursors_extended.resource-pack.default")),
-    DEFAULT_AUTO(CursorsExtended.loc("default_auto"), Component.translatable("cursors_extended.resource-pack.default.auto")),
-    LEGACY(CursorsExtended.loc("legacy"), Component.translatable("cursors_extended.resource-pack.legacy"));
+    DEFAULT(CursorsExtended.id("default"), Component.translatable("cursors_extended.resource-pack.default")),
+    DEFAULT_AUTO(CursorsExtended.id("default_auto"), Component.translatable("cursors_extended.resource-pack.default.auto")),
+    LEGACY(CursorsExtended.id("legacy"), Component.translatable("cursors_extended.resource-pack.legacy"));
 
-    private final ResourceLocation location;
+    private final Identifier location;
     private final Component displayName;
 
-    BuiltinCursorResourcePack(ResourceLocation location, Component displayName) {
+    BuiltinCursorResourcePack(Identifier location, Component displayName) {
         this.location = location;
         this.displayName = displayName;
     }
 
-    public ResourceLocation getLocation() {
+    public Identifier getLocation() {
         return location;
     }
 

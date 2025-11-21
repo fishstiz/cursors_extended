@@ -8,7 +8,7 @@ import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -44,7 +44,7 @@ public sealed interface CursorRenderer {
 
     final class Virtual implements CursorRenderer {
         private final CursorRegistry registry;
-        private ResourceLocation textureLocation;
+        private Identifier textureLocation;
         private int textureWidth;
         private int textureHeight;
         private int spriteWidth;

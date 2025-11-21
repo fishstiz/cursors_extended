@@ -4,13 +4,13 @@ import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.renderstate.GuiColoredRectRenderState;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
-import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import org.joml.Matrix3x2f;
 
 public class DrawUtil {
@@ -68,7 +68,7 @@ public class DrawUtil {
             int height,
             float cellWidth,
             float cellHeight,
-            ResourceLocation checkerboard,
+            Identifier checkerboard,
             int textureSize
     ) {
         float drawWidth = textureSize * cellWidth;

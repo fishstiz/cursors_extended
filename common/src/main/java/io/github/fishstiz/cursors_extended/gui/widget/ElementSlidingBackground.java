@@ -1,12 +1,12 @@
 package io.github.fishstiz.cursors_extended.gui.widget;
 
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class ElementSlidingBackground {
     private static final float ANIMATION_SPEED = 25;
@@ -29,7 +29,7 @@ public class ElementSlidingBackground {
         this.lastFrameTime = Util.getNanos();
     }
 
-    public void render(@NotNull GuiGraphics guiGraphics, int x, int y, int width, int height, float partialTick) {
+    public void render(@NonNull GuiGraphics guiGraphics, int x, int y, int width, int height, float partialTick) {
         long now = Util.getNanos();
         float deltaTime = (now - this.lastFrameTime) / 1_000_000_000f;
         this.lastFrameTime = now;
@@ -53,7 +53,7 @@ public class ElementSlidingBackground {
         }
     }
 
-    public void render(@NotNull GuiGraphics guiGraphics, @Nullable LayoutElement element, float partialTick) {
+    public void render(@NonNull GuiGraphics guiGraphics, @Nullable LayoutElement element, float partialTick) {
         if (element == null) {
             this.reset();
             return;

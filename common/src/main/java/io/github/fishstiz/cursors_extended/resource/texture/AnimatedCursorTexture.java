@@ -7,7 +7,7 @@ import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
     private final AnimationState animationState;
     private final Frame fallback;
     private final Frame[] frames;
-    private final ResourceLocation texturePath;
+    private final Identifier texturePath;
     private final CursorMetadata metadata;
     private final float scale;
     private final int xhot;
@@ -31,7 +31,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
     public AnimatedCursorTexture(
             AnimationState animationState,
             NativeImage image,
-            ResourceLocation path,
+            Identifier path,
             CursorMetadata metadata,
             CursorProperties settings
     ) throws IOException {
@@ -152,7 +152,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
     }
 
     @Override
-    public @NotNull ResourceLocation texturePath() {
+    public @NotNull Identifier texturePath() {
         return texturePath;
     }
 
@@ -251,7 +251,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
         }
 
         @Override
-        public @NotNull ResourceLocation texturePath() {
+        public @NotNull Identifier texturePath() {
             return texturePath;
         }
 
