@@ -7,9 +7,9 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.ColoredRectangleRenderState;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Copied from {@link ColoredRectangleRenderState}, changed bounds to float
@@ -43,12 +43,12 @@ public record GuiColoredRectRenderState(
     }
 
     @Override
-    public @NotNull RenderPipeline pipeline() {
+    public @NonNull RenderPipeline pipeline() {
         return RenderPipelines.GUI;
     }
 
     @Override
-    public @NotNull TextureSetup textureSetup() {
+    public @NonNull TextureSetup textureSetup() {
         return TextureSetup.noTexture();
     }
 

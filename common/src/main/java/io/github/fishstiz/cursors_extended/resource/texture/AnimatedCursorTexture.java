@@ -8,7 +8,7 @@ import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -118,7 +118,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
         return yhot;
     }
 
-    public @NotNull Boolean animated() {
+    public @NonNull Boolean animated() {
         return animated;
     }
 
@@ -152,7 +152,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
     }
 
     @Override
-    public @NotNull Identifier texturePath() {
+    public @NonNull Identifier texturePath() {
         return texturePath;
     }
 
@@ -251,7 +251,7 @@ public final class AnimatedCursorTexture implements CursorTexture {
         }
 
         @Override
-        public @NotNull Identifier texturePath() {
+        public @NonNull Identifier texturePath() {
             return texturePath;
         }
 

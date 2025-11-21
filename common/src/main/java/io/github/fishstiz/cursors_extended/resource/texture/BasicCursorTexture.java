@@ -6,7 +6,7 @@ import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 
@@ -68,7 +68,7 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
     }
 
     @Override
-    public @NotNull Identifier texturePath() {
+    public @NonNull Identifier texturePath() {
         return texturePath;
     }
 

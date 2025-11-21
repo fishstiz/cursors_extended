@@ -4,13 +4,13 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-public record CatalogItem(@NotNull String id, @NotNull Component text, @Nullable Prefix prefix) {
+public record CatalogItem(@NonNull String id, @NonNull Component text, @Nullable Prefix prefix) {
     public CatalogItem {
         Objects.requireNonNull(id);
         Objects.requireNonNull(text);

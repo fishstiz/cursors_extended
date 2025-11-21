@@ -4,8 +4,8 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -222,11 +222,11 @@ public class Config implements Serializable {
             this.scale = sanitizeScale(scale);
         }
 
-        public void setXHot(@NotNull Cursor cursor, int xhot) {
+        public void setXHot(@NonNull Cursor cursor, int xhot) {
             this.xhot = sanitizeXHot(xhot, cursor);
         }
 
-        public void setYHot(@NotNull Cursor cursor, int yhot) {
+        public void setYHot(@NonNull Cursor cursor, int yhot) {
             this.yhot = sanitizeYHot(yhot, cursor);
         }
 

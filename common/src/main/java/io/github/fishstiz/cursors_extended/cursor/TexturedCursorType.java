@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.cursor;
 
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface TexturedCursorType {
     default void cursors_extended$setCustom(boolean custom) {

@@ -3,7 +3,7 @@ package io.github.fishstiz.cursors_extended.compat;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public sealed interface CursorStateTracker permits CursorStateTrackerImpl, CursorStateTrackerImpl.DefaultTracker {
     void trackCursor(ModCursor cursor);

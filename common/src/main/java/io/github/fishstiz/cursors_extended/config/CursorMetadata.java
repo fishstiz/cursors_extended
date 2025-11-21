@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.config;
 
 import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Collections;

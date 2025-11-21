@@ -10,7 +10,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
@@ -22,7 +21,6 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     protected T menu;
 
     @Shadow
-    @Nullable
     protected Slot hoveredSlot;
 
     protected AbstractContainerScreenMixin(Component title) {

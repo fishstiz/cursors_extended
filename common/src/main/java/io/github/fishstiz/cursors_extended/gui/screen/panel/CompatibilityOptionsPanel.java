@@ -5,8 +5,8 @@ import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
@@ -94,7 +94,7 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    protected void searched(@NotNull String search, @Nullable Component matched) {
+    protected void searched(@NonNull String search, @Nullable Component matched) {
         if (this.optionsList != null) {
             this.optionsList.search(search);
         }

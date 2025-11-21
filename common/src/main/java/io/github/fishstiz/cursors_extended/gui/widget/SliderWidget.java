@@ -5,8 +5,8 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -33,8 +33,8 @@ public class SliderWidget extends AbstractSliderButton {
             double min,
             double max,
             double step,
-            @NotNull Consumer<Double> listener,
-            @NotNull Component prefix,
+            @NonNull Consumer<Double> listener,
+            @NonNull Component prefix,
             @Nullable Component suffix,
             @Nullable TextMapper textMapper,
             @Nullable MouseEventListener mouseEventListener
@@ -64,8 +64,8 @@ public class SliderWidget extends AbstractSliderButton {
             double min,
             double max,
             double step,
-            @NotNull Consumer<Double> listener,
-            @NotNull Component prefix,
+            @NonNull Consumer<Double> listener,
+            @NonNull Component prefix,
             @Nullable Component suffix,
             @Nullable TextMapper textMapper,
             @Nullable MouseEventListener mouseEventListener
@@ -78,8 +78,8 @@ public class SliderWidget extends AbstractSliderButton {
             double min,
             double max,
             double step,
-            @NotNull Consumer<Double> listener,
-            @NotNull Component prefix,
+            @NonNull Consumer<Double> listener,
+            @NonNull Component prefix,
             @Nullable Component suffix
     ) {
         this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, mappedValue, min, max, step, listener, prefix, suffix, null, null);
@@ -169,7 +169,7 @@ public class SliderWidget extends AbstractSliderButton {
 
     @FunctionalInterface
     public interface MouseEventListener {
-        void onMouseEvent(@NotNull SliderWidget target, @NotNull MouseEvent mouseEvent, double mappedValue);
+        void onMouseEvent(@NonNull SliderWidget target, @NonNull MouseEvent mouseEvent, double mappedValue);
     }
 
     @FunctionalInterface

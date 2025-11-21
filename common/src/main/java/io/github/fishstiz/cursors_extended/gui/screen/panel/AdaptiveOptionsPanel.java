@@ -11,8 +11,8 @@ import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -92,7 +92,7 @@ public class AdaptiveOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    protected void searched(@NotNull String search, @Nullable Component matched) {
+    protected void searched(@NonNull String search, @Nullable Component matched) {
         if (this.optionsList != null) {
             this.optionsList.search(search);
         }

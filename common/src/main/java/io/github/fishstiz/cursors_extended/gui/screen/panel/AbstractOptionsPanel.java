@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentPanel {
     protected static final Component ENABLE_TEXT = Component.translatable("cursors_extended.options.enabled");
@@ -49,7 +49,7 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
         return Math.max(0, this.getHeight() - (top - this.getY()));
     }
 
-    static boolean loadCursor(@NotNull Cursor deferredCursor) {
+    static boolean loadCursor(@NonNull Cursor deferredCursor) {
         CursorTexture texture = deferredCursor.getTexture();
         if (texture != null) {
             throw new IllegalStateException("Cursor is already loaded");

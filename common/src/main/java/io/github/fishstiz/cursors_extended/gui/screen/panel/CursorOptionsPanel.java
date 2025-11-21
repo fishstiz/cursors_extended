@@ -22,8 +22,8 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -81,7 +81,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         this.layout.visitWidgets(this::addRenderableWidget);
     }
 
-    private @NotNull LayoutElement setupFirstColumnWidgets() {
+    private @NonNull LayoutElement setupFirstColumnWidgets() {
         this.optionsList = new OptionsList(this.getMinecraft(), Button.DEFAULT_HEIGHT, this.getSpacing());
 
         this.optionsList.addOption(new ToggleWidget(
@@ -150,7 +150,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         return this.optionsList;
     }
 
-    private @NotNull LayoutElement setupSecondColumnWidgets() {
+    private @NonNull LayoutElement setupSecondColumnWidgets() {
         final int column = 0;
         int row = 0;
 
@@ -347,7 +347,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.scaling) {
@@ -368,27 +368,27 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             super(minecraft, 0, 0, 0, itemHeight, spacing);
         }
 
-        private <T extends AbstractWidget> @NotNull T addOption(@NotNull T optionWidget, @Nullable Function<T, AbstractWidget> decoration) {
+        private <T extends AbstractWidget> @NonNull T addOption(@NonNull T optionWidget, @Nullable Function<T, AbstractWidget> decoration) {
             this.addEntry(new Entry(optionWidget, decoration != null ? decoration.apply(optionWidget) : null));
             return optionWidget;
         }
 
-        private <T extends AbstractWidget> @NotNull T addOption(@NotNull T optionWidget) {
+        private <T extends AbstractWidget> @NonNull T addOption(@NonNull T optionWidget) {
             return this.addOption(optionWidget, null);
         }
 
         @Override
-        protected void renderListBackground(@NotNull GuiGraphics guiGraphics) {
+        protected void renderListBackground(@NonNull GuiGraphics guiGraphics) {
             // remove background
         }
 
         @Override
-        protected void renderListSeparators(@NotNull GuiGraphics guiGraphics) {
+        protected void renderListSeparators(@NonNull GuiGraphics guiGraphics) {
             // remove separators
         }
 
         @Override
-        public void visitChildren(@NotNull Consumer<LayoutElement> visitor) {
+        public void visitChildren(@NonNull Consumer<LayoutElement> visitor) {
             this.children().forEach(visitor);
         }
 
@@ -398,7 +398,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             this.clampScrollAmount();
         }
 
-        protected void renderSlidingBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderSlidingBackground(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             int paddingX = this.rowGap;
 
             int minX = this.getX() - paddingX;
@@ -422,7 +422,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         }
 
         @Override
-        public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderSlidingBackground(guiGraphics, mouseX, mouseY, partialTick);
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         }
@@ -432,7 +432,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             private final AbstractWidget optionWidget;
             private final AbstractWidget decoration;
 
-            private Entry(@NotNull AbstractWidget optionWidget, @Nullable AbstractWidget decoration) {
+            private Entry(@NonNull AbstractWidget optionWidget, @Nullable AbstractWidget decoration) {
                 this.optionWidget = optionWidget;
                 this.decoration = decoration;
 
@@ -443,7 +443,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             }
 
             @Override
-            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
                 this.optionWidget.setPosition(this.getX(), this.getY());
                 this.optionWidget.render(guiGraphics, mouseX, mouseY, partialTick);
 
@@ -453,22 +453,22 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             }
 
             @Override
-            public @NotNull List<AbstractWidget> children() {
+            public @NonNull List<AbstractWidget> children() {
                 return this.children;
             }
 
             @Override
-            public @NotNull List<? extends NarratableEntry> narratables() {
+            public @NonNull List<? extends NarratableEntry> narratables() {
                 return this.children;
             }
 
             @Override
-            public void visitChildren(@NotNull Consumer<LayoutElement> visitor) {
+            public void visitChildren(@NonNull Consumer<LayoutElement> visitor) {
                 visitor.accept(this.optionWidget);
             }
 
             @Override
-            public void visitWidgets(@NotNull Consumer<AbstractWidget> visitor) {
+            public void visitWidgets(@NonNull Consumer<AbstractWidget> visitor) {
                 visitor.accept(this.optionWidget);
             }
 

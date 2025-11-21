@@ -5,8 +5,8 @@ import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class DebugOptionsPanel extends AbstractOptionsPanel {
     private static final String ISSUES_LINK = "https://github.com/fishstiz/cursors_extended/issues";
@@ -57,7 +57,7 @@ public class DebugOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    protected void searched(@NotNull String search, @Nullable Component matched) {
+    protected void searched(@NonNull String search, @Nullable Component matched) {
         if (this.optionsList != null) {
             this.optionsList.search(search);
         }

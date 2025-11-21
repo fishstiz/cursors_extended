@@ -6,8 +6,8 @@ import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -55,7 +55,7 @@ public class SettingsUtil {
 
     public static float getAutoScale(float scale) {
         if (isAutoScale(scale)) {
-            OptionInstance<Integer> guiScale = Minecraft.getInstance().options.guiScale();
+            OptionInstance<@NonNull Integer> guiScale = Minecraft.getInstance().options.guiScale();
             int max = Integer.MAX_VALUE;
             int guiScaleValue = guiScale.get();
 
@@ -83,11 +83,11 @@ public class SettingsUtil {
         return clamp(hotspot, HOT_MIN, imageSize - 1);
     }
 
-    public static int sanitizeXHot(int xhot, @NotNull Cursor cursor) {
+    public static int sanitizeXHot(int xhot, @NonNull Cursor cursor) {
         return sanitizeHotspot(xhot, cursor.getTexture() != null ? cursor.getTexture().spriteWidth() : 0);
     }
 
-    public static int sanitizeYHot(int yhot, @NotNull Cursor cursor) {
+    public static int sanitizeYHot(int yhot, @NonNull Cursor cursor) {
         return sanitizeHotspot(yhot, cursor.getTexture() != null ? cursor.getTexture().spriteHeight() : 0);
     }
 

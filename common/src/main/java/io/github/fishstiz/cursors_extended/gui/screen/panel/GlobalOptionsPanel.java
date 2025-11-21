@@ -21,8 +21,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -40,8 +40,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip RESET_INFO = Tooltip.create(Component.translatable("cursors_extended.options.resource_pack.reset.tooltip"));
     private static final int PREVIEW_BUTTON_SIZE = 20;
     private final Runnable refreshCursors;
-    private @NotNull Iterator<Cursor> cursors = cursorIterator();
-    private @NotNull Cursor currentCursor = getDefaultCursor();
+    private @NonNull Iterator<Cursor> cursors = cursorIterator();
+    private @NonNull Cursor currentCursor = getDefaultCursor();
     private OptionsListWidget optionList;
     private GlobalPreviewWidget previewWidget;
     private boolean scaling = false;
@@ -225,7 +225,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    protected void searched(@NotNull String search, @Nullable Component matched) {
+    protected void searched(@NonNull String search, @Nullable Component matched) {
         if (this.optionList != null) {
             this.optionList.search(search);
         }
@@ -270,7 +270,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                 .iterator();
     }
 
-    private static @NotNull Cursor getDefaultCursor() {
+    private static @NonNull Cursor getDefaultCursor() {
         return CursorsExtended.getInstance().getRegistry().get(CursorType.DEFAULT);
     }
 
@@ -295,7 +295,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.scaling) {
@@ -305,16 +305,16 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     private static class GlobalPreviewWidget extends CursorPreviewWidget {
         private static final float CELL_DIVISOR = 32;
-        private @NotNull Cursor cursor;
+        private @NonNull Cursor cursor;
 
-        public GlobalPreviewWidget(@NotNull Cursor cursor, @NotNull Font font, @Nullable Button button) {
+        public GlobalPreviewWidget(@NonNull Cursor cursor, @NonNull Font font, @Nullable Button button) {
             super(cursor, font, button);
 
             this.cursor = cursor;
         }
 
         @Override
-        protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderBackground(guiGraphics);
             this.renderPreviewText(guiGraphics);
             this.renderTestButton(guiGraphics, mouseX, mouseY, partialTick);
@@ -339,12 +339,12 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
             return false;
         }
 
-        public void setCursor(@NotNull Cursor cursor) {
+        public void setCursor(@NonNull Cursor cursor) {
             this.cursor = cursor;
         }
 
         @Override
-        public @NotNull Cursor getCursor() {
+        public @NonNull Cursor getCursor() {
             return this.cursor;
         }
     }

@@ -11,7 +11,7 @@ import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
 import io.github.fishstiz.cursors_extended.cursor.TexturedCursorType;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;

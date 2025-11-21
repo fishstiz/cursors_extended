@@ -5,7 +5,7 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -21,8 +21,8 @@ public class ToggleWidget extends Button.Plain {
             int width,
             int height,
             boolean value,
-            @NotNull Component prefix,
-            @NotNull BiConsumer<ToggleWidget, Boolean> listener
+            @NonNull Component prefix,
+            @NonNull BiConsumer<ToggleWidget, Boolean> listener
     ) {
         super(x, y, width, height, prefix, btn -> {}, DEFAULT_NARRATION);
 
@@ -32,11 +32,11 @@ public class ToggleWidget extends Button.Plain {
         this.setValue(value);
     }
 
-    public ToggleWidget(boolean value, @NotNull Component prefix, @NotNull BiConsumer<ToggleWidget, Boolean> listener) {
+    public ToggleWidget(boolean value, @NonNull Component prefix, @NonNull BiConsumer<ToggleWidget, Boolean> listener) {
         this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, value, prefix, listener);
     }
 
-    public ToggleWidget(boolean value, @NotNull Component prefix, @NotNull Consumer<Boolean> listener) {
+    public ToggleWidget(boolean value, @NonNull Component prefix, @NonNull Consumer<Boolean> listener) {
         this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, value, prefix, (target, v) -> listener.accept(v));
     }
 
