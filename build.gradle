@@ -85,7 +85,7 @@ publishMods {
         optional("modmenu")
     }
     modrinth("modrinthNeoForge") {
-        from modrinthOptions
+        from modrinthOptions, neoforgeOptions
         modLoaders.add("neoforge")
     }
 
@@ -98,7 +98,7 @@ publishMods {
         optional("modmenu")
     }
     curseforge("curseforgeNeoForge") {
-        from curseforgeOptions
+        from curseforgeOptions, neoforgeOptions
         modLoaders.add("neoforge")
         clientRequired = true
     }
