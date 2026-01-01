@@ -1,2 +1,1 @@
-- Port to 1.21.11
-- Removed several adaptive cursor options as they were added in vanilla 1.21.11
+- Fixed crash when navigating to the cursor settings screen and a global cursor override (scale, xhot, yhot) is enabled ([#10](https://github.com/fishstiz/cursors_extended/issues/10)) 
