@@ -42,7 +42,7 @@ public class InactiveInfoWidget extends ButtonWidget {
         this.refreshVisibility();
 
         if (this.active) {
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+            super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
 
             int iconX = this.getX() + (this.getWidth() - ICON_SIZE) / 2;
             int iconY = this.getY() + (this.getHeight() - ICON_SIZE) / 2;
