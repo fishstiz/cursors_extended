@@ -6,17 +6,6 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-repositories {
-    maven {
-        name = "Maven for PR #2815" // https://github.com/neoforged/NeoForge/pull/2815
-        url = uri("https://prmaven.neoforged.net/NeoForge/pr2815")
-        content {
-            includeModule("net.neoforged", "neoforge")
-            includeModule("net.neoforged", "testframework")
-        }
-    }
-}
-
 neoForge {
     version = neoforge_version
 
@@ -73,15 +62,5 @@ processResources {
     doLast {
         delete defaultPack
         delete "${sourceSets.main.output.resourcesDir}/${mod_id}.accesswidener"
-
-        def mixinConfigFile = file("${sourceSets.main.output.resourcesDir}/${mod_id}.mixins.json")
-        if (mixinConfigFile.exists()) {
-            def jsonSlurper = new JsonSlurper()
-            def mixinConfig = jsonSlurper.parse(mixinConfigFile)
-
-            mixinConfig.remove("refmap")
-
-            mixinConfigFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(mixinConfig))
-        }
     }
 }
