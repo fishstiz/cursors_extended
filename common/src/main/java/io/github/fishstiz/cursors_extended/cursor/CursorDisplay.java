@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.debug.CursorDebugRenderer;
-import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,7 +12,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import org.jspecify.annotations.Nullable;
 
-public class CursorDisplay implements ClientStartedListener {
+public class CursorDisplay {
     private final CursorRegistry registry;
     private Minecraft minecraft;
     private CursorDebugRenderer debugRenderer = CursorDebugRenderer.NOP;
@@ -25,7 +24,6 @@ public class CursorDisplay implements ClientStartedListener {
         this.cursorRenderer = new CursorRenderer.Native(registry);
     }
 
-    @Override
     public void onClientStarted(Minecraft minecraft) {
         this.minecraft = minecraft;
 
