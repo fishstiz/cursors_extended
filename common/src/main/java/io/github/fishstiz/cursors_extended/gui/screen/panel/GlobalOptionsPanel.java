@@ -73,7 +73,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
                         this::onChangeScale,
                         this.index(SCALE_TEXT),
                         CommonComponents.EMPTY,
-                        SettingsUtil::getAutoText,
+                        AbstractOptionsPanel::getAutoText,
                         this::onSliderMouseEvent
                 ),
                 CONFIG.getGlobal().isScaleActive(),

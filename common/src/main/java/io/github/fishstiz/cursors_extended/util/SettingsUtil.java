@@ -45,14 +45,6 @@ public class SettingsUtil {
         return isAutoScale((float) scale);
     }
 
-    public static @Nullable Component getAutoText(float scale) {
-        return isAutoScale(scale) ? Component.translatable("options.guiScale.auto") : null;
-    }
-
-    public static @Nullable Component getAutoText(double scale) {
-        return getAutoText((float) scale);
-    }
-
     public static float getAutoScale(float scale) {
         if (isAutoScale(scale)) {
             OptionInstance<Integer> guiScale = Minecraft.getInstance().options.guiScale();
