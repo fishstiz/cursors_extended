@@ -11,7 +11,6 @@ import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimationState;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.lifecycle.ClientStartedListener;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.resource.texture.BasicCursorTexture;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
@@ -34,7 +33,7 @@ import java.util.concurrent.Executor;
 import static io.github.fishstiz.cursors_extended.CursorsExtended.*;
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
-public class CursorTextureLoader implements PreparableReloadListener, ClientStartedListener {
+public class CursorTextureLoader implements PreparableReloadListener {
     private final Map<String, CursorMetadata> preparedMetadata = new Object2ObjectOpenHashMap<>();
     private final CursorRegistry registry;
     private Minecraft minecraft;
@@ -44,7 +43,6 @@ public class CursorTextureLoader implements PreparableReloadListener, ClientStar
         this.registry = registry;
     }
 
-    @Override
     public void onClientStarted(Minecraft minecraft) {
         this.minecraft = minecraft;
     }
