@@ -1,1 +1,1 @@
-- Fixed crash when navigating to the cursor settings screen and a global cursor override (scale, xhot, yhot) is enabled ([#10](https://github.com/fishstiz/cursors_extended/issues/10)) 
+- Fixed crash with mixins to `Component` ([#12](https://github.com/fishstiz/cursors_extended/issues/12))
