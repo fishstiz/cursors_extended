@@ -4,12 +4,14 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogBrowserScreen;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
+import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentPanel {
     protected static final Component ENABLE_TEXT = Component.translatable("cursors_extended.options.enabled");
@@ -64,6 +66,10 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
                 Component.translatable("cursors_extended.options.global.deferred_loading.fail", deferredCursor.text())
         ));
         return false;
+    }
+
+    static @Nullable Component getAutoText(double scale) {
+        return SettingsUtil.isAutoScale((float) scale) ? Component.translatable("options.guiScale.auto") : null;
     }
 
     static void setScale(Cursor cursor, float scale) {

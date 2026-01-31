@@ -100,7 +100,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
                             this::onChangeScale,
                             SCALE_TEXT,
                             CommonComponents.EMPTY,
-                            SettingsUtil::getAutoText,
+                            AbstractOptionsPanel::getAutoText,
                             this::onScaleMouseEvent
                     ),
                     this.bindGlobalInfo(GLOBAL_SCALE_TOOLTIP, CursorsExtended.CONFIG.getGlobal().isScaleActive())
