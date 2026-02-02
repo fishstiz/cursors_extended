@@ -122,7 +122,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     }
 
     private int computeBackgroundWidth(AbstractEntry entry) {
-        return entry.getWidth() + this.rowGap + (this.scrollbarVisible() ? SCROLLBAR_WIDTH : BACKGROUND_PADDING_Y);
+        return entry.getWidth() + this.rowGap + (this.scrollable() ? SCROLLBAR_WIDTH : BACKGROUND_PADDING_Y);
     }
 
     private int computeBackgroundHeight(AbstractEntry entry) {

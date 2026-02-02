@@ -1,4 +1,4 @@
-accessWidener v2 named
+classTweaker v1 official
 accessible method com/mojang/blaze3d/platform/cursor/CursorType <init> (Ljava/lang/String;J)V
 accessible field com/mojang/blaze3d/platform/cursor/CursorType handle J
 accessible field com/mojang/blaze3d/platform/Window currentCursor Lcom/mojang/blaze3d/platform/cursor/CursorType;

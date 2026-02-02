@@ -40,7 +40,7 @@ public abstract class AbstractListWidget<E extends AbstractListWidget<E>.Entry> 
 
     @Override
     public int getRowWidth() {
-        return this.scrollbarVisible() ? this.getWidth() - SCROLLBAR_WIDTH : this.getWidth();
+        return this.scrollable() ? this.getWidth() - SCROLLBAR_WIDTH : this.getWidth();
     }
 
     @Override

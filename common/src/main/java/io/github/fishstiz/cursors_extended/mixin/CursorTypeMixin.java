@@ -13,7 +13,6 @@ import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -72,7 +71,7 @@ public abstract class CursorTypeMixin implements TexturedCursorType {
     @WrapOperation(method = "select", at = @At(
             value = "FIELD",
             target = "Lcom/mojang/blaze3d/platform/cursor/CursorType;handle:J",
-            opcode = Opcodes.GETFIELD
+            opcode = 180 // GETFIELD
     ))
     private long onSetCursor(CursorType instance, Operation<Long> original) {
         if (!cursors_extended$isCustom() &&
