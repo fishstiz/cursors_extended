@@ -413,7 +413,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             } else {
                 int x = entry.getX() - paddingX;
                 int y = entry.getY() - BACKGROUND_PADDING_Y;
-                int width = entry.getWidth() + paddingX + (this.scrollbarVisible() ? SCROLLBAR_WIDTH : BACKGROUND_PADDING_Y);
+                int width = entry.getWidth() + paddingX + (this.scrollable() ? SCROLLBAR_WIDTH : BACKGROUND_PADDING_Y);
                 int height = entry.getHeight() + BACKGROUND_PADDING_Y * 2;
                 this.hoveredBackground.render(guiGraphics, x, y, width, height, partialTick);
             }
