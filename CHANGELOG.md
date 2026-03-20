@@ -1,1 +1,2 @@
-- Fixed crash with mixins to `Component` ([#12](https://github.com/fishstiz/cursors_extended/issues/12))
+- Port to 26.1
+- Made legacy mode cursor detection stricter 
