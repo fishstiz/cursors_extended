@@ -6,7 +6,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.debug.CursorDebugRenderer;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -53,17 +53,20 @@ public class CursorDisplay {
      */
     public CursorType getCursorAt(GuiEventListener element, double mouseX, double mouseY) {
         if (CursorTypeUtil.isHovered(element, mouseX, mouseY)) {
-            if (element instanceof ContainerEventHandler container) {
-                for (GuiEventListener child : container.children()) {
-                    CursorType cursorType = getCursorAt(child, mouseX, mouseY);
-                    if (CursorTypeUtil.nonDefault(cursorType)) {
-                        return cursorType;
-                    }
+            if (element instanceof CursorProvider cursorProvider) {
+                CursorType cursorType = cursorProvider.cursors_extended$cursorType(mouseX, mouseY);
+                if (CursorTypeUtil.nonDefault(cursorType)) {
+                    debugRenderer.setLastCursorAt(element, mouseX, mouseY);
+                    return cursorType;
                 }
             }
-            if (element instanceof CursorProvider provider) {
-                debugRenderer.setLastCursorAt(element, mouseX, mouseY);
-                return provider.cursors_extended$cursorType(mouseX, mouseY);
+
+            if (element instanceof ContainerEventHandler container) {
+                for (GuiEventListener child : container.children()) {
+                    if (CursorTypeUtil.isHovered(child, mouseX, mouseY)) {
+                        return getCursorAt(child, mouseX, mouseY);
+                    }
+                }
             }
             debugRenderer.setLastCursorAt(element, mouseX, mouseY);
         }
@@ -85,7 +88,7 @@ public class CursorDisplay {
         cursorRenderer.applyCursor(minecraft.getWindow());
     }
 
-    public void renderCursor(Window window, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    public void renderCursor(Window window, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         cursorRenderer.render(window, minecraft, guiGraphics, mouseX, mouseY);
     }
 
@@ -97,7 +100,7 @@ public class CursorDisplay {
         debugRenderer = debugRenderer.isActive() ? CursorDebugRenderer.NOP : CursorDebugRenderer.create();
     }
 
-    public void renderDebugger(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    public void renderDebugger(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         debugRenderer.render(minecraft, this::getVisibleScreen, guiGraphics, mouseX, mouseY);
     }
 

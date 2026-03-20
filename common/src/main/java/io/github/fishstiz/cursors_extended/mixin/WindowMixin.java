@@ -14,6 +14,7 @@ import io.github.fishstiz.cursors_extended.compat.WindowCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -101,7 +102,13 @@ public abstract class WindowMixin implements WindowCursor {
             return requestedCursor;
         }
         if (CursorsExtended.CONFIG.isLegacyMode()) {
-            CursorType cursorType = CursorsExtended.getInstance().getDisplay().getCursorAt((Window) (Object) this);
+            Window self = (Window) (Object) this;
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.getWindow() != self || (minecraft.getOverlay() != null && minecraft.getOverlay().isPauseScreen())) {
+                return requestedCursor;
+            }
+
+            CursorType cursorType = CursorsExtended.getInstance().getDisplay().getCursorAt(self);
             if (CursorTypeUtil.nonDefault(cursorType)) {
                 return cursorType;
             }

@@ -54,6 +54,6 @@ public abstract class AbstractRecipeBookScreenMixin extends AbstractContainerScr
                 return CursorTypeUtil.canShift() ? CursorTypesExt.SHIFT : CursorTypes.POINTING_HAND;
             }
         }
-        return CursorTypes.ARROW;
+        return CursorType.DEFAULT;
     }
 }

@@ -31,7 +31,7 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
                 return CursorTypes.NOT_ALLOWED;
             }
         }
-        return CursorTypes.ARROW;
+        return CursorType.DEFAULT;
     }
 
     @ModifyArg(method = "handleCursor", at = @At(

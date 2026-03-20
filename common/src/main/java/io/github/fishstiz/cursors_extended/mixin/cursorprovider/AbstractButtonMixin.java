@@ -24,6 +24,6 @@ public abstract class AbstractButtonMixin extends AbstractWidget implements Curs
                 return CursorTypes.NOT_ALLOWED;
             }
         }
-        return CursorTypes.ARROW;
+        return CursorType.DEFAULT;
     }
 }

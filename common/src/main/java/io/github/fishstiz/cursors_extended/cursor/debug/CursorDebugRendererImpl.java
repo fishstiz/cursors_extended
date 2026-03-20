@@ -51,6 +51,8 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
             renderInspected(minecraft, renderDeepest(minecraft, screen, guiGraphics, mouseX, mouseY), guiGraphics);
             renderVirtualInfo(minecraft, screenRectangle, guiGraphics);
         }
+        this.inspectedBounds = null;
+        this.inspectedElement = null;
     }
 
     private ScreenRectangle renderDeepest(Minecraft minecraft, Screen screen, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
