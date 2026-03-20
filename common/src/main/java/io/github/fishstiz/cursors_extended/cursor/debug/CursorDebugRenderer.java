@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.cursor.debug;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import org.jspecify.annotations.Nullable;
@@ -19,7 +19,7 @@ public interface CursorDebugRenderer {
     default void setLastCursorAt(GuiEventListener inspected, double mouseX, double mouseY) {
     }
 
-    default void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    default void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
     }
 
     default boolean isActive() {

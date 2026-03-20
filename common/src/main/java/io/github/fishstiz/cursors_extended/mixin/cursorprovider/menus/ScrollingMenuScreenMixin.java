@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 @Mixin(value = {LoomScreen.class, StonecutterScreen.class})
 public abstract class ScrollingMenuScreenMixin {
     @ModifyArg(
-            method = "renderBg",
+            method = "extractBackground",
             slice = @Slice(from = @At(
                     value = "FIELD",
                     target = "Lcom/mojang/blaze3d/platform/cursor/CursorTypes;RESIZE_NS:Lcom/mojang/blaze3d/platform/cursor/CursorType;",
@@ -20,7 +20,7 @@ public abstract class ScrollingMenuScreenMixin {
             )),
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V",
+                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V",
                     ordinal = 0
             )
     )

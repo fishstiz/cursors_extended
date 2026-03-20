@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(AbstractScrollArea.class)
 public abstract class AbstractScrollAreaMixin {
-    @ModifyArg(method = "renderScrollbar", at = @At(
+    @ModifyArg(method = "extractScrollbar", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
     ))
     private CursorType holdResizeNs(CursorType cursorType) {
         return CursorTypeUtil.applyScrollbarConfig(cursorType);

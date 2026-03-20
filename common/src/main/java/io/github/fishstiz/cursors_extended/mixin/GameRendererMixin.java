@@ -5,7 +5,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,12 +18,13 @@ public abstract class GameRendererMixin {
     @Final
     private Minecraft minecraft;
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderDeferredSubtitles()V"))
+    @Inject(method = "extractGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractDeferredSubtitles()V"))
     private void renderCursor(
             DeltaTracker deltaTracker,
-            boolean renderLevel,
+            boolean shouldRenderLevel,
+            boolean resourcesLoaded,
             CallbackInfo ci,
-            @Local(ordinal = 0) GuiGraphics guiGraphics,
+            @Local(ordinal = 0) GuiGraphicsExtractor guiGraphics,
             @Local(ordinal = 0) int mouseX,
             @Local(ordinal = 1) int mouseY
     ) {

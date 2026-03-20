@@ -8,7 +8,7 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
@@ -24,11 +24,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreenMixin<M
         super(title);
     }
 
-    @WrapOperation(method = "renderContents", at = @At(
+    @WrapOperation(method = "extractContents", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screens/inventory/MerchantScreen$TradeOfferButton;isHoveredOrFocused()Z"
     ))
-    private boolean setCursorOnHover(@Coerce Button instance, Operation<Boolean> original, @Local(argsOnly = true) GuiGraphics guiGraphics) {
+    private boolean setCursorOnHover(@Coerce Button instance, Operation<Boolean> original, @Local(argsOnly = true) GuiGraphicsExtractor guiGraphics) {
         if (instance.isHovered()) {
             if (instance.isActive()) {
                 guiGraphics.requestCursor(CursorTypeUtil.canShift() && CursorsExtended.CONFIG.isLegacyMode()
@@ -43,9 +43,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreenMixin<M
         return original.call(instance);
     }
 
-    @ModifyArg(method = "renderScroller", at = @At(
+    @ModifyArg(method = "extractScroller", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
     ))
     private CursorType onRequestCursor(CursorType cursor) {
         return CursorTypeUtil.applyScrollbarConfig(cursor);

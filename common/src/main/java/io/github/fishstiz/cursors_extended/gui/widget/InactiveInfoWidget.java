@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui.widget;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -37,12 +37,12 @@ public class InactiveInfoWidget extends ButtonWidget {
     }
 
     @Override
-    protected void renderContents(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractContents(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.refreshPosition();
         this.refreshVisibility();
 
         if (this.active) {
-            super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
+            super.extractContents(guiGraphics, mouseX, mouseY, partialTick);
 
             int iconX = this.getX() + (this.getWidth() - ICON_SIZE) / 2;
             int iconY = this.getY() + (this.getHeight() - ICON_SIZE) / 2;

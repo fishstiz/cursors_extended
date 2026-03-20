@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.widget;
 
 import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -66,15 +66,15 @@ public class ButtonWidget extends Button.Plain {
     }
 
     @Override
-    protected void renderDefaultLabel(@NonNull ActiveTextCollector activeTextCollector) {
+    protected void extractDefaultLabel(@NonNull ActiveTextCollector activeTextCollector) {
         if (this.sprite == null) {
-            super.renderDefaultLabel(activeTextCollector);
+            super.extractDefaultLabel(activeTextCollector);
         }
     }
 
     @Override
-    protected void renderContents(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
+    protected void extractContents(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractContents(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.sprite != null) {
             int spriteWidth = Math.min(this.getWidth(), this.textureWidth);

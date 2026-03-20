@@ -4,7 +4,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -129,7 +129,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         return entry.getHeight() + BACKGROUND_PADDING_Y * 2;
     }
 
-    protected void renderSearchBackground(@NonNull GuiGraphics guiGraphics) {
+    protected void renderSearchBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
         if (!this.search.isEmpty()) {
             for (AbstractEntry entry : this.children()) {
                 if (entry.indexedLabel.contains(this.search)) {
@@ -144,7 +144,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
     }
 
-    protected void renderEntryBackground(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderEntryBackground(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         int minX = this.getX() - this.rowGap;
         int minY = this.getY() - BACKGROUND_PADDING_Y;
         int maxX = this.getRight() + SCROLLBAR_WIDTH;
@@ -168,18 +168,18 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
     }
 
     @Override
-    public void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderEntryBackground(guiGraphics, mouseX, mouseY, partialTick);
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    protected void renderListBackground(@NonNull GuiGraphics guiGraphics) {
+    protected void extractListBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
         // remove background
     }
 
     @Override
-    protected void renderListSeparators(@NonNull GuiGraphics guiGraphics) {
+    protected void extractListSeparators(@NonNull GuiGraphicsExtractor guiGraphics) {
         // remove separators
     }
 
@@ -194,9 +194,9 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void extractContent(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             for (AbstractWidget child : this.children) {
-                child.render(guiGraphics, mouseX, mouseY, partialTick);
+                child.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
             }
         }
 
@@ -226,10 +226,10 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void extractContent(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             this.widget.setSize(width, this.getHeight());
             this.widget.setPosition(this.getX(), this.getY());
-            super.renderContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
+            super.extractContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
         }
     }
 
@@ -310,7 +310,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
             this.onToggle.accept(this.value);
         }
 
-        protected void renderLabel(@NonNull GuiGraphics guiGraphics) {
+        protected void renderLabel(@NonNull GuiGraphicsExtractor guiGraphics) {
             int marginX = 0;
 
             if (this.prefix != null) {
@@ -327,7 +327,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void extractContent(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             this.button.active = this.active.getAsBoolean();
             int right = this.getRight();
 
@@ -339,7 +339,7 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
 
             this.button.setPosition(right - this.button.getWidth(), this.getY());
             this.renderLabel(guiGraphics);
-            super.renderContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
+            super.extractContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
         }
     }
 
@@ -367,16 +367,16 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         }
 
         @Override
-        protected void renderLabel(@NonNull GuiGraphics guiGraphics) {
+        protected void renderLabel(@NonNull GuiGraphicsExtractor guiGraphics) {
             // remove label
         }
 
         @Override
-        public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void extractContent(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             this.slider.setWidth(width - BUTTON_WIDTH - OptionsListWidget.this.rowGap);
             this.slider.setPosition(this.getX(), this.getY());
-            this.slider.render(guiGraphics, mouseX, mouseY, partialTick);
-            super.renderContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
+            this.slider.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+            super.extractContent(guiGraphics, mouseX, mouseY, hovered, partialTick);
         }
     }
 
@@ -385,6 +385,6 @@ public class OptionsListWidget extends AbstractListWidget<OptionsListWidget.Abst
         /**
          * @return width of prefix
          */
-        int render(@NonNull GuiGraphics guiGraphics, Font font, int x, int y, int height);
+        int render(@NonNull GuiGraphicsExtractor guiGraphics, Font font, int x, int y, int height);
     }
 }

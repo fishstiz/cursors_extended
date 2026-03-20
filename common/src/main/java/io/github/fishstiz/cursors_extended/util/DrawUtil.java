@@ -5,7 +5,7 @@ import io.github.fishstiz.cursors_extended.gui.renderstate.GuiColoredRectRenderS
 import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -18,7 +18,7 @@ public class DrawUtil {
     }
 
     public static void drawScrollableTextLeftAlign(
-            GuiGraphics context,
+            GuiGraphicsExtractor context,
             Font textRenderer,
             Component text,
             int startX,
@@ -40,15 +40,15 @@ public class DrawUtil {
             double scrollOffset = Mth.lerp(scrollFactor, 0.0, overflowWidth);
 
             context.enableScissor(startX, startY, endX, endY);
-            context.drawString(textRenderer, text, startX - (int) scrollOffset, textY, color, shadow);
+            context.text(textRenderer, text, startX - (int) scrollOffset, textY, color, shadow);
             context.disableScissor();
         } else {
-            context.drawString(textRenderer, text, startX, textY, color, shadow);
+            context.text(textRenderer, text, startX, textY, color, shadow);
         }
     }
 
     public static void drawScrollableTextLeftAlign(
-            GuiGraphics context,
+            GuiGraphicsExtractor context,
             Font textRenderer,
             Component text,
             int startX,
@@ -61,7 +61,7 @@ public class DrawUtil {
     }
 
     public static void drawCheckerboard(
-            GuiGraphics guiGraphics,
+            GuiGraphicsExtractor guiGraphics,
             int x,
             int y,
             int width,
@@ -94,21 +94,21 @@ public class DrawUtil {
         );
     }
 
-    public static void renderOutline(GuiGraphics guiGraphics, int x, int y, int width, int height, int color) {
+    public static void renderOutline(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, int color) {
         guiGraphics.fill(x, y, x + width, y + 1, color);
         guiGraphics.fill(x, y + height - 1, x + width, y + height, color);
         guiGraphics.fill(x, y + 1, x + 1, y + height - 1, color);
         guiGraphics.fill(x + width - 1, y + 1, x + width, y + height - 1, color);
     }
 
-    public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
+    public static void fill(GuiGraphicsExtractor guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
         Services.PLATFORM.guiGraphicsHelper().submitGuiElementRenderState(
                 guiGraphics,
                 new GuiColoredRectRenderState(new Matrix3x2f(guiGraphics.pose()), minX, minY, maxX, maxY, color)
         );
     }
 
-    public static void drawCursor(GuiGraphics guiGraphics, Cursor cursor, int x, int y, int size) {
+    public static void drawCursor(GuiGraphicsExtractor guiGraphics, Cursor cursor, int x, int y, int size) {
         CursorTexture texture = cursor.getTexture();
         if (texture != null) {
             int spriteWidth = texture.spriteWidth();

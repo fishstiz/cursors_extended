@@ -9,7 +9,7 @@ import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -122,15 +122,15 @@ public class ConfigurationScreen extends CatalogBrowserScreen {
     }
 
     @Override
-    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.refreshFuture != null && !this.refreshFuture.isDone()) {
             guiGraphics.requestCursor(CursorTypesExt.BUSY);
         }
     }
 
-    private int renderListCursor(GuiGraphics guiGraphics, Font font, CatalogItem item, LayoutElement bounds, int spacing, int mouseX, int mouseY, float partialTick) {
+    private int renderListCursor(GuiGraphicsExtractor guiGraphics, Font font, CatalogItem item, LayoutElement bounds, int spacing, int mouseX, int mouseY, float partialTick) {
         Cursor cursor = CursorsExtended.getInstance().getRegistry().tryGet(item.id());
 
         if (cursor != null && cursor.getTexture() != null) {

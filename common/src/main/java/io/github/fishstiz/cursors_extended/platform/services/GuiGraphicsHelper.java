@@ -1,8 +1,8 @@
 package io.github.fishstiz.cursors_extended.platform.services;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.render.state.GuiElementRenderState;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 
 public interface GuiGraphicsHelper {
-    void submitGuiElementRenderState(GuiGraphics guiGraphics, GuiElementRenderState guiElementRenderState);
+    void submitGuiElementRenderState(GuiGraphicsExtractor guiGraphics, GuiElementRenderState guiElementRenderState);
 }

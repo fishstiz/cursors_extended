@@ -17,7 +17,7 @@ dependencies {
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
     compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
-    localRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+//    localRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 loom {

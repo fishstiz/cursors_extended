@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.network.chat.Component;
@@ -21,11 +21,11 @@ public abstract class TabButtonMixin extends AbstractWidget implements CursorPro
         super(x, y, width, height, message);
     }
 
-    @WrapWithCondition(method = "renderWidget", at = @At(
+    @WrapWithCondition(method = "extractWidgetRenderState", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/TabButton;handleCursor(Lnet/minecraft/client/gui/GuiGraphics;)V"
+            target = "Lnet/minecraft/client/gui/components/TabButton;handleCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
     ))
-    private boolean shouldHandleCursor(TabButton instance, GuiGraphics guiGraphics) {
+    private boolean shouldHandleCursor(TabButton instance, GuiGraphicsExtractor guiGraphics) {
         return !instance.isSelected();
     }
 

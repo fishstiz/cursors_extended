@@ -34,9 +34,9 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         return CursorTypes.ARROW;
     }
 
-    @ModifyArg(method = "renderWidget", at = @At(
+    @ModifyArg(method = "handleCursor", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
     ))
     private CursorType setCursor(CursorType cursorType) {
         if (CursorsExtended.CONFIG.isLegacyMode()) {

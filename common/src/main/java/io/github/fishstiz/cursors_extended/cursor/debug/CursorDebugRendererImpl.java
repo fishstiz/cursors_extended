@@ -6,7 +6,7 @@ import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -43,7 +43,7 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
     }
 
     @Override
-    public void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void render(Minecraft minecraft, Supplier<@Nullable Screen> visibleScreen, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         Screen screen = visibleScreen.get();
         if (screen != null) {
             ScreenRectangle screenRectangle = getBounds(screen);
@@ -53,7 +53,7 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
         }
     }
 
-    private ScreenRectangle renderDeepest(Minecraft minecraft, Screen screen, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    private ScreenRectangle renderDeepest(Minecraft minecraft, Screen screen, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         GuiEventListener child = findDeepest(screen, mouseX, mouseY);
         GuiEventListener inspect = child != null ? child : screen;
         ScreenRectangle bounds = getBounds(inspect);
@@ -62,7 +62,7 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
         return bounds;
     }
 
-    private void renderInspected(Minecraft minecraft, ScreenRectangle container, GuiGraphics guiGraphics) {
+    private void renderInspected(Minecraft minecraft, ScreenRectangle container, GuiGraphicsExtractor guiGraphics) {
         if (inspectedBounds != null) {
             Component label = inspectedLabel.copy().append(inspectedElement);
             int index = this.inspectedBounds.top() != container.top() ? 0 : 1;
@@ -70,21 +70,21 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
         }
     }
 
-    private void renderScreenName(Minecraft minecraft, Screen screen, ScreenRectangle bounds, GuiGraphics guiGraphics) {
+    private void renderScreenName(Minecraft minecraft, Screen screen, ScreenRectangle bounds, GuiGraphicsExtractor guiGraphics) {
         Component label = screenLabel.copy().append(getClassName(screen));
         this.renderInfo(minecraft, guiGraphics, bounds, label, Position.BOTTOM_RIGHT, false);
     }
 
-    private void renderVirtualInfo(Minecraft minecraft, ScreenRectangle screenBounds, GuiGraphics guiGraphics) {
+    private void renderVirtualInfo(Minecraft minecraft, ScreenRectangle screenBounds, GuiGraphicsExtractor guiGraphics) {
         Component virtualMode = virtualModeLabel.copy().append(CursorsExtended.getInstance().getDisplay().isVirtual() ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
         renderInfo(minecraft, guiGraphics, screenBounds, virtualMode, Position.TOP_RIGHT, false);
     }
 
-    private void renderInfo(Minecraft minecraft, GuiGraphics guiGraphics, ScreenRectangle bounds, Component label, Position pos, boolean outline) {
+    private void renderInfo(Minecraft minecraft, GuiGraphicsExtractor guiGraphics, ScreenRectangle bounds, Component label, Position pos, boolean outline) {
         this.renderInfo(minecraft, guiGraphics, bounds, label, pos, 0, outline);
     }
 
-    private void renderInfo(Minecraft minecraft, GuiGraphics guiGraphics, ScreenRectangle bounds, Component label, Position pos, int index, boolean outline) {
+    private void renderInfo(Minecraft minecraft, GuiGraphicsExtractor guiGraphics, ScreenRectangle bounds, Component label, Position pos, int index, boolean outline) {
         TextColor textColor = label.getStyle().getColor();
         int color = 0xFF000000 | (textColor != null ? textColor.getValue() : 0xFFFFFFFF);
 
@@ -97,7 +97,7 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
             DrawUtil.renderOutline(guiGraphics, bounds.left(), bounds.top(), bounds.width(), bounds.height(), color);
         matrix3x2fStack.translate(TEXT_SCALE, TEXT_SCALE);
         matrix3x2fStack.scale(TEXT_SCALE, TEXT_SCALE);
-        guiGraphics.drawString(minecraft.font, label, textX, textY, color);
+        guiGraphics.text(minecraft.font, label, textX, textY, color);
         matrix3x2fStack.popMatrix();
     }
 

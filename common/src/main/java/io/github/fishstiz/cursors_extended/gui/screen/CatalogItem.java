@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.gui.screen;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
@@ -49,6 +49,6 @@ public record CatalogItem(@NonNull String id, @NonNull Component text, @Nullable
         /**
          * @return width of prefix.
          */
-        int render(GuiGraphics guiGraphics, Font font, CatalogItem item, LayoutElement bounds, int spacing, int mouseX, int mouseY, float partialTick);
+        int render(GuiGraphicsExtractor guiGraphics, Font font, CatalogItem item, LayoutElement bounds, int spacing, int mouseX, int mouseY, float partialTick);
     }
 }

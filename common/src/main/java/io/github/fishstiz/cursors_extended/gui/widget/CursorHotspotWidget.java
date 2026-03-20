@@ -9,7 +9,7 @@ import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -49,20 +49,20 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.active = !this.isOverflowing() && (this.xhotSlider.isActive() || this.yhotSlider.isActive());
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.isHovered() && this.isOverflowing()) {
             Font font = Minecraft.getInstance().font;
             int textX = this.getX() + (this.getWidth() / 2 - font.width(OVERFLOW_TEXT) / 2);
             int textY = this.getY() + (this.getHeight() / 2 - font.lineHeight / 2);
-            guiGraphics.drawString(font, OVERFLOW_TEXT, textX, textY, OVERFLOW_COLOR);
+            guiGraphics.text(font, OVERFLOW_TEXT, textX, textY, OVERFLOW_COLOR);
         }
     }
 
     @Override
-    protected void renderBackground(@NonNull GuiGraphics guiGraphics) {
+    protected void renderBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
         super.renderBackground(guiGraphics);
 
         if (!this.active) {
@@ -71,12 +71,12 @@ public class CursorHotspotWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderCursor(@NonNull GuiGraphics guiGraphics, @NonNull Cursor cursor) {
+    protected void renderCursor(@NonNull GuiGraphicsExtractor guiGraphics, @NonNull Cursor cursor) {
         DrawUtil.drawCursor(guiGraphics, cursor, this.getX(), this.getY(), this.getWidth());
     }
 
     @Override
-    protected void renderRuler(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderRuler(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         if (this.isOverflowing()) return;
 
         boolean isGlobalX = CONFIG.getGlobal().isXHotActive();

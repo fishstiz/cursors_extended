@@ -4,7 +4,7 @@ import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -43,12 +43,12 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         this(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT, message, cursor, background128);
     }
 
-    protected void renderCursor(@NonNull GuiGraphics guiGraphics, @NonNull Cursor cursor) {
+    protected void renderCursor(@NonNull GuiGraphicsExtractor guiGraphics, @NonNull Cursor cursor) {
     }
 
-    protected abstract void renderRuler(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY);
+    protected abstract void renderRuler(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY);
 
-    protected void renderBackground(@NonNull GuiGraphics guiGraphics) {
+    protected void renderBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
         if (!this.isOverflowing()) {
             DrawUtil.drawCheckerboard(
                     guiGraphics,
@@ -64,13 +64,13 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
         }
     }
 
-    protected void renderBorder(@NonNull GuiGraphics guiGraphics) {
+    protected void renderBorder(@NonNull GuiGraphicsExtractor guiGraphics) {
         int color = this.isFocused() && this.active ? FOCUSED_BORDER_COLOR : BORDER_COLOR;
         DrawUtil.renderOutline(guiGraphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), color);
     }
 
     @Override
-    protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.cursor.hasTexture()) {
             this.renderBackground(guiGraphics);
             this.renderCursor(guiGraphics, this.cursor);

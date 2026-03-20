@@ -10,7 +10,7 @@ import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -578,7 +578,7 @@ public abstract class CatalogBrowserScreen extends Screen {
             return null;
         }
 
-        private void renderSlidingBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        private void renderSlidingBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.hoveredBackground.render(guiGraphics, this.getEntryAtPosition(mouseX, mouseY), partialTick);
             this.selectedBackground.render(guiGraphics, this.getEntryFromItem(this.selectedItem), partialTick);
             this.focusedBackground.render(guiGraphics, this.getFocused(), partialTick);
@@ -592,9 +592,9 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public void renderListItems(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void extractListItems(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderSlidingBackground(guiGraphics, mouseX, mouseY, partialTick);
-            super.renderListItems(guiGraphics, mouseX, mouseY, partialTick);
+            super.extractListItems(guiGraphics, mouseX, mouseY, partialTick);
         }
 
         @Override
@@ -631,10 +631,10 @@ public abstract class CatalogBrowserScreen extends Screen {
             }
 
             @Override
-            public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            public void extractContent(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
                 this.button.setSize(this.getWidth(), this.getHeight());
                 this.button.setPosition(this.getX(), this.getY());
-                this.button.render(guiGraphics, mouseX, mouseY, partialTick);
+                this.button.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
             }
 
             @Override
@@ -729,7 +729,7 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        protected void renderContents(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void extractContents(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             int prefixWidth = this.item.prefix() != null
                     ? this.item.prefix().render(guiGraphics, this.font, this.item, this, this.spacing, mouseX, mouseY, partialTick)
                     : 0;
@@ -871,9 +871,9 @@ public abstract class CatalogBrowserScreen extends Screen {
         }
 
         @Override
-        public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             for (Renderable renderable : this.renderables) {
-                renderable.render(guiGraphics, mouseX, mouseY, partialTick);
+                renderable.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
             }
         }
 

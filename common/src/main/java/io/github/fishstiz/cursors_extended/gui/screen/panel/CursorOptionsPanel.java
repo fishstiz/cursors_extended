@@ -10,9 +10,8 @@ import io.github.fishstiz.cursors_extended.gui.MouseEvent;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
-import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -347,8 +346,8 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.scaling) {
             guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.cursor.cursorType()));
@@ -378,12 +377,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         }
 
         @Override
-        protected void renderListBackground(@NonNull GuiGraphics guiGraphics) {
+        protected void extractListBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
             // remove background
         }
 
         @Override
-        protected void renderListSeparators(@NonNull GuiGraphics guiGraphics) {
+        protected void extractListSeparators(@NonNull GuiGraphicsExtractor guiGraphics) {
             // remove separators
         }
 
@@ -398,7 +397,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             this.clampScrollAmount();
         }
 
-        protected void renderSlidingBackground(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderSlidingBackground(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             int paddingX = this.rowGap;
 
             int minX = this.getX() - paddingX;
@@ -422,9 +421,9 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
         }
 
         @Override
-        public void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderSlidingBackground(guiGraphics, mouseX, mouseY, partialTick);
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+            super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
         }
 
         private class Entry extends AbstractListWidget<Entry>.Entry implements Layout {
@@ -443,12 +442,12 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             }
 
             @Override
-            public void renderContent(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            public void extractContent(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
                 this.optionWidget.setPosition(this.getX(), this.getY());
-                this.optionWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+                this.optionWidget.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
                 if (this.decoration != null) {
-                    this.decoration.render(guiGraphics, mouseX, mouseY, partialTick);
+                    this.decoration.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
                 }
             }
 

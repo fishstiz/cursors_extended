@@ -6,7 +6,7 @@ import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
@@ -43,7 +43,7 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderBackground(@NonNull GuiGraphics guiGraphics) {
+    protected void renderBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
         super.renderBackground(guiGraphics);
 
         if (this.isOverflowing()) {
@@ -52,7 +52,7 @@ public class CursorPreviewWidget extends CursorWidget {
     }
 
     @Override
-    protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         Cursor cursor = this.getCursor();
 
         if (cursor.hasTexture()) {
@@ -72,7 +72,7 @@ public class CursorPreviewWidget extends CursorWidget {
         if (this.isHovered()) guiGraphics.requestCursor(this.cursors_extended$cursorType(mouseX, mouseY));
     }
 
-    protected void renderPreviewText(@NonNull GuiGraphics guiGraphics) {
+    protected void renderPreviewText(@NonNull GuiGraphicsExtractor guiGraphics) {
         int width = this.font.width(PREVIEW_TEXT);
         int endX = this.getRight() - PREVIEW_TEXT_OFFSET;
         int endY = this.getBottom() - PREVIEW_TEXT_OFFSET;
@@ -81,20 +81,20 @@ public class CursorPreviewWidget extends CursorWidget {
         DrawUtil.drawScrollableTextLeftAlign(guiGraphics, this.font, PREVIEW_TEXT, startX, startY, endX, endY, PREVIEW_TEXT_COLOR, false);
     }
 
-    protected void renderTestButton(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderTestButton(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.button != null) {
             int buttonX = this.getX() + (this.getWidth() / 2 - this.button.getWidth() / 2);
             int buttonY = this.getY() + (this.getHeight() / 2 - this.button.getHeight() / 2);
             this.button.setPosition(buttonX, buttonY);
-            this.button.render(guiGraphics, mouseX, mouseY, partialTick);
+            this.button.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
     @Override
-    protected void renderRuler(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderRuler(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         if (this.isRenderRuler() && this.isMouseOver(mouseX, mouseY)) {
-            guiGraphics.hLine(this.getX(), this.getRight() - 1, mouseY, RULER_COLOR);
-            guiGraphics.vLine(mouseX, getY(), this.getBottom(), RULER_COLOR);
+            guiGraphics.horizontalLine(this.getX(), this.getRight() - 1, mouseY, RULER_COLOR);
+            guiGraphics.verticalLine(mouseX, getY(), this.getBottom(), RULER_COLOR);
         }
     }
 

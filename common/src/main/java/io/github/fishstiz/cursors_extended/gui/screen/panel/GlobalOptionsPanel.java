@@ -16,7 +16,7 @@ import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
@@ -295,8 +295,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     @Override
-    public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.scaling) {
             guiGraphics.requestCursor(CursorTypeUtil.arrowIfDefault(this.currentCursor.cursorType()));
@@ -314,7 +314,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
         }
 
         @Override
-        protected void renderWidget(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.renderBackground(guiGraphics);
             this.renderPreviewText(guiGraphics);
             this.renderTestButton(guiGraphics, mouseX, mouseY, partialTick);

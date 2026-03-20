@@ -6,7 +6,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
@@ -19,7 +19,7 @@ public sealed interface CursorRenderer {
 
     void resetCursor(Window window);
 
-    void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY);
+    void render(Window window, Minecraft minecraft, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY);
 
     default Cursor getCurrentCursor(Window window) {
         return registry().get(window.currentCursor);
@@ -37,7 +37,7 @@ public sealed interface CursorRenderer {
         }
 
         @Override
-        public void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        public void render(Window window, Minecraft minecraft, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
             // no-op
         }
     }
@@ -96,7 +96,7 @@ public sealed interface CursorRenderer {
         }
 
         @Override
-        public void render(Window window, Minecraft minecraft, GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        public void render(Window window, Minecraft minecraft, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
             if (!minecraft.mouseHandler.isMouseGrabbed()) {
                 if (this.textureLocation != null) {
                     int guiScale = minecraft.getWindow().getGuiScale();

@@ -18,9 +18,9 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreenMixin<Cr
         super(title);
     }
 
-    @ModifyArg(method = "renderSlot", at = @At(
+    @ModifyArg(method = "extractSlot", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;requestCursor(Lcom/mojang/blaze3d/platform/cursor/CursorType;)V"
     ))
     private CursorType onRequestCursor(
             CursorType cursorType,
