@@ -92,13 +92,14 @@ public class NativeImageUtil {
 
         ByteBuffer pixels = null;
         NativeImage scaledImage = null;
+        GLFWImage glfwImage = null;
 
         try {
             if (scale != 1) {
                 scaledImage = NativeImageUtil.scaleImage(image, trueScale);
             }
 
-            GLFWImage glfwImage = GLFWImage.create();
+            glfwImage = GLFWImage.malloc();
             NativeImage validImage = scaledImage != null ? scaledImage : image;
 
             pixels = MemoryUtil.memAlloc(validImage.getWidth() * validImage.getHeight() * 4);
@@ -118,6 +119,9 @@ public class NativeImageUtil {
             }
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
+            }
+            if (glfwImage != null) {
+                glfwImage.free();
             }
         }
     }

@@ -2,6 +2,7 @@ package io.github.fishstiz.cursors_extended.platform;
 
 import io.github.fishstiz.cursors_extended.platform.services.GuiGraphicsHelper;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 
 class NeoForgeGuiGraphicsHelper implements GuiGraphicsHelper {
@@ -10,5 +11,10 @@ class NeoForgeGuiGraphicsHelper implements GuiGraphicsHelper {
     @Override
     public void submitGuiElementRenderState(GuiGraphicsExtractor guiGraphics, GuiElementRenderState guiElementRenderState) {
         guiGraphics.submitGuiElementRenderState(guiElementRenderState);
+    }
+
+    @Override
+    public ScreenRectangle peekScissorStack(GuiGraphicsExtractor guiGraphics) {
+        return guiGraphics.peekScissorStack();
     }
 }

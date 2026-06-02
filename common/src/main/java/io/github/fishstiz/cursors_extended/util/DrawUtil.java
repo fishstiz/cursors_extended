@@ -104,7 +104,7 @@ public class DrawUtil {
     public static void fill(GuiGraphicsExtractor guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
         Services.PLATFORM.guiGraphicsHelper().submitGuiElementRenderState(
                 guiGraphics,
-                new GuiColoredRectRenderState(new Matrix3x2f(guiGraphics.pose()), minX, minY, maxX, maxY, color)
+                GuiColoredRectRenderState.create(guiGraphics, minX, minY, maxX, maxY, color)
         );
     }
 
