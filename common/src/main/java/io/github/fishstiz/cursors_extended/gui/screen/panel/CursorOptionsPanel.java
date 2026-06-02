@@ -397,6 +397,11 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             this.clampScrollAmount();
         }
 
+        @Override
+        public void removeChildren() {
+            clearEntries();
+        }
+
         protected void renderSlidingBackground(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
             int paddingX = this.rowGap;
 
@@ -474,6 +479,10 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
             @Override
             public void arrangeElements() {
                 this.optionWidget.setWidth(this.getWidth());
+            }
+
+            @Override
+            public void removeChildren() {
             }
         }
     }

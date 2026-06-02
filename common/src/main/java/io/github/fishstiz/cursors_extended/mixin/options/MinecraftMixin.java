@@ -22,7 +22,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "<init>", at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderSystem;initBackendSystem(Lcom/mojang/blaze3d/platform/BackendOptions;)Lnet/minecraft/util/TimeSource$NanoTimeSource;",
+            target = "Lcom/mojang/blaze3d/systems/RenderSystem;initBackendSystem()Lnet/minecraft/util/TimeSource$NanoTimeSource;",
             shift = At.Shift.AFTER,
             unsafe = true
     ))

@@ -7,25 +7,25 @@ import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.TabButton;
+import net.minecraft.client.gui.components.tabs.MenuTabBar;
+import net.minecraft.client.gui.components.tabs.Tab;
+import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(TabButton.class)
-public abstract class TabButtonMixin extends AbstractWidget implements CursorProvider {
-    @Shadow
-    public abstract boolean isSelected();
-
-    protected TabButtonMixin(int x, int y, int width, int height, Component message) {
-        super(x, y, width, height, message);
+@Mixin(MenuTabBar.MenuTabButton.class)
+public abstract class TabButtonMixin extends TabButton implements CursorProvider {
+    public TabButtonMixin(TabManager tabManager, Tab tab, int width, int height) {
+        super(tabManager, tab, width, height);
     }
 
     @WrapWithCondition(method = "extractWidgetRenderState", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/TabButton;handleCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
+            target = "Lnet/minecraft/client/gui/components/tabs/MenuTabBar$MenuTabButton;handleCursor(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
     ))
-    private boolean shouldHandleCursor(TabButton instance, GuiGraphicsExtractor guiGraphics) {
+    private boolean shouldHandleCursor(MenuTabBar.MenuTabButton instance, GuiGraphicsExtractor graphics) {
         return !instance.isSelected();
     }
 

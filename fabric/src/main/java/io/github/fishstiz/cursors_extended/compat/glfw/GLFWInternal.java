@@ -4,13 +4,11 @@ import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
-import java.util.Map;
-
 public class GLFWInternal {
     private static final ThreadLocal<Boolean> IS_CREATE_STANDARD_CURSOR = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> IS_CREATE_CURSOR = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> IS_SET_CURSOR = new ThreadLocal<>();
-    private static final Map<Long, Long> REENTRY_CURSORS = new Long2LongOpenHashMap();
+    private static final Long2LongOpenHashMap REENTRY_CURSORS = new Long2LongOpenHashMap();
 
     private GLFWInternal() {
     }

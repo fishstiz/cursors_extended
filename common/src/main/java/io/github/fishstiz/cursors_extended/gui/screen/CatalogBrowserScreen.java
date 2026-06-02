@@ -117,7 +117,7 @@ public abstract class CatalogBrowserScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.previous);
+        this.minecraft.gui.setScreen(this.previous);
     }
 
     @Override

@@ -59,8 +59,7 @@ public abstract class AbstractOptionsPanel extends CatalogBrowserScreen.ContentP
         if (CursorsExtended.getInstance().getLoader().loadTexture(deferredCursor)) {
             return true;
         }
-        Minecraft.getInstance().getToastManager().addToast(SystemToast.multiline(
-                Minecraft.getInstance(),
+        Minecraft.getInstance().gui.toastManager().addToast(new SystemToast(
                 SystemToast.SystemToastId.PACK_LOAD_FAILURE,
                 Component.translatable("resourcePack.load_fail"),
                 Component.translatable("cursors_extended.options.global.deferred_loading.fail", deferredCursor.text())

@@ -104,7 +104,7 @@ public abstract class WindowMixin implements WindowCursor {
         if (CursorsExtended.CONFIG.isLegacyMode()) {
             Window self = (Window) (Object) this;
             Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.getWindow() != self || (minecraft.getOverlay() != null && minecraft.getOverlay().isPauseScreen())) {
+            if (minecraft.getWindow() != self || (minecraft.gui.overlay() != null && minecraft.gui.overlay().isPausing())) {
                 return requestedCursor;
             }
 

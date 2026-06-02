@@ -78,7 +78,7 @@ public class CursorDisplay {
     }
 
     public @Nullable Screen getVisibleScreen() {
-        Screen screen = minecraft.screen;
+        Screen screen = minecraft.gui.screen();
         return screen != null ? screen : visibleScreen;
     }
 

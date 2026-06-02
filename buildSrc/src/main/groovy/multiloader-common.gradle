@@ -13,14 +13,13 @@ repositories {
         }
         filter { includeGroupAndSubgroups('org.spongepowered') }
     }
-    exclusiveContent {
-        forRepositories(
-                maven {
-                    name = 'ParchmentMC'
-                    url = 'https://maven.parchmentmc.org/'
-                }
-        )
-        filter { includeGroup('org.parchmentmc.data') }
+    maven {
+        name = "Maven for PR #3198" // https://github.com/neoforged/NeoForge/pull/3198
+        url = uri("https://prmaven.neoforged.net/NeoForge/pr3198")
+        content {
+            includeModule("net.neoforged", "neoforge")
+            includeModule("net.neoforged", "testframework")
+        }
     }
 }
 

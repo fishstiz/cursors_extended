@@ -25,14 +25,11 @@ public abstract class MouseOptionsScreenMixin extends OptionsSubScreen {
         }
 
         Button settingsBtn = Button.builder(
-                Component.translatable("cursors_extended.options").append("..."),
-                btn -> {
-                    if (this.minecraft != null) {
-                        this.minecraft.setScreen(new ConfigurationScreen(this));
-                    }
-                }).build();
+                        Component.translatable("cursors_extended.options").append("..."),
+                        _ -> minecraft.gui.setScreen(new ConfigurationScreen(this)))
+                .build();
 
-        Button fillerBtn = Button.builder(Component.empty(), button -> {
+        Button fillerBtn = Button.builder(Component.empty(), _ -> {
         }).build();
         fillerBtn.visible = false;
         fillerBtn.active = false;
