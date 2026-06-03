@@ -1,6 +1,9 @@
+import me.modmuss50.mpp.ReleaseType
+
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
+    id 'me.modmuss50.mod-publish-plugin'
 }
 
 neoForge {
@@ -66,3 +69,32 @@ processResources {
         delete "${sourceSets.main.output.resourcesDir}/${mod_id}.classtweaker"
     }
 }
+
+publishMods {
+    dryRun = Boolean.valueOf(dry_run)
+    type = ReleaseType.of(release_type)
+    changelog = rootProject.file("CHANGELOG.md").text
+    file = jar.archiveFile
+    additionalFiles.from(sourcesJar.archiveFile)
+    displayName = "NeoForge v${this.version}"
+    modLoaders.add("neoforge")
+
+    github {
+        parent rootProject.tasks.named("publishGithub")
+        accessToken = findProperty("GITHUB_TOKEN") ?: ""
+    }
+
+    modrinth {
+        accessToken = findProperty("MODRINTH_TOKEN") ?: ""
+        minecraftVersions.addAll(modrinth_versions.split(','))
+        projectId = modrinth_id
+    }
+
+    curseforge {
+        accessToken = findProperty("CURSEFORGE_TOKEN") ?: ""
+        projectId = curseforge_id
+        minecraftVersions.addAll(curseforge_versions.split(','))
+        client = true
+    }
+}
+
