@@ -1,2 +1,1 @@
-- Port to 26.1
-- Made legacy mode cursor detection stricter 
+- Port to 26.2
