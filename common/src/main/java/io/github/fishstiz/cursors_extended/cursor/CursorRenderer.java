@@ -9,8 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-
-import static org.lwjgl.glfw.GLFW.*;
+import org.lwjgl.sdl.SDLMouse;
 
 public sealed interface CursorRenderer {
     CursorRegistry registry();
@@ -28,7 +27,7 @@ public sealed interface CursorRenderer {
     record Native(CursorRegistry registry) implements CursorRenderer {
         @Override
         public void applyCursor(Window window) {
-            getCurrentCursor(window).cursorType().select(window);
+            getCurrentCursor(window).cursorType().select();
         }
 
         @Override
@@ -67,7 +66,7 @@ public sealed interface CursorRenderer {
         @Override
         public void applyCursor(Window window) {
             Cursor cursor = getCurrentCursor(window);
-            cursor.cursorType().select(window);
+            cursor.cursorType().select();
 
             CursorTexture texture = cursor.getTexture();
             if (texture == null || cursor.isCustom() || !CursorsExtended.CONFIG.getOrCreateSettings(cursor).enabled()) {
@@ -91,7 +90,7 @@ public sealed interface CursorRenderer {
 
         @Override
         public void resetCursor(Window window) {
-            glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            SDLMouse.SDL_SetWindowRelativeMouseMode(window.handle(), false);
             this.textureLocation = null;
         }
 
@@ -105,7 +104,7 @@ public sealed interface CursorRenderer {
                     int x = mouseX - Math.round(this.xhot / guiScale);
                     int y = mouseY - Math.round(this.yhot / guiScale);
 
-                    glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+                    SDLMouse.SDL_SetWindowRelativeMouseMode(window.handle(), true);
 
                     guiGraphics.nextStratum();
                     guiGraphics.blit(
@@ -118,7 +117,7 @@ public sealed interface CursorRenderer {
                             this.textureWidth, this.textureHeight
                     );
                 } else {
-                    glfwSetInputMode(window.handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    resetCursor(window);
                 }
             }
         }

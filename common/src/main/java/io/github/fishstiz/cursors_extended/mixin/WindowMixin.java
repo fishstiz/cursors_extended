@@ -12,6 +12,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.compat.CursorStateTracker;
 import io.github.fishstiz.cursors_extended.compat.WindowCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
 import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
@@ -68,12 +69,13 @@ public abstract class WindowMixin implements WindowCursor {
 
     @WrapOperation(method = "selectCursor", at = @At(
             value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/platform/cursor/CursorType;select(Lcom/mojang/blaze3d/platform/Window;)V"
+            target = "Lcom/mojang/blaze3d/platform/cursor/CursorType;select()V"
     ))
-    private void onSelect(CursorType instance, Window window, Operation<Void> original) {
+    private void onSelect(CursorType instance, Operation<Void> original) {
         Cursor cursor = CursorsExtended.getInstance().getRegistry().get(instance);
         cursors_extended$currentCursorHandle = cursor.handle();
-        CursorsExtended.getInstance().getDisplay().applyCursor(window);
+        CursorDisplay cursorDisplay = CursorsExtended.getInstance().getDisplay();
+        cursorDisplay.applyCursor(cursorDisplay.getWindow());
     }
 
     @Override

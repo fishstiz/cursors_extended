@@ -37,21 +37,22 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
-            return null;
-        }
-
-        if (!CursorsExtended.CONFIG.isWorkaroundsEnabled()) {
-            CursorsExtended.LOGGER.info("[cursors_extended] Compatibility workarounds disabled by config.");
-            return null;
-        }
-
-        if (FabricLauncherBase.getLauncher().isClassLoaded("org.lwjgl.glfw.GLFW")) {
-            CursorsExtended.LOGGER.warn("[cursors_extended] GLFW has been loaded early, unable to apply compatibility workarounds.");
-            return null;
-        }
-
-        return List.of("compat.glfw.GLFWMixin", "compat.glfw.internal.CursorTypeMixin", "compat.glfw.internal.NativeImageUtilMixin");
+//        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
+//            return null;
+//        }
+//
+//        if (!CursorsExtended.CONFIG.isWorkaroundsEnabled()) {
+//            CursorsExtended.LOGGER.info("[cursors_extended] Compatibility workarounds disabled by config.");
+//            return null;
+//        }
+//
+//        if (FabricLauncherBase.getLauncher().isClassLoaded("org.lwjgl.glfw.GLFW")) {
+//            CursorsExtended.LOGGER.warn("[cursors_extended] GLFW has been loaded early, unable to apply compatibility workarounds.");
+//            return null;
+//        }
+//
+//        return List.of("compat.glfw.GLFWMixin", "compat.glfw.internal.CursorTypeMixin", "compat.glfw.internal.NativeImageUtilMixin");
+        return null;
     }
 
     @Override

@@ -4,8 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.mixin.util.NativeImageAccess;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.sdl.*;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -13,6 +12,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+
+import static org.lwjgl.sdl.SDLError.SDL_GetError;
 
 public class NativeImageUtil {
     private NativeImageUtil() {
@@ -92,24 +93,32 @@ public class NativeImageUtil {
 
         ByteBuffer pixels = null;
         NativeImage scaledImage = null;
-        GLFWImage glfwImage = null;
+        SDL_Surface surface = null;
 
         try {
             if (scale != 1) {
                 scaledImage = NativeImageUtil.scaleImage(image, trueScale);
             }
 
-            glfwImage = GLFWImage.malloc();
             NativeImage validImage = scaledImage != null ? scaledImage : image;
 
             pixels = MemoryUtil.memAlloc(validImage.getWidth() * validImage.getHeight() * 4);
             NativeImageUtil.writePixelsRGBA(validImage, pixels);
 
-            glfwImage.set(validImage.getWidth(), validImage.getHeight(), pixels);
+            surface = SDLSurface.SDL_CreateSurfaceFrom(
+                    validImage.getWidth(),
+                    validImage.getHeight(),
+                    SDLPixels.SDL_PIXELFORMAT_RGBA32,
+                    pixels,
+                    validImage.getWidth() * 4
+            );
+            if (surface == null) {
+                throw new IOException("Could not create SDL Surface for cursor: " + SDL_GetError());
+            }
 
-            long handle = GLFW.glfwCreateCursor(glfwImage, scaledXHot, scaledYHot);
+            long handle = SDLMouse.SDL_CreateColorCursor(surface, scaledXHot, scaledYHot);
             if (handle == MemoryUtil.NULL) {
-                throw new IOException("Could not create GLFW Cursor");
+                throw new IOException("Could not create SDL Cursor: " + SDL_GetError());
             }
 
             return handle;
@@ -117,11 +126,11 @@ public class NativeImageUtil {
             if (scaledImage != null) {
                 scaledImage.close();
             }
+            if (surface != null) {
+                SDLSurface.SDL_DestroySurface(surface);
+            }
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
-            }
-            if (glfwImage != null) {
-                glfwImage.free();
             }
         }
     }

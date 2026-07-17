@@ -2,7 +2,6 @@ package io.github.fishstiz.cursors_extended.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
@@ -21,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CursorType.class)
 public abstract class CursorTypeMixin implements TexturedCursorType {
     @Shadow
-    public abstract void select(Window window);
+    public abstract void select();
 
     @Unique
     private CursorTexture cursors_extended$texture;
@@ -50,7 +49,7 @@ public abstract class CursorTypeMixin implements TexturedCursorType {
 
         CursorDisplay cursorDisplay = CursorsExtended.getInstance().getDisplay();
         if (cursorDisplay.getDisplayedCursor() == cursors_extended$getKey()) {
-            select(cursorDisplay.getWindow());
+            select();
         }
 
         if (previousTexture != null && previousTexture != texture) {
