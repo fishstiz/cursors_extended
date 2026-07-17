@@ -66,12 +66,12 @@ publishMods {
         requires("fabric-api")
     }
 
-    curseforge {
-        accessToken = findProperty("CURSEFORGE_TOKEN") ?: ""
-        projectId = curseforge_id
-        minecraftVersions.addAll(curseforge_versions.split(','))
-        client = true
-        requires("fabric-api")
-    }
+//    curseforge {
+//        accessToken = findProperty("CURSEFORGE_TOKEN") ?: ""
+//        projectId = curseforge_id
+//        minecraftVersions.addAll(curseforge_versions.split(','))
+//        client = true
+//        requires("fabric-api")
+//    }
 }
 
