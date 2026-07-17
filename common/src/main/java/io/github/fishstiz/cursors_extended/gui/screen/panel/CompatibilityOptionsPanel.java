@@ -2,7 +2,10 @@ package io.github.fishstiz.cursors_extended.gui.screen.panel;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
+import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
+import io.github.fishstiz.cursors_extended.resource.CursorTextureLoader;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
@@ -15,6 +18,8 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
     private static final Tooltip AGGRESSIVE_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.aggressive_cursor.info"));
     private static final Component VIRTUAL_TEXT = Component.translatable("cursors_extended.options.compat.virtual_mode");
     private static final Tooltip VIRTUAL_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.virtual_mode.info"));
+    private static final Component NATIVE_ANIMATED_CURSORS_TEXT = Component.translatable("cursors_extended.options.compat.native_animated_cursors");
+    private static final Tooltip NATIVE_ANIMATED_CURSORS_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.native_animated_cursors.info"));
     private static final Component REMAP_TEXT = Component.translatable("cursors_extended.options.compat.remap_cursors");
     private static final Tooltip REMAP_INFO = Tooltip.create(Component.translatable("cursors_extended.options.compat.remap_cursors.info"));
     private static final Component WORKAROUNDS_TEXT = Component.translatable("cursors_extended.options.compat.workarounds");
@@ -70,6 +75,25 @@ public class CompatibilityOptionsPanel extends AbstractOptionsPanel {
                 this.index(VIRTUAL_TEXT),
                 VIRTUAL_INFO,
                 true
+        );
+        this.optionsList.addToggle(
+                CONFIG.shouldAnimateCursorsNatively(),
+                defaults.shouldAnimateCursorsNatively(),
+                value -> {
+                    CONFIG.setNativeAnimatedCursors(value);
+
+                    CursorTextureLoader textureLoader = CursorsExtended.getInstance().getLoader();
+                    for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getCursors()) {
+                        CursorTexture cursorTexture = cursor.getTexture();
+                        if (cursorTexture != null && (cursor.isCustom() || cursor.isTextureEnabled()) &&
+                            cursorTexture.metadata().animation() != null) {
+                            textureLoader.loadTexture(cursor);
+                        }
+                    }
+                },
+                this.index(NATIVE_ANIMATED_CURSORS_TEXT),
+                NATIVE_ANIMATED_CURSORS_INFO,
+                () -> !CONFIG.isVirtualMode()
         );
         this.optionsList.addToggle(
                 CONFIG.isLegacyMode(),

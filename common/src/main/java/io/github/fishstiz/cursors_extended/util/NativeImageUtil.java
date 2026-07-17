@@ -4,6 +4,11 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.mixin.util.NativeImageAccess;
+import io.github.fishstiz.cursors_extended.resource.texture.*;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.SharedConstants;
 import org.lwjgl.sdl.*;
 import org.lwjgl.system.MemoryUtil;
 
@@ -12,8 +17,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
-
-import static org.lwjgl.sdl.SDLError.SDL_GetError;
+import java.util.List;
 
 public class NativeImageUtil {
     private NativeImageUtil() {
@@ -96,10 +100,7 @@ public class NativeImageUtil {
         SDL_Surface surface = null;
 
         try {
-            if (scale != 1) {
-                scaledImage = NativeImageUtil.scaleImage(image, trueScale);
-            }
-
+            if (scale != 1) scaledImage = NativeImageUtil.scaleImage(image, trueScale);
             NativeImage validImage = scaledImage != null ? scaledImage : image;
 
             pixels = MemoryUtil.memAlloc(validImage.getWidth() * validImage.getHeight() * 4);
@@ -113,12 +114,12 @@ public class NativeImageUtil {
                     validImage.getWidth() * 4
             );
             if (surface == null) {
-                throw new IOException("Could not create SDL Surface for cursor: " + SDL_GetError());
+                throw new IOException("Failed to create SDL Surface for cursor: " + SDLError.SDL_GetError());
             }
 
             long handle = SDLMouse.SDL_CreateColorCursor(surface, scaledXHot, scaledYHot);
             if (handle == MemoryUtil.NULL) {
-                throw new IOException("Could not create SDL Cursor: " + SDL_GetError());
+                throw new IOException("Failed to create SDL Cursor: " + SDLError.SDL_GetError());
             }
 
             return handle;
@@ -131,6 +132,116 @@ public class NativeImageUtil {
             }
             if (pixels != null) {
                 MemoryUtil.memFree(pixels);
+            }
+        }
+    }
+
+    public static long createAnimatedCursor(
+            NativeImage image,
+            AnimationMode mode,
+            List<AnimatedCursorFrame> frames,
+            CursorProperties settings
+    ) throws IOException, OSUnsupportedException {
+        if (mode.random()) {
+            throw new OSUnsupportedException("Random animation modes are not supported by native animated cursors.");
+        }
+
+        float scale = SettingsUtil.sanitizeScale(settings.scale());
+        int xhot = SettingsUtil.sanitizeHotspot(settings.xhot(), image.getWidth());
+        int yhot = SettingsUtil.sanitizeHotspot(settings.yhot(), image.getHeight());
+
+        float trueScale = SettingsUtil.getAutoScale(scale);
+        int scaledXHot = scale == 1 ? xhot : Math.round(xhot * trueScale);
+        int scaledYHot = scale == 1 ? yhot : Math.round(yhot * trueScale);
+
+        List<AnimatedCursorFrame> sortedFrames = new ObjectArrayList<>(frames.size());
+        switch (mode) {
+            case LOOP,
+                 LOOP_REVERSE,
+                 FORWARDS,
+                 REVERSE -> sortedFrames.addAll(frames);
+            case OSCILLATE -> {
+                sortedFrames.addAll(frames);
+                for (int i = frames.size() - 2; i > 0; i--) {
+                    sortedFrames.add(frames.get(i));
+                }
+            }
+            default ->
+                    throw new OSUnsupportedException("Unsupported animation mode for native animated cursor " + mode);
+        }
+        int frameCount = sortedFrames.size();
+
+        NativeImage scaledImage = null;
+        ByteBuffer pixels = null;
+        Int2ObjectMap<SDL_Surface> surfaces = new Int2ObjectOpenHashMap<>();
+        SDL_CursorFrameInfo.Buffer frameBuffer = null;
+
+        try {
+            if (scale != 1) scaledImage = NativeImageUtil.scaleImage(image, trueScale);
+            NativeImage validImage = scaledImage != null ? scaledImage : image;
+
+            int pitch = validImage.getWidth() * 4;
+            pixels = MemoryUtil.memAlloc(validImage.getWidth() * validImage.getHeight() * 4);
+            NativeImageUtil.writePixelsRGBA(validImage, pixels);
+
+            frameBuffer = SDL_CursorFrameInfo.malloc(frameCount);
+
+            for (int i = 0; i < frameCount; i++) {
+                AnimatedCursorFrame frame = sortedFrames.get(i);
+                int duration = mode.oneShot() && i == frameCount - 1 ? 0 : frame.duration() * SharedConstants.MILLIS_PER_TICK;
+                int vOffset = frame.spriteVOffset();
+
+                SDL_Surface surface = surfaces.get(vOffset);
+                if (surface == null) {
+                    int scaledFrameWidth = scale == 1 ? frame.spriteWidth() : Math.round(frame.spriteWidth() * trueScale);
+                    int scaledFrameHeight = scale == 1 ? frame.spriteHeight() : Math.round(frame.spriteHeight() * trueScale);
+
+                    int yOffset = scale == 1 ? vOffset : Math.round(vOffset * trueScale);
+                    long pixelPointer = MemoryUtil.memAddress(pixels) + (long) yOffset * pitch;
+                    ByteBuffer frameSlice = MemoryUtil.memByteBuffer(pixelPointer, pitch * scaledFrameHeight);
+                    surface = SDLSurface.SDL_CreateSurfaceFrom(
+                            scaledFrameWidth,
+                            scaledFrameHeight,
+                            SDLPixels.SDL_PIXELFORMAT_RGBA32,
+                            frameSlice,
+                            pitch
+                    );
+                    if (surface == null) {
+                        throw new IOException("Failed to create SDL Surface for animated cursor frame: " + SDLError.SDL_GetError());
+                    }
+                    surfaces.put(vOffset, surface);
+                }
+
+                frameBuffer.get(i).surface(surface).duration(duration);
+            }
+
+            AnimatedCursorFrame firstFrame = sortedFrames.getFirst();
+            int hotFrameWidth = scale == 1 ? firstFrame.spriteWidth() : Math.round(firstFrame.spriteWidth() * trueScale);
+            int hotFrameHeight = scale == 1 ? firstFrame.spriteHeight() : Math.round(firstFrame.spriteHeight() * trueScale);
+
+            long handle = SDLMouse.SDL_CreateAnimatedCursor(
+                    frameBuffer,
+                    Math.min(scaledXHot, hotFrameWidth - 1),
+                    Math.min(scaledYHot, hotFrameHeight - 1)
+            );
+
+            if (handle == MemoryUtil.NULL) {
+                throw new IOException("Failed to create native animated cursor: " + SDLError.SDL_GetError());
+            }
+
+            return handle;
+        } finally {
+            if (frameBuffer != null) {
+                frameBuffer.free();
+            }
+            for (SDL_Surface surface : surfaces.values()) {
+                SDLSurface.SDL_DestroySurface(surface);
+            }
+            if (pixels != null) {
+                MemoryUtil.memFree(pixels);
+            }
+            if (scaledImage != null) {
+                scaledImage.close();
             }
         }
     }

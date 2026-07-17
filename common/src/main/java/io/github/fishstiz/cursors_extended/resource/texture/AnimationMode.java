@@ -1,4 +1,4 @@
-package io.github.fishstiz.cursors_extended.cursor;
+package io.github.fishstiz.cursors_extended.resource.texture;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 
@@ -11,8 +11,16 @@ public enum AnimationMode {
     RANDOM,
     RANDOM_CYCLE;
 
-    public boolean isReversed() {
+    public boolean reverse() {
         return this == LOOP_REVERSE || this == REVERSE;
+    }
+
+    public boolean oneShot() {
+        return this == FORWARDS || this == REVERSE;
+    }
+
+    public boolean random() {
+        return this == RANDOM || this == RANDOM_CYCLE;
     }
 
     @Override

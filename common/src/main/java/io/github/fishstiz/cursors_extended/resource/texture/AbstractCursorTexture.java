@@ -11,8 +11,12 @@ import java.io.IOException;
 public abstract class AbstractCursorTexture implements CursorTexture {
     private long handle;
 
+    protected AbstractCursorTexture(long handle) {
+        this.handle = handle;
+    }
+
     protected AbstractCursorTexture(NativeImage image, CursorProperties settings) throws IOException {
-        this.handle = NativeImageUtil.createCursor(image, settings);
+        this(NativeImageUtil.createCursor(image, settings));
     }
 
     @Override
@@ -23,8 +27,14 @@ public abstract class AbstractCursorTexture implements CursorTexture {
     @Override
     public void close() {
         if (handle != MemoryUtil.NULL) {
-            SDLMouse.SDL_DestroyCursor(handle);
+            destroy(handle);
             handle = MemoryUtil.NULL;
+        }
+    }
+
+    static void destroy(long handle) {
+        if (handle != MemoryUtil.NULL) {
+            SDLMouse.SDL_DestroyCursor(handle);
         }
     }
 }

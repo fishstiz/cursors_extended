@@ -13,7 +13,7 @@ import io.github.fishstiz.cursors_extended.compat.CursorStateTracker;
 import io.github.fishstiz.cursors_extended.compat.WindowCursor;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorDisplay;
-import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
@@ -45,8 +45,8 @@ public abstract class WindowMixin implements WindowCursor {
     private boolean checkHasChanged(boolean original, @Local(ordinal = 1) CursorType cursorType) {
         Cursor cursor = CursorsExtended.getInstance().getRegistry().get(cursorType);
         if (original) {
-            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
-                animatedCursorTexture.restartAnimation();
+            if (cursor.getTexture() instanceof CursorTexture.Animated animatedCursor) {
+                animatedCursor.restartAnimation();
             }
             return true;
         }

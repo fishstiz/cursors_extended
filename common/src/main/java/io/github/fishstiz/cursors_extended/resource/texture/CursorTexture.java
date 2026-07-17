@@ -1,14 +1,14 @@
 package io.github.fishstiz.cursors_extended.resource.texture;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
-import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 
-public interface CursorTexture extends ClientAsset.Texture, AutoCloseable {
+public interface CursorTexture extends CursorSprite, ClientAsset.Texture, AutoCloseable {
     long handle();
 
     int xhot();
@@ -16,10 +16,6 @@ public interface CursorTexture extends ClientAsset.Texture, AutoCloseable {
     int yhot();
 
     float scale();
-
-    int textureWidth();
-
-    int textureHeight();
 
     CursorMetadata metadata();
 
@@ -31,19 +27,11 @@ public interface CursorTexture extends ClientAsset.Texture, AutoCloseable {
         return texturePath();
     }
 
-    default int spriteWidth() {
-        return textureWidth();
+    default NativeImage toNativeImage() throws IOException {
+        throw new UnsupportedOperationException("Cannot convert CursorTexture to NativeImage");
     }
 
-    default int spriteHeight() {
-        return textureHeight();
-    }
-
-    default int spriteVOffset() {
-        return 0;
-    }
-
-    default CursorTexture recreate(CursorProperties properties) throws IOException {
-        throw new IOException("This cursor texture cannot be recreated");
+    interface Animated {
+        void restartAnimation();
     }
 }

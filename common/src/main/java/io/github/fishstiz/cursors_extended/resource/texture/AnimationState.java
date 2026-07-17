@@ -1,81 +1,93 @@
 package io.github.fishstiz.cursors_extended.resource.texture;
 
-import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
+import net.minecraft.SharedConstants;
 import net.minecraft.util.Util;
 
 import java.util.Random;
+import java.util.function.IntFunction;
 
-public sealed interface AnimationState {
-    int next(AnimatedCursorTexture texture);
+abstract sealed class AnimationState {
+    protected static final Random RANDOM = new Random();
+    protected static final long MS_PER_TICK = SharedConstants.MILLIS_PER_TICK;
+    protected final int frameCount;
+    protected final IntFunction<AnimatedCursorFrame> frameGetter;
+    private int lastFrame;
+    private long lastFrameTime;
 
-    void reset();
+    AnimationState(int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
+        this.frameCount = frameCount;
+        this.frameGetter = frameGetter;
+    }
 
-    static AnimationState of(AnimationMode mode) {
+    static AnimationState of(AnimationMode mode, int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
         return switch (mode) {
-            case LOOP, LOOP_REVERSE -> new Loop();
-            case FORWARDS, REVERSE -> new Forwards();
-            case OSCILLATE -> new Oscillate();
-            case RANDOM -> new RandomState();
-            case RANDOM_CYCLE -> new RandomCycle();
+            case LOOP, LOOP_REVERSE -> new Loop(frameCount, frameGetter);
+            case FORWARDS, REVERSE -> new Forwards(frameCount, frameGetter);
+            case OSCILLATE -> new Oscillate(frameCount, frameGetter);
+            case RANDOM -> new RandomState(frameCount, frameGetter);
+            case RANDOM_CYCLE -> new RandomCycle(frameCount, frameGetter);
         };
     }
 
-    abstract sealed class Base implements AnimationState {
-        protected static final long MS_PER_TICK = 50;
-        protected int currentFrameIndex;
-        protected long lastFrameTime;
+    private boolean shouldAdvance() {
+        AnimatedCursorFrame frame = frameGetter.apply(lastFrame);
+        long currentTime = Util.getMillis();
+        return currentTime - lastFrameTime >= frame.duration() * MS_PER_TICK;
+    }
 
-        protected boolean shouldAdvance(AnimatedCursorTexture texture) {
-            AnimatedCursorTexture.Frame currentFrame = texture.getFrame(currentFrameIndex);
-            long currentTime = Util.getMillis();
-            return currentTime - lastFrameTime >= currentFrame.time() * MS_PER_TICK;
-        }
+    protected int lastFrame() {
+        return lastFrame;
+    }
 
-        protected void updateFrameTime() {
+    protected abstract int nextFrame();
+
+    public final int currentFrame() {
+        if (shouldAdvance()) {
             lastFrameTime = Util.getMillis();
+            lastFrame = nextFrame();
+        }
+        return lastFrame;
+    }
+
+    public void reset() {
+        lastFrameTime = Util.getMillis();
+        lastFrame = 0;
+    }
+
+    private static final class Loop extends AnimationState {
+        Loop(int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
+            super(frameCount, frameGetter);
         }
 
         @Override
-        public void reset() {
-            lastFrameTime = Util.getMillis();
-            currentFrameIndex = 0;
+        protected int nextFrame() {
+            return (lastFrame() + 1) % frameCount;
         }
     }
 
-    final class Loop extends Base {
+    private static final class Forwards extends AnimationState {
+        Forwards(int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
+            super(frameCount, frameGetter);
+        }
+
         @Override
-        public int next(AnimatedCursorTexture texture) {
-            if (shouldAdvance(texture)) {
-                updateFrameTime();
-                currentFrameIndex = (currentFrameIndex + 1) % texture.frameCount();
-            }
-            return currentFrameIndex;
+        protected int nextFrame() {
+            return Math.min(lastFrame() + 1, frameCount - 1);
         }
     }
 
-    final class Forwards extends Base {
-        @Override
-        public int next(AnimatedCursorTexture texture) {
-            if (shouldAdvance(texture)) {
-                updateFrameTime();
-                currentFrameIndex = Math.min(currentFrameIndex + 1, texture.frameCount() - 1);
-            }
-            return currentFrameIndex;
-        }
-    }
-
-    final class Oscillate extends Base {
+    private static final class Oscillate extends AnimationState {
         private boolean reversed;
 
+        Oscillate(int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
+            super(frameCount, frameGetter);
+        }
+
         @Override
-        public int next(AnimatedCursorTexture texture) {
-            if (shouldAdvance(texture)) {
-                updateFrameTime();
-                reversed = currentFrameIndex != 0 &&
-                           (currentFrameIndex == texture.frameCount() - 1 || reversed);
-                currentFrameIndex = reversed ? currentFrameIndex - 1 : currentFrameIndex + 1;
-            }
-            return currentFrameIndex;
+        protected int nextFrame() {
+            int lastFrame = lastFrame();
+            reversed = lastFrame != 0 && (lastFrame == frameCount - 1 || reversed);
+            return reversed ? lastFrame - 1 : lastFrame + 1;
         }
 
         @Override
@@ -85,45 +97,42 @@ public sealed interface AnimationState {
         }
     }
 
-    final class RandomState extends Base {
-        private final Random random = new Random();
+    private static final class RandomState extends AnimationState {
+        RandomState(int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
+            super(frameCount, frameGetter);
+        }
 
         @Override
-        public int next(AnimatedCursorTexture texture) {
-            if (shouldAdvance(texture)) {
-                updateFrameTime();
+        protected int nextFrame() {
+            int lastFrame = lastFrame();
 
-                int count = texture.frameCount();
-                if (count > 1) {
-                    int newFrame;
-                    do {
-                        newFrame = random.nextInt(count);
-                    } while (newFrame == currentFrameIndex);
-                    currentFrameIndex = newFrame;
-                }
+            if (frameCount > 1) {
+                int newFrame;
+                do {
+                    newFrame = RANDOM.nextInt(frameCount);
+                } while (newFrame == lastFrame);
+                return newFrame;
             }
-            return currentFrameIndex;
+
+            return lastFrame;
         }
     }
 
-    final class RandomCycle extends Base {
-        private final Random random = new Random();
+    private static final class RandomCycle extends AnimationState {
         private int[] shuffledFrames;
         private int shuffledIndex = 0;
 
+        RandomCycle(int frameCount, IntFunction<AnimatedCursorFrame> frameGetter) {
+            super(frameCount, frameGetter);
+        }
+
         @Override
-        public int next(AnimatedCursorTexture texture) {
-            if (shouldAdvance(texture)) {
-                updateFrameTime();
-                int count = texture.frameCount();
-
-                if (shuffledFrames == null || shuffledIndex >= count) {
-                    shuffleFrames(count);
-                }
-
-                currentFrameIndex = shuffledFrames[shuffledIndex++];
+        protected int nextFrame() {
+            if (shuffledFrames == null || shuffledIndex >= frameCount) {
+                shuffleFrames(frameCount);
             }
-            return currentFrameIndex;
+
+            return shuffledFrames[shuffledIndex++];
         }
 
         private void shuffleFrames(int count) {
@@ -133,7 +142,7 @@ public sealed interface AnimationState {
             }
 
             for (int i = count - 1; i > 0; i--) {
-                int j = random.nextInt(i + 1);
+                int j = RANDOM.nextInt(i + 1);
                 int tmp = shuffledFrames[i];
                 shuffledFrames[i] = shuffledFrames[j];
                 shuffledFrames[j] = tmp;

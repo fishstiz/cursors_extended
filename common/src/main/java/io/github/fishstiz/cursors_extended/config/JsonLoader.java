@@ -2,7 +2,7 @@ package io.github.fishstiz.cursors_extended.config;
 
 import com.google.gson.*;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
+import io.github.fishstiz.cursors_extended.resource.texture.AnimationMode;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import net.minecraft.server.packs.resources.Resource;
 

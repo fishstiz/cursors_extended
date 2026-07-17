@@ -16,9 +16,35 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
     private final int yhot;
     private final int textureWidth;
     private final int textureHeight;
+    private final int spriteWidth;
+    private final int spriteHeight;
     private final byte[] pixels;
     private final Identifier texturePath;
     private final CursorMetadata metadata;
+
+    public BasicCursorTexture(
+            long handle,
+            byte[] pixels,
+            int imageWidth,
+            int imageHeight,
+            int spriteWidth,
+            int spriteHeight,
+            Identifier texturePath,
+            CursorMetadata metadata,
+            CursorProperties settings
+    ) {
+        super(handle);
+        this.scale = SettingsUtil.sanitizeScale(settings.scale());
+        this.xhot = SettingsUtil.sanitizeHotspot(settings.xhot(), imageWidth);
+        this.yhot = SettingsUtil.sanitizeHotspot(settings.yhot(), imageHeight);
+        this.textureWidth = imageWidth;
+        this.textureHeight = imageHeight;
+        this.spriteWidth = spriteWidth;
+        this.spriteHeight = spriteHeight;
+        this.texturePath = texturePath;
+        this.metadata = metadata;
+        this.pixels = pixels;
+    }
 
     public BasicCursorTexture(
             NativeImage image,
@@ -26,15 +52,11 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
             CursorMetadata metadata,
             CursorProperties settings
     ) throws IOException {
-        super(image, settings);
-        this.scale = SettingsUtil.sanitizeScale(settings.scale());
-        this.xhot = SettingsUtil.sanitizeHotspot(settings.xhot(), image.getWidth());
-        this.yhot = SettingsUtil.sanitizeHotspot(settings.yhot(), image.getHeight());
-        this.textureWidth = image.getWidth();
-        this.textureHeight = image.getHeight();
-        this.pixels = NativeImageUtil.getBytes(image);
-        this.texturePath = texturePath;
-        this.metadata = metadata;
+        byte[] pixels = NativeImageUtil.getBytes(image);
+        long handle = NativeImageUtil.createCursor(image, settings);
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+        this(handle, pixels, imageWidth, imageHeight, imageWidth, imageHeight, texturePath, metadata, settings);
     }
 
     @Override
@@ -63,6 +85,16 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
     }
 
     @Override
+    public int spriteWidth() {
+        return spriteWidth;
+    }
+
+    @Override
+    public int spriteHeight() {
+        return spriteHeight;
+    }
+
+    @Override
     public CursorMetadata metadata() {
         return metadata;
     }
@@ -73,9 +105,7 @@ public final class BasicCursorTexture extends AbstractCursorTexture {
     }
 
     @Override
-    public CursorTexture recreate(CursorProperties properties) throws IOException {
-        try (NativeImage image = NativeImage.read(pixels)) {
-            return new BasicCursorTexture(image, texturePath, metadata, properties);
-        }
+    public NativeImage toNativeImage() throws IOException {
+        return NativeImage.read(pixels);
     }
 }

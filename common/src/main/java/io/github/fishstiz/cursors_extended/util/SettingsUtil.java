@@ -5,12 +5,12 @@ import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
-import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Random;
 
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
@@ -27,6 +27,7 @@ public class SettingsUtil {
     public static final int HOT_STEP = 1;
     public static final boolean ENABLED = true;
     public static final Boolean ANIMATED = null;
+    public static final Random RANDOM = new Random();
 
     private SettingsUtil() {
     }
@@ -103,6 +104,16 @@ public class SettingsUtil {
             return cursor.getTexture().spriteHeight() - 1;
         }
         return 0;
+    }
+
+    public static int getFrameWidth(@Nullable Integer specifiedWidth, int imageWidth, int imageHeight) {
+        int preferredFrameSize = Math.min(imageWidth, imageHeight);
+        return Math.min(Math.abs(Objects.requireNonNullElse(specifiedWidth, preferredFrameSize)), imageWidth);
+    }
+
+    public static int getFrameHeight(@Nullable Integer specifiedHeight, int imageWidth, int imageHeight) {
+        int preferredFrameSize = Math.min(imageWidth, imageHeight);
+        return Math.min(Math.abs(Objects.requireNonNullElse(specifiedHeight, preferredFrameSize)), imageHeight);
     }
 
     public static boolean equalSettings(@Nullable CursorProperties a, @Nullable CursorProperties b, boolean excludeGlobal) {

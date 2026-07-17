@@ -7,7 +7,6 @@ import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.screen.CatalogItem;
 import io.github.fishstiz.cursors_extended.gui.widget.*;
 import io.github.fishstiz.cursors_extended.gui.MouseEvent;
-import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.client.Minecraft;
@@ -135,8 +134,9 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
                     this::onToggleGuide
             ));
 
-            if (this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
-                this.optionsList.addOption(new ToggleWidget(animatedCursor.animated(), ANIMATE_TEXT, this::onToggleAnimate));
+            CursorTexture cursorTexture = this.cursor.getTexture();
+            if (cursorTexture.metadata().animation() != null) {
+                this.optionsList.addOption(new ToggleWidget(cursorTexture instanceof CursorTexture.Animated, ANIMATE_TEXT, this::onToggleAnimate));
                 this.optionsList.addOption(new ButtonWidget(RESET_ANIMATION_TEXT, this::restartAnimation));
             }
 
@@ -249,12 +249,10 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void onToggleAnimate(boolean animated) {
-        if (!(this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor)) {
-            throw new IllegalStateException("Cursor is not an animated cursor");
-        }
-        animatedCursor.setAnimated(animated);
+        CursorsExtended.getInstance().getLoader().updateTexture(cursor, animated);
         this.settings.setAnimated(animated);
         this.refreshDefaultsButton();
+        refreshCursors.run();
     }
 
     private void onToggleGuide(boolean shown) {
@@ -264,7 +262,7 @@ public class CursorOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void restartAnimation() {
-        if (this.cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
+        if (this.cursor.getTexture() instanceof CursorTexture.Animated animatedCursor) {
             animatedCursor.restartAnimation();
         }
     }

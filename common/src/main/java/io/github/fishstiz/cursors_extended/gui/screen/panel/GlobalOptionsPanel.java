@@ -11,7 +11,6 @@ import io.github.fishstiz.cursors_extended.gui.widget.ButtonWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.CursorPreviewWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.OptionsListWidget;
 import io.github.fishstiz.cursors_extended.gui.widget.SliderWidget;
-import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
@@ -201,11 +200,19 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
     }
 
     private void toggleCursorAnimations(boolean animated) {
+        boolean shouldRefresh = false;
+
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor) {
-                animatedCursor.setAnimated(animated);
+            CursorTexture texture = cursor.getTexture();
+            if (texture != null && texture.metadata().animation() != null) {
+                CursorsExtended.getInstance().getLoader().updateTexture(cursor, animated);
                 CONFIG.getOrCreateSettings(cursor).setAnimated(animated);
+                shouldRefresh = true;
             }
+        }
+
+        if (shouldRefresh) {
+            refreshCursors.run();
         }
     }
 
@@ -233,7 +240,8 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     public boolean hasAnimationAny() {
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-            if (cursor.getTexture() instanceof AnimatedCursorTexture) {
+            CursorTexture texture = cursor.getTexture();
+            if (texture != null && texture.metadata().animation() != null) {
                 return true;
             }
         }
@@ -242,7 +250,7 @@ public class GlobalOptionsPanel extends AbstractOptionsPanel {
 
     public boolean isAnimatedAny() {
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-            if (cursor.getTexture() instanceof AnimatedCursorTexture animatedCursor && animatedCursor.animated()) {
+            if (cursor.getTexture() instanceof CursorTexture.Animated) {
                 return true;
             }
         }

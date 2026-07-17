@@ -1,6 +1,6 @@
 package io.github.fishstiz.cursors_extended.config;
 
-import io.github.fishstiz.cursors_extended.cursor.AnimationMode;
+import io.github.fishstiz.cursors_extended.resource.texture.AnimationMode;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;

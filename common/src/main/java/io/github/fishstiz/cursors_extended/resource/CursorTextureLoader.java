@@ -8,12 +8,11 @@ import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.config.CursorMetadata;
 import io.github.fishstiz.cursors_extended.config.JsonLoader;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
-import io.github.fishstiz.cursors_extended.resource.texture.AnimationState;
+import io.github.fishstiz.cursors_extended.resource.texture.*;
 import io.github.fishstiz.cursors_extended.cursor.CursorRegistry;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
-import io.github.fishstiz.cursors_extended.resource.texture.BasicCursorTexture;
-import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
+import io.github.fishstiz.cursors_extended.util.NativeImageUtil;
+import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -167,9 +166,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
 
                     CursorMetadata metadata = preparedMetadata.getOrDefault(cursor.name(), loadMetadata(manager, path, resource.sourcePackId()));
                     CursorProperties settings = CONFIG.getGlobal().apply(CONFIG.getOrCreateSettings(cursor));
-                    CursorTexture texture = metadata.animation() != null
-                            ? new AnimatedCursorTexture(AnimationState.of(metadata.animation().mode()), image, path, metadata, settings)
-                            : new BasicCursorTexture(image, path, metadata, settings);
+                    CursorTexture texture = createTexture(image, path, metadata, settings);
 
                     cursor.setTexture(texture);
                     minecraft.execute(() -> minecraft.getTextureManager().release(path));
@@ -212,7 +209,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
         loadTextures(minecraft.getResourceManager(), cursors);
     }
 
-    public void updateTexture(Cursor cursor, float scale, int xhot, int yhot) {
+    public void updateTexture(Cursor cursor, float scale, int xhot, int yhot, Boolean animated) {
         CursorTexture texture = cursor.getTexture();
         if (texture == null) return;
 
@@ -220,19 +217,36 @@ public class CursorTextureLoader implements PreparableReloadListener {
         settings.setScale(scale);
         settings.setXHot(cursor, xhot);
         settings.setYHot(cursor, yhot);
+        settings.setAnimated(animated);
 
-        try {
-            CursorTexture updatedTexture = texture.recreate(settings);
+        CursorTexture updatedTexture = null;
+
+        try (NativeImage image = texture.toNativeImage()) {
+            updatedTexture = createTexture(image, texture.texturePath(), texture.metadata(), settings);
             cursor.setTexture(updatedTexture);
             texture.close();
         } catch (Exception e) {
             LOGGER.error("[cursors_extended] Failed to update texture of cursor '{}'.", cursor.cursorType(), e);
             cursor.setTexture(texture);
+            if (updatedTexture != null) {
+                updatedTexture.close();
+            }
+        }
+    }
+
+    public void updateTexture(Cursor cursor, float scale, int xhot, int yhot) {
+        updateTexture(cursor, scale, xhot, yhot, cursor.getTexture() instanceof CursorTexture.Animated);
+    }
+
+    public void updateTexture(Cursor cursor, boolean animated) {
+        CursorTexture texture = cursor.getTexture();
+        if (texture != null) {
+            updateTexture(cursor, texture.scale(), texture.xhot(), texture.yhot(), animated);
         }
     }
 
     public void updateTexture(Cursor cursor, CursorProperties settings) {
-        updateTexture(cursor, settings.scale(), settings.xhot(), settings.yhot());
+        updateTexture(cursor, settings.scale(), settings.xhot(), settings.yhot(), settings.animated());
     }
 
     private CursorMetadata loadMetadata(ResourceManager manager, Identifier location, String source) {
@@ -242,6 +256,55 @@ public class CursorTextureLoader implements PreparableReloadListener {
                 .findFirst()
                 .map(metadata -> JsonLoader.fromResource(CursorMetadata.class, metadata))
                 .orElse(new CursorMetadata());
+    }
+
+    private static CursorTexture createTexture(
+            NativeImage image,
+            Identifier path,
+            CursorMetadata metadata,
+            CursorProperties settings
+    ) throws IOException {
+        CursorMetadata.Animation animation = metadata.animation();
+        if (animation == null) {
+            return new BasicCursorTexture(image, path, metadata, settings);
+        }
+        if (Boolean.FALSE.equals(settings.animated())) {
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+
+            int spriteWidth = SettingsUtil.getFrameWidth(animation.width(), imageWidth, imageHeight);
+            int spriteHeight = SettingsUtil.getFrameHeight(animation.height(), imageWidth, imageHeight);
+            SettingsUtil.assertImageSize(spriteWidth, spriteHeight);
+
+            byte[] pixels = NativeImageUtil.getBytes(image);
+
+            try (NativeImage sprite = NativeImageUtil.cropImage(image, 0, 0, spriteWidth, spriteHeight)) {
+                return new BasicCursorTexture(
+                        NativeImageUtil.createCursor(sprite, settings),
+                        pixels,
+                        imageWidth,
+                        imageHeight,
+                        spriteWidth,
+                        spriteHeight,
+                        path,
+                        metadata,
+                        settings
+                );
+            }
+        }
+
+        if (CONFIG.shouldAnimateCursorsNatively()) {
+            try {
+                return new OSAnimatedCursorTexture(image, path, metadata, settings);
+            } catch (OSUnsupportedException e) {
+                CursorsExtended.LOGGER.warn(
+                        "[cursors_extended] Failed to create native animated cursor for {}, reverting to software animation. {}",
+                        path, e.getMessage()
+                );
+            }
+        }
+
+        return new SWAnimatedCursorTexture(image, path, metadata, settings);
     }
 
     private static void writeBytes(ByteArrayOutputStream out, CursorMetadata metadata) throws IOException {

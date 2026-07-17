@@ -3,7 +3,7 @@ package io.github.fishstiz.cursors_extended.gui.widget;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.resource.texture.AnimatedCursorTexture;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -103,9 +103,9 @@ public class CursorPreviewWidget extends CursorWidget {
         if (this.button != null &&
             this.button.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y()) &&
             this.button.mouseClicked(mouseButtonEvent, doubleClicked) &&
-            this.getCursor().getTexture() instanceof AnimatedCursorTexture animatedCursorTexture) {
-                animatedCursorTexture.restartAnimation();
-            }
+            this.getCursor().getTexture() instanceof CursorTexture.Animated animatedCursorTexture) {
+            animatedCursorTexture.restartAnimation();
+        }
 
         return false;
     }

@@ -21,6 +21,7 @@ public class Config implements Serializable {
     private boolean heldCursorsEnabled = true;
     private boolean aggressiveCursor = false;
     private boolean virtualMode = false;
+    private boolean nativeAnimatedCursors = true;
     private boolean legacyMode = true;
     private boolean showHotspotGuide = true;
     private boolean remapStandardCursors = true;
@@ -113,6 +114,14 @@ public class Config implements Serializable {
         this.virtualMode = virtualMode;
     }
 
+    public boolean shouldAnimateCursorsNatively() {
+        return !this.virtualMode && this.nativeAnimatedCursors;
+    }
+
+    public void setNativeAnimatedCursors(boolean nativeAnimatedCursors) {
+        this.nativeAnimatedCursors = nativeAnimatedCursors;
+    }
+
     public boolean isLegacyMode() {
         return legacyMode;
     }
@@ -197,7 +206,7 @@ public class Config implements Serializable {
             return this.animated;
         }
 
-        public void setAnimated(boolean animated) {
+        public void setAnimated(Boolean animated) {
             this.animated = animated;
         }
 

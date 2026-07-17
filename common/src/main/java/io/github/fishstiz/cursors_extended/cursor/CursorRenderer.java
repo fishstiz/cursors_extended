@@ -43,14 +43,9 @@ public sealed interface CursorRenderer {
 
     final class Virtual implements CursorRenderer {
         private final CursorRegistry registry;
-        private Identifier textureLocation;
-        private int textureWidth;
-        private int textureHeight;
-        private int spriteWidth;
-        private int spriteHeight;
+        private CursorTexture texture;
         private float drawWidth;
         private float drawHeight;
-        private int vOffset;
         private float xhot;
         private float yhot;
 
@@ -70,51 +65,50 @@ public sealed interface CursorRenderer {
 
             CursorTexture texture = cursor.getTexture();
             if (texture == null || cursor.isCustom() || !CursorsExtended.CONFIG.getOrCreateSettings(cursor).enabled()) {
-                this.textureLocation = null;
+                this.texture = null;
                 return;
             }
 
-            this.textureLocation = texture.texturePath();
-            this.textureWidth = texture.textureWidth();
-            this.textureHeight = texture.textureHeight();
-            this.spriteWidth = texture.spriteWidth();
-            this.spriteHeight = texture.spriteHeight();
-            this.vOffset = texture.spriteVOffset();
-
+            this.texture = texture;
             float scale = SettingsUtil.getAutoScale(texture.scale());
             this.xhot = texture.xhot() * scale;
             this.yhot = texture.yhot() * scale;
-            this.drawWidth = this.spriteWidth * scale;
-            this.drawHeight = this.spriteHeight * scale;
+            this.drawWidth = this.texture.spriteWidth() * scale;
+            this.drawHeight = this.texture.spriteHeight() * scale;
         }
 
         @Override
         public void resetCursor(Window window) {
-            SDLMouse.SDL_SetWindowRelativeMouseMode(window.handle(), false);
-            this.textureLocation = null;
+            SDLMouse.SDL_ShowCursor();
+            this.texture = null;
         }
 
         @Override
         public void render(Window window, Minecraft minecraft, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
             if (!minecraft.mouseHandler.isMouseGrabbed()) {
-                if (this.textureLocation != null) {
+                if (this.texture != null) {
                     int guiScale = minecraft.getWindow().getGuiScale();
                     int scaledWidth = Math.round(this.drawWidth / guiScale);
                     int scaledHeight = Math.round(this.drawHeight / guiScale);
                     int x = mouseX - Math.round(this.xhot / guiScale);
                     int y = mouseY - Math.round(this.yhot / guiScale);
 
-                    SDLMouse.SDL_SetWindowRelativeMouseMode(window.handle(), true);
+                    SDLMouse.SDL_HideCursor();
 
                     guiGraphics.nextStratum();
                     guiGraphics.blit(
                             RenderPipelines.GUI_TEXTURED,
-                            this.textureLocation,
-                            x, y,
-                            0, this.vOffset,
-                            scaledWidth, scaledHeight,
-                            this.spriteWidth, this.spriteHeight,
-                            this.textureWidth, this.textureHeight
+                            this.texture.texturePath(),
+                            x,
+                            y,
+                            0,
+                            this.texture.spriteVOffset(),
+                            scaledWidth,
+                            scaledHeight,
+                            this.texture.spriteWidth(),
+                            this.texture.spriteHeight(),
+                            this.texture.textureWidth(),
+                            this.texture.textureHeight()
                     );
                 } else {
                     resetCursor(window);
