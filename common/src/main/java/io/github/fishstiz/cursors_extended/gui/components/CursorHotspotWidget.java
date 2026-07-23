@@ -55,7 +55,7 @@ public class CursorHotspotWidget extends CursorWidget {
 
     @Override
     protected void extractWidgetRenderState(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.active = !this.isOverflowing() && (!globalMode || (CONFIG.getGlobal().isXHotActive() || CONFIG.getGlobal().isYHotActive()));
+        this.active = !this.isOverflowing() && (globalMode == (CONFIG.getGlobal().isXHotActive() || CONFIG.getGlobal().isYHotActive()));
         super.extractWidgetRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
         if (this.isHovered() && this.isOverflowing()) {

@@ -60,8 +60,8 @@ public record CursorState(
         return new CursorState(enabled, scale, hotspots.y(yhot), animated);
     }
 
-    public CursorState hotspots(Hotspots hotspots) {
-        return new CursorState(enabled, scale, hotspots, animated);
+    public CursorState hotspots(int xhot, int yhot) {
+        return new CursorState(enabled, scale, new Hotspots(xhot, yhot), animated);
     }
 
     public CursorState animated(Boolean animated) {

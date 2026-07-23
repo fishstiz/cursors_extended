@@ -64,11 +64,11 @@ public class ConfigScreen extends FZScreen {
     @Override
     public void added() {
         for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-            cursorStates.put(cursor.name(), new FZMutableRef<>(new CursorState(cursor)));
-
             if (cursor.isLazy()) {
                 CursorsExtended.getInstance().getLoader().loadTexture(cursor);
             }
+
+            cursorStates.put(cursor.name(), new FZMutableRef<>(new CursorState(cursor)));
         }
     }
 

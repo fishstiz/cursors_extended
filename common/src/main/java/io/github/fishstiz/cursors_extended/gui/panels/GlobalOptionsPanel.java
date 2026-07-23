@@ -176,7 +176,7 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                             .active(setting.active)
                             .toProps())))
                     .toggleBuilder()
-                    .state(active -> state.set(prev -> prev.yhotActive(active)), () -> state.value().xhot.active)
+                    .state(active -> state.set(prev -> prev.yhotActive(active)), () -> state.value().yhot.active)
                     .build();
 
             state.subscribe("YHotValue", GlobalState::yhotValue, this::onChangeYHot);
@@ -318,18 +318,16 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
     }
 
     private void onChangeHotspots(CursorState.Hotspots hotspots) {
-        state.set(prev -> prev.hotspots(hotspots.x(), hotspots.y()));
-
         hotspotGuide.set(true);
-
         if (CONFIG.getGlobal().isXHotActive() && CONFIG.getGlobal().isYHotActive()) {
             CONFIG.getGlobal().setXHot(hotspots.x());
             CONFIG.getGlobal().setYHot(hotspots.y());
             setHotspots(previewCursor.value(), hotspots.x(), hotspots.y());
+            state.set(prev -> prev.hotspots(hotspots.x(), hotspots.y()));
         } else if (CONFIG.getGlobal().isXHotActive()) {
-            onChangeXHot(hotspots.x());
+            state.set(prev -> prev.xhot(hotspots.x()));
         } else if (CONFIG.getGlobal().isYHotActive()) {
-            onChangeYHot(hotspots.y());
+            state.set(prev -> prev.yhot(hotspots.y()));
         }
     }
 

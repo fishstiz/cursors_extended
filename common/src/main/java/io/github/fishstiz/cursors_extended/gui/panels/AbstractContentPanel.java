@@ -218,28 +218,28 @@ public abstract class AbstractContentPanel extends AbstractContainerWidget {
 
     protected static void setScale(Cursor cursor, float scale) {
         CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
+        if (texture != null && texture.scale() != scale) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, scale, texture.xhot(), texture.yhot());
         }
     }
 
     protected static void setXHot(Cursor cursor, int xhot) {
         CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
+        if (texture != null && texture.xhot() == xhot) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, texture.yhot());
         }
     }
 
     protected static void setYHot(Cursor cursor, int yhot) {
         CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
+        if (texture != null && texture.yhot() != yhot) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), texture.xhot(), yhot);
         }
     }
 
     protected static void setHotspots(Cursor cursor, int xhot, int yhot) {
         CursorTexture texture = cursor.getTexture();
-        if (texture != null) {
+        if (texture != null && (texture.xhot() != xhot || texture.yhot() != yhot)) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, yhot);
         }
     }

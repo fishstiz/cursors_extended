@@ -155,8 +155,6 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                 collector.renderableWidget(new InactiveInfoWidget(yhotSlider, GLOBAL_YHOT_TOOLTIP, globalRedirect));
             }
 
-            subscriptions.add(state.subscribe("HotspotsSettings", CursorState::hotspots, this::onChangeHotspots));
-
             list.addEntry(FZButton.bind("HotspotGuideToggle", hotspotGuide.map(value -> FZButton.builder()
                     .message(CommonComponents.optionNameValue(HOTSPOT_GUIDE_TEXT, CommonComponents.optionStatus(value)))
                     .onPress(() -> hotspotGuide.set(prev -> !prev))
@@ -208,8 +206,9 @@ public class CursorOptionsPanel extends AbstractContentPanel {
             CursorHotspotWidget hotspotWidget = new CursorHotspotWidget(
                     cursor,
                     state.map(CursorState::hotspots),
-                    hotspots -> state.set(prev -> prev.hotspots(hotspots))
+                    this::onChangeHotspots
             );
+            hotspotWidget.active = !CONFIG.getGlobal().isYHotActive() && !CONFIG.getGlobal().isXHotActive();
             hotspotWidget.setRenderRuler(hotspotGuide.value());
             cursorWidgets.child(hotspotWidget);
 
@@ -268,9 +267,25 @@ public class CursorOptionsPanel extends AbstractContentPanel {
 
     private void onChangeHotspots(CursorState.Hotspots hotspots) {
         hotspotGuide.set(true);
-        CONFIG.getOrCreateSettings(cursor).setXHot(cursor, hotspots.x());
-        CONFIG.getOrCreateSettings(cursor).setYHot(cursor, hotspots.y());
-        setHotspots(cursor, hotspots.x(), hotspots.y());
+        int xhot = hotspots.x();
+        int yhot = hotspots.y();
+
+        if (!CONFIG.getGlobal().isXHotActive()) {
+            CONFIG.getOrCreateSettings(cursor).setXHot(cursor, xhot);
+        } else {
+            xhot = CONFIG.getOrCreateSettings(cursor).xhot();
+        }
+
+        if (!CONFIG.getGlobal().isYHotActive()) {
+            CONFIG.getOrCreateSettings(cursor).setYHot(cursor, yhot);
+        } else {
+            yhot = CONFIG.getOrCreateSettings(cursor).yhot();
+        }
+
+        final int xhotspot = xhot;
+        final int yhotspot = yhot;
+        setHotspots(cursor, xhotspot, yhotspot);
+        state.set(prev -> prev.hotspots(xhotspot, yhotspot));
     }
 
     private void onChangeAnimated(Boolean animated) {
