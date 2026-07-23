@@ -133,12 +133,12 @@ public class CategoryListWidget extends FZAbstractListWidget<CategoryListWidget.
         Entry entry = entries.get(selected);
         if (entry != null) {
             this.selected = entry;
-            scrollToEntry(entry);
             setFocused(entry);
             if (entry.hidden != null) {
                 entry.hidden.set(false);
                 entry.visible = true;
             }
+            scrollToEntry(entry);
         }
     }
 

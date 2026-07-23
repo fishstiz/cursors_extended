@@ -3,6 +3,7 @@ package io.github.fishstiz.cursors_extended.gui.components;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.util.KeywordSearcher;
 import io.github.fishstiz.fidgetz.v0.gui.components.*;
+import io.github.fishstiz.fidgetz.v0.gui.components.events.FZHoverableElement;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexElement;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
 import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
@@ -196,7 +197,12 @@ public class OptionsListWidget extends FZAbstractListWidget<OptionsListWidget.En
             layout.fidgetz$setSize(getWidth(), getHeight());
             layout.arrangeElements();
 
-            element.visitWidgets(children::add);
+            element.visitWidgets(widget -> {
+                if (widget instanceof FZHoverableElement hoverable) {
+                    hoverable.fidgetz$setHovered(false);
+                }
+                children.add(widget);
+            });
         }
 
         Entry(LayoutElement element) {

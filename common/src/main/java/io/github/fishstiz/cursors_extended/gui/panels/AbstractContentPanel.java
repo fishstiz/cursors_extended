@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class AbstractContentPanel extends AbstractContainerWidget {
+    protected static final Component GLOBAL_SETTINGS_TEXT = Component.translatable("cursors_extended.options.global.title");
     protected static final Component ENABLE_TEXT = Component.translatable("cursors_extended.options.enabled");
     protected static final Component SCALE_TEXT = Component.translatable("cursors_extended.options.scale");
     protected static final Component GUI_SCALE_TEXT = Component.translatable("cursors_extended.options.scale.gui");

@@ -1,5 +1,6 @@
 package io.github.fishstiz.cursors_extended.gui;
 
+import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.panels.*;
@@ -52,6 +53,9 @@ public class ConfigScreen extends FZScreen {
     private final FZMutableRef<String> searchRef = new FZMutableRef<>("");
     private final CategoryListWidget categoryList = new CategoryListWidget(this::setContent);
     private final FZMutableRef<Boolean> loadingRef = new FZMutableRef<>(false);
+    private final FZMutableRef<Cursor> previewCursor = new FZMutableRef<>(CursorsExtended.getInstance()
+            .getRegistry()
+            .get(CursorType.DEFAULT));
     private FZTextField searchField;
     private FZLayout rootLayout;
 
@@ -119,17 +123,26 @@ public class ConfigScreen extends FZScreen {
 
     @Override
     protected void init() {
-        registerCategory(new GlobalOptionsPanel(minecraft, this, cursorStates));
+        registerCategory(new GlobalOptionsPanel(minecraft, this, previewCursor, cursorStates, this::setContent));
 
         AdaptiveOptionsPanel adaptiveOptions = new AdaptiveOptionsPanel(minecraft, this);
+
         MutableObject<String> initialPanelId = new MutableObject<>(adaptiveOptions.getId());
+
         registerCategory(adaptiveOptions);
 
         registerParentCategory("Cursors", CURSORS_TEXT, (parent, panelCollector) -> {
-            int i = 0;
+            boolean firstFound = false;
             for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-                FZMutableRef<CursorState> state = cursorStates.computeIfAbsent(cursor.name(), _ -> new FZMutableRef<>(new CursorState(cursor)));
-                AbstractContentPanel panel = new CursorOptionsPanel(minecraft, this, cursor, state, () -> setContent("Global"));
+                FZMutableRef<CursorState> state = cursorStates.computeIfAbsent(
+                        cursor.name(),
+                        _ -> new FZMutableRef<>(new CursorState(cursor))
+                );
+
+                AbstractContentPanel panel = new CursorOptionsPanel(minecraft, this, cursor, state, () -> {
+                    previewCursor.set(cursor);
+                    setContent("Global");
+                });
 
                 parent.collapse(!CONFIG.hasResourcePack());
 
@@ -149,14 +162,16 @@ public class ConfigScreen extends FZScreen {
                 );
                 panelCollector.accept(panel);
 
-                if (i == 0 && CONFIG.hasResourcePack()) {
+                if (!firstFound && cursor.isTextureEnabled()) {
+                    previewCursor.set(cursor);
                     initialPanelId.setValue(panel.getId());
-                    i++;
+                    firstFound = true;
                 }
             }
         });
 
         registerCategory(new CompatibilityOptionsPanel(minecraft, this));
+
         registerCategory(new DebugOptionsPanel(minecraft, this));
 
         categoryList.repositionEntries();
@@ -166,6 +181,7 @@ public class ConfigScreen extends FZScreen {
         if (initialPanelId.get() != null) {
             setContent(initialPanelId.get());
         }
+
         if (this.searchField != null) {
             setInitialFocus(this.searchField);
         }
@@ -196,7 +212,12 @@ public class ConfigScreen extends FZScreen {
                         .square()
                         .active(!value.isEmpty())
                         .tooltip(CLEAR_SEARCH_INFO)
-                        .icon(WidgetElements.noFocus(Renderables.sprite(CLEAR_SPRITE), Renderables.sprite(CLEAR_SPRITE, 0x80A0A0A0), 16, 16))
+                        .icon(WidgetElements.noFocus(
+                                Renderables.sprite(CLEAR_SPRITE),
+                                Renderables.sprite(CLEAR_SPRITE, 0x80A0A0A0),
+                                16,
+                                16
+                        ))
                         .onPress(() -> {
                             searchRef.set("");
                             setFocused(searchField);

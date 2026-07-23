@@ -53,7 +53,7 @@ public class CursorOptionsPanel extends AbstractContentPanel {
     ) {
         Component title = Component.translatable("cursors_extended.options.cursor-type", cursor.text());
         Component shorthandTitle = cursor.text();
-        super("cursor-type." + cursor.name(), minecraft, screen, title, shorthandTitle);
+        super(cursor.text().toString(), minecraft, screen, title, shorthandTitle);
         this.state = state;
         this.cursor = cursor;
         this.globalRedirect = globalRedirect;
@@ -197,6 +197,11 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                         .active(!SettingsUtil.equalSettings(cursorTexture.metadata().cursor(), value, true))
                         .toProps())));
             }
+
+            list.addEntry(FZButton.builder()
+                    .message(GLOBAL_SETTINGS_TEXT.copy().append(CommonComponents.ELLIPSIS))
+                    .onPress(globalRedirect)
+                    .build());
         }
 
         FZFlexLayout cursorWidgets = layout.child(FZFlexLayout.vertical(), layout.flexChildVerticalSettings());

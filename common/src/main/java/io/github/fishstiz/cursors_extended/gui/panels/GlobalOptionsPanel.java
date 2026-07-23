@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
 
 public class GlobalOptionsPanel extends AbstractContentPanel {
+    private static final int PREVIEW_CURSOR_BUTTON_SIZE = 24;
     private static final WidgetRenderables PREVIEW_CURSOR_SPRITES = new WidgetRenderables(
             Renderables.sprite(Identifier.fromNamespaceAndPath("fidgetz", "widget/popovermenu_entry")),
             Renderables.sprite(Identifier.fromNamespaceAndPath("fidgetz", "widget/popovermenu_entry")),
@@ -43,17 +44,25 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
     private static final Component RESET_INFO = Component.translatable("cursors_extended.options.resource_pack.reset.tooltip");
     private final FZMutableRef<GlobalState> state = new FZMutableRef<>(new GlobalState());
     private final Map<String, FZMutableRef<CursorState>> cursorStates;
-    private final FZMutableRef<Cursor> previewCursor = new FZMutableRef<>(CursorsExtended.getInstance().getRegistry().get(CursorType.DEFAULT));
+    private final FZMutableRef<Cursor> previewCursor;
     private final FZMutableRef<Boolean> hotspotGuide = new FZMutableRef<>(CONFIG.isShowHotspotGuide());
+    private final Consumer<String> redirect;
     private OptionsListWidget list;
     private CursorHotspotWidget hotspotWidget;
     private boolean scaling = false;
 
-    public GlobalOptionsPanel(Minecraft minecraft, Screen screen, Map<String, FZMutableRef<CursorState>> cursorStates) {
-        Component title = Component.translatable("cursors_extended.options.global.title");
+    public GlobalOptionsPanel(
+            Minecraft minecraft,
+            Screen screen,
+            FZMutableRef<Cursor> previewCursor,
+            Map<String, FZMutableRef<CursorState>> cursorStates,
+            Consumer<String> redirect
+    ) {
         Component shorthandTitle = Component.translatable("cursors_extended.options.global");
-        super("Global", minecraft, screen, title, shorthandTitle);
+        super("Global", minecraft, screen, GLOBAL_SETTINGS_TEXT, shorthandTitle);
         this.cursorStates = cursorStates;
+        this.previewCursor = previewCursor;
+        this.redirect = redirect;
     }
 
     private static Component createGlobalInfo(Component message) {
@@ -73,28 +82,44 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
     protected void buildWidgets(GuiComponentCollector collector, FZFlexLayout layout) {
         FZFlexLayout center = layout.child(FZFlexLayout.vertical(), layout.flexChildSettings()).spacing(DEFAULT_SPACING);
 
-        center.child(
-                FZDropdown.bind("PreviewCursorDropdown", previewCursor.map(value -> FZDropdown.builder(this)
-                        .message(CommonComponents.optionNameValue(Component.translatable("cursors_extended.options.preview"), value.text()))
-                        .leftIcon(CursorRenderable.widgetElements(value, 16).marginLeft(4).marginRight(-12))
-                        .height(24)
-                        .entryDivider(null)
-                        .entries(CursorsExtended.getInstance().getRegistry().getInternalCursors()
-                                .stream()
-                                .filter(Cursor::isTextureEnabled)
-                                .map(cursor -> FZPopoverMenuItem.fromWidget(FZButton.builder()
-                                        .sprites(PREVIEW_CURSOR_SPRITES)
-                                        .leftIcon(CursorRenderable.widgetElements(cursor, 16))
-                                        .message(cursor.text())
-                                        .leftAlignedMessage()
-                                        .active(value != cursor)
-                                        .onPress(() -> previewCursor.set(cursor))
-                                        .build()))
-                                .collect(Collectors.toUnmodifiableList()))
-                        .active(CONFIG.hasResourcePack())
-                        .toProps())),
-                center.flexChildHorizontalSettings()
-        );
+        FZFlexLayout head = center.child(FZFlexLayout.horizontal(), center.flexChildHorizontalSettings()).spacing(DEFAULT_SPACING);
+        {
+            head.child(
+                    FZDropdown.bind("PreviewCursorDropdown", previewCursor.map(value -> FZDropdown.builder(this)
+                            .message(CommonComponents.optionNameValue(Component.translatable("cursors_extended.options.preview"), value.text()))
+                            .leftIcon(CursorRenderable.widgetElements(value, 16).marginLeft(4).marginRight(-12))
+                            .height(PREVIEW_CURSOR_BUTTON_SIZE)
+                            .entryDivider(null)
+                            .entries(CursorsExtended.getInstance().getRegistry().getInternalCursors()
+                                    .stream()
+                                    .filter(Cursor::isTextureEnabled)
+                                    .map(cursor -> FZPopoverMenuItem.fromWidget(FZButton.builder()
+                                            .sprites(PREVIEW_CURSOR_SPRITES)
+                                            .leftIcon(CursorRenderable.widgetElements(cursor, 16))
+                                            .message(cursor.text())
+                                            .leftAlignedMessage()
+                                            .active(value != cursor)
+                                            .onPress(() -> previewCursor.set(cursor))
+                                            .build()))
+                                    .collect(Collectors.toUnmodifiableList()))
+                            .active(CONFIG.hasResourcePack())
+                            .toProps())),
+                    head.flexChildHorizontalSettings()
+            );
+
+            head.child(FZIconButton.bind("PreviewCursorRedirect", previewCursor.map(value -> FZIconButton.builder()
+                    .size(PREVIEW_CURSOR_BUTTON_SIZE, PREVIEW_CURSOR_BUTTON_SIZE)
+                    .icon(WidgetElements.noFocus(
+                            Renderables.sprite(CursorsExtended.id("icon/caret_right")),
+                            Renderables.sprite(CursorsExtended.id("icon/caret_right"), 0x80A0A0A0),
+                            16,
+                            16
+                    ))
+                    .tooltip(value.text().copy().append(CommonComponents.ELLIPSIS))
+                    .onPress(() -> redirect.accept(value.text().toString()))
+                    .active(CONFIG.hasResourcePack())
+                    .toProps())));
+        }
 
         this.list = center.child(new OptionsListWidget(), center.flexChildSettings());
         {
