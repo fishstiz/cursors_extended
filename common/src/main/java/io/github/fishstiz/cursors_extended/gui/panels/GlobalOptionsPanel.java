@@ -128,7 +128,10 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
 
             list.addEntry(FZButton.bind("AutoScaleButton", state.map(GlobalState::scale).map(setting -> FZButton.builder()
                     .message(GUI_SCALE_TEXT)
-                    .onPress(() -> state.set(prev -> prev.scale(SettingsUtil.SCALE_AUTO_PREFERRED)))
+                    .onPress(() -> {
+                        state.set(prev -> prev.scale(SettingsUtil.SCALE_AUTO_PREFERRED));
+                        onReleaseScale();
+                    })
                     .active(!SettingsUtil.isAutoScale(setting.value) && CONFIG.getGlobal().isScaleActive())
                     .toProps())));
 
@@ -250,6 +253,11 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                 graphics.requestCursor(cursorType);
             }
         }
+    }
+
+    @Override
+    public void onRemove() {
+        this.scaling = false;
     }
 
     @Override
