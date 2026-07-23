@@ -1,0 +1,7 @@
+[versions]
+fidgetz = "0.6.0-alpha.10+26.3"
+
+[libraries]
+fidgetz-common = { module = "io.github.fishstiz.fidgetz:fidgetz-common", version.ref = "fidgetz" }
+fidgetz-fabric = { module = "io.github.fishstiz.fidgetz:fidgetz-fabric", version.ref = "fidgetz" }
+fidgetz-neoforge = { module = "io.github.fishstiz.fidgetz:fidgetz-neoforge", version.ref = "fidgetz" }

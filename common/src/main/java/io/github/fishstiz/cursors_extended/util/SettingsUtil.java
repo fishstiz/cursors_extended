@@ -10,7 +10,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Random;
 
 public class SettingsUtil {
     public static final int IMAGE_SIZE_MIN = 8;
@@ -27,7 +26,6 @@ public class SettingsUtil {
     public static final int HOT_STEP = 1;
     public static final boolean ENABLED = true;
     public static final Boolean ANIMATED = null;
-    public static final Random RANDOM = new Random();
 
     private SettingsUtil() {
     }

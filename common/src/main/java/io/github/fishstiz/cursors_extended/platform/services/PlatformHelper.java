@@ -7,8 +7,6 @@ public interface PlatformHelper {
 
     Path getConfigDir();
 
-    GuiGraphicsHelper guiGraphicsHelper();
-
     default String mapClassName(String namespace, String className) {
         return className;
     }

@@ -52,6 +52,9 @@ repositories {
 }
 
 dependencies {
+    implementation libs.fidgetz.neoforge
+    jarJar libs.fidgetz.neoforge
+
     compileOnly "maven.modrinth:owo-lib:$owo_version"
 }
 

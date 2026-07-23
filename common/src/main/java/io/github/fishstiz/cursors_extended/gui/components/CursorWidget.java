@@ -1,13 +1,13 @@
-package io.github.fishstiz.cursors_extended.gui.widget;
+package io.github.fishstiz.cursors_extended.gui.components;
 
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorProvider;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
-import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
@@ -21,7 +21,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     private static final int BORDER_COLOR = 0xFF000000; // black
     private static final int FOCUSED_BORDER_COLOR = 0xFFFFFFFF; // white
     private final Identifier background128;
-    private final Cursor cursor;
+    private Cursor cursor;
     private boolean renderRuler = true;
 
     protected CursorWidget(
@@ -50,7 +50,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
 
     protected void renderBackground(@NonNull GuiGraphicsExtractor guiGraphics) {
         if (!this.isOverflowing()) {
-            DrawUtil.drawCheckerboard(
+            drawCheckerboard(
                     guiGraphics,
                     this.getX(),
                     this.getY(),
@@ -66,7 +66,7 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
 
     protected void renderBorder(@NonNull GuiGraphicsExtractor guiGraphics) {
         int color = this.isFocused() && this.active ? FOCUSED_BORDER_COLOR : BORDER_COLOR;
-        DrawUtil.renderOutline(guiGraphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), color);
+        guiGraphics.outline(this.getX(), this.getY(), this.getWidth(), this.getHeight(), color);
     }
 
     @Override
@@ -80,6 +80,10 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
             }
         }
         this.renderBorder(guiGraphics);
+    }
+
+    public void setCursor(Cursor cursor) {
+        this.cursor = cursor;
     }
 
     public void setRenderRuler(boolean renderRuler) {
@@ -124,5 +128,39 @@ public abstract class CursorWidget extends AbstractWidget implements CursorProvi
     @Override
     protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput) {
         narrationElementOutput.add(NarratedElementType.TITLE, this.createNarrationMessage());
+    }
+
+    private static void drawCheckerboard(
+            GuiGraphicsExtractor guiGraphics,
+            int x,
+            int y,
+            int width,
+            int height,
+            float cellWidth,
+            float cellHeight,
+            Identifier checkerboard,
+            int textureSize
+    ) {
+        float drawWidth = textureSize * cellWidth;
+        float drawHeight = textureSize * cellHeight;
+
+        float clippedWidth = Math.min(drawWidth, width);
+        float clippedHeight = Math.min(drawHeight, height);
+
+        float uRatio = clippedWidth / drawWidth;
+        float vRatio = clippedHeight / drawHeight;
+
+        int uvWidth = Math.round(textureSize * uRatio);
+        int uvHeight = Math.round(textureSize * vRatio);
+
+        guiGraphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                checkerboard,
+                x, y,
+                0, 0,
+                (int) clippedWidth, (int) clippedHeight,
+                uvWidth, uvHeight,
+                textureSize, textureSize
+        );
     }
 }

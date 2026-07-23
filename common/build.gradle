@@ -26,6 +26,7 @@ dependencies {
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.0'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.0'
 
+    compileOnly libs.fidgetz.common
 }
 
 loom {

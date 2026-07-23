@@ -1,10 +1,10 @@
-package io.github.fishstiz.cursors_extended.gui.widget;
+package io.github.fishstiz.cursors_extended.gui.components;
 
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
-import io.github.fishstiz.cursors_extended.util.DrawUtil;
+import io.github.fishstiz.fidgetz.v0.utils.GuiGraphicsUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -78,7 +78,7 @@ public class CursorPreviewWidget extends CursorWidget {
         int endY = this.getBottom() - PREVIEW_TEXT_OFFSET;
         int startX = endX - width;
         int startY = endY - this.font.lineHeight;
-        DrawUtil.drawScrollableTextLeftAlign(guiGraphics, this.font, PREVIEW_TEXT, startX, startY, endX, endY, PREVIEW_TEXT_COLOR, false);
+        GuiGraphicsUtils.scrollingText(guiGraphics, this.font, PREVIEW_TEXT, startX, startY, endX, endY, PREVIEW_TEXT_COLOR, false);
     }
 
     protected void renderTestButton(@NonNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {

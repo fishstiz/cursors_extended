@@ -1,6 +1,5 @@
 package io.github.fishstiz.cursors_extended.platform;
 
-import io.github.fishstiz.cursors_extended.platform.services.GuiGraphicsHelper;
 import io.github.fishstiz.cursors_extended.platform.services.PlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -15,11 +14,6 @@ public class FabricPlatformHelper implements PlatformHelper {
     @Override
     public Path getConfigDir() {
         return FabricLoader.getInstance().getConfigDir();
-    }
-
-    @Override
-    public GuiGraphicsHelper guiGraphicsHelper() {
-        return FabricGuiGraphicsHelper.INSTANCE;
     }
 
     @Override

@@ -1,6 +1,5 @@
-package io.github.fishstiz.cursors_extended.gui.widget;
+package io.github.fishstiz.cursors_extended.gui.components;
 
-import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -47,7 +46,7 @@ public class ElementSlidingBackground {
         int bottom = (int) this.lastY + height;
 
         if (this.outlineOnly) {
-            DrawUtil.renderOutline(guiGraphics, x, (int) this.lastY, width, height, this.color);
+            guiGraphics.outline(x, (int) this.lastY, width, height, this.color);
         } else {
             guiGraphics.fill(x, (int) this.lastY, right, bottom, this.color);
         }

@@ -3,7 +3,6 @@ package io.github.fishstiz.cursors_extended.cursor.debug;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.platform.Services;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
-import io.github.fishstiz.cursors_extended.util.DrawUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -95,8 +94,9 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
 
         Matrix3x2fStack matrix3x2fStack = guiGraphics.pose().pushMatrix();
         guiGraphics.nextStratum();
-        if (outline)
-            DrawUtil.renderOutline(guiGraphics, bounds.left(), bounds.top(), bounds.width(), bounds.height(), color);
+        if (outline) {
+            guiGraphics.outline(bounds.left(), bounds.top(), bounds.width(), bounds.height(), color);
+        }
         matrix3x2fStack.translate(TEXT_SCALE, TEXT_SCALE);
         matrix3x2fStack.scale(TEXT_SCALE, TEXT_SCALE);
         guiGraphics.text(minecraft.font, label, textX, textY, color);

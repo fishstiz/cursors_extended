@@ -1,14 +1,20 @@
-package io.github.fishstiz.cursors_extended.gui.widget;
+package io.github.fishstiz.cursors_extended.gui.components;
 
+import io.github.fishstiz.fidgetz.v0.gui.components.FZPopover;
+import io.github.fishstiz.fidgetz.v0.gui.components.WidgetVisitor;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
 
-public class InactiveInfoWidget extends ButtonWidget {
+import java.util.function.Consumer;
+
+public class InactiveInfoWidget extends Button.Plain implements FZPopover {
     private static final Identifier ICON = Identifier.withDefaultNamespace("textures/gui/sprites/icon/unseen_notification.png");
     private static final int SIZE = 16;
     private static final int ICON_SIZE = 10;
@@ -16,11 +22,9 @@ public class InactiveInfoWidget extends ButtonWidget {
     private final AbstractWidget widget;
 
     public InactiveInfoWidget(AbstractWidget widget, Tooltip tooltip, Runnable onPress) {
-        super(CommonComponents.EMPTY, onPress);
-
+        super(0, 0, SIZE, SIZE, CommonComponents.EMPTY, _ -> onPress.run(), DEFAULT_NARRATION);
         this.widget = widget;
         this.active = false;
-        this.setSize(SIZE, SIZE);
         this.setTooltip(tooltip);
         this.refreshPosition();
         this.refreshVisibility();
@@ -57,5 +61,15 @@ public class InactiveInfoWidget extends ButtonWidget {
         } else {
             this.isHovered = false;
         }
+    }
+
+    @Override
+    public void fidgetz$visitWidgets(WidgetVisitor visitor) {
+        visitor.visitWidget(this);
+    }
+
+    @Override
+    public void fidgetz$visitRenderables(Consumer<Renderable> visitor) {
+        visitor.accept(this);
     }
 }
