@@ -266,7 +266,10 @@ public class CategoryListWidget extends FZAbstractListWidget<CategoryListWidget.
                     .toProps())));
 
             entries.put(id, entry);
-            CategoryListWidget.this.addEntry(entry);
+
+            if (!collapsedRef.value()) {
+                CategoryListWidget.this.addEntry(entry);
+            }
         }
 
         public void addEntry(String id, FZRef<Component> message) {
