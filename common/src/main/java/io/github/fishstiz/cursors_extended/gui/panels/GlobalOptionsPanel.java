@@ -139,7 +139,7 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                             })
                             .onDrag(_ -> {
                                 Cursor cursor = previewCursor.value();
-                                if (cursor.isTextureEnabled()) {
+                                if (!this.scaling && cursor.isTextureEnabled()) {
                                     cursor.cursorType().select();
                                 }
                                 this.scaling = true;

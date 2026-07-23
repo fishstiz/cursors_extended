@@ -104,7 +104,7 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                         if (format != null) e.format(format);
                     })
                     .onDrag(_ -> {
-                        if (cursor.isTextureEnabled()) {
+                        if (!this.scaling && cursor.isTextureEnabled()) {
                             cursor.cursorType().select();
                         }
                         this.scaling = true;
@@ -193,6 +193,7 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                             state.set(new CursorState(settings));
 
                             CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(defaults));
+                            buildWidgets();
                         })
                         .active(!SettingsUtil.equalSettings(cursorTexture.metadata().cursor(), value, true))
                         .toProps())));
@@ -232,8 +233,9 @@ public class CursorOptionsPanel extends AbstractContentPanel {
         if (this.list != null) {
             list.repositionEntries();
             list.setScrollAmount(this.list.scrollAmount());
-            this.list = list;
         }
+
+        this.list = list;
     }
 
     private Config.CursorSettings getDefaults() {

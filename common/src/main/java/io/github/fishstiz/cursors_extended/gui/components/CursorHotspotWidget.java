@@ -31,8 +31,8 @@ public class CursorHotspotWidget extends CursorWidget {
     private static final int OVERFLOW_COLOR = 0xFFFFFFFF; // white
     private final FZRef<CursorState.Hotspots> state;
     private final Consumer<CursorState.Hotspots> onChange;
-    private final int maxXHot;
-    private final int maxYHot;
+    private int maxXHot;
+    private int maxYHot;
     private Runnable onRelease = FunctionUtils.nop();
     private boolean globalMode;
     private boolean dragging = false;
@@ -41,6 +41,13 @@ public class CursorHotspotWidget extends CursorWidget {
         super(0, 0, 128, 128, CommonComponents.ELLIPSIS, cursor, BACKGROUND_128);
         this.state = state;
         this.onChange = onChange;
+        this.maxXHot = SettingsUtil.getMaxXHot(cursor);
+        this.maxYHot = SettingsUtil.getMaxYHot(cursor);
+    }
+
+    @Override
+    public void setCursor(Cursor cursor) {
+        super.setCursor(cursor);
         this.maxXHot = SettingsUtil.getMaxXHot(cursor);
         this.maxYHot = SettingsUtil.getMaxYHot(cursor);
     }
