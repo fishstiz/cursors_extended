@@ -137,13 +137,8 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                                 Component format = getAutoText(e.target().getValue());
                                 if (format != null) e.format(format);
                             })
-                            .onDrag(_ -> {
-                                Cursor cursor = previewCursor.value();
-                                if (!this.scaling && cursor.isTextureEnabled()) {
-                                    cursor.cursorType().select();
-                                }
-                                this.scaling = true;
-                            })
+                            .onClick(_ -> this.scaling = true)
+                            .onDrag(_ -> this.scaling = true)
                             .onRelease(_ -> onReleaseScale())
                             .active(setting.active)
                             .toProps())))

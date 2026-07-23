@@ -103,12 +103,8 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                         Component format = getAutoText(e.target().getValue());
                         if (format != null) e.format(format);
                     })
-                    .onDrag(_ -> {
-                        if (!this.scaling && cursor.isTextureEnabled()) {
-                            cursor.cursorType().select();
-                        }
-                        this.scaling = true;
-                    })
+                    .onClick(_ -> this.scaling = true)
+                    .onDrag(_ -> this.scaling = true)
                     .onRelease(_ -> this.scaling = false)
                     .active(!CONFIG.getGlobal().isScaleActive())
                     .toProps())));

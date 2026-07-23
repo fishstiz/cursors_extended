@@ -2,7 +2,9 @@ package io.github.fishstiz.cursors_extended.gui.panels;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
+import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.gui.components.OptionsListWidget;
+import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.fidgetz.v0.gui.components.GuiComponentCollector;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
 import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
@@ -97,7 +99,7 @@ public class CompatibilityOptionsPanel extends AbstractContentPanel {
                 .tooltip(NATIVE_ANIMATED_CURSORS_INFO)
                 .toggleBuilder()
                 .defaultValue(defaults.shouldAnimateCursorsNatively())
-                .state(CONFIG::setNativeAnimatedCursors, CONFIG::shouldAnimateCursorsNatively)
+                .state(this::onUpdateNativeAnimatedCursors, CONFIG::shouldAnimateCursorsNatively)
                 .active(virtualModeRef.map(value -> !value))
                 .build();
 
@@ -114,6 +116,16 @@ public class CompatibilityOptionsPanel extends AbstractContentPanel {
     public void onSearch(String search) {
         if (this.list != null) {
             this.list.onSearch(search);
+        }
+    }
+
+    private void onUpdateNativeAnimatedCursors(boolean nativeAnimatedCursors) {
+        CONFIG.setNativeAnimatedCursors(nativeAnimatedCursors);
+        for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getCursors()) {
+            CursorTexture cursorTexture = cursor.getTexture();
+            if (cursorTexture != null && cursorTexture.metadata().animation() != null) {
+                CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getOrCreateSettings(cursor));
+            }
         }
     }
 }
