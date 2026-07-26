@@ -10,9 +10,11 @@ import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import io.github.fishstiz.fidgetz.v0.gui.components.FZButton;
+import io.github.fishstiz.fidgetz.v0.gui.components.FZIcon;
 import io.github.fishstiz.fidgetz.v0.gui.components.FZSlider;
 import io.github.fishstiz.fidgetz.v0.gui.components.GuiComponentCollector;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
+import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
 import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -20,6 +22,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -194,6 +197,8 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                         .active(!SettingsUtil.equalSettings(cursorTexture.metadata().cursor(), value, true))
                         .toProps())));
             }
+
+            list.addEntry(FZIcon.builder(Renderables.fill(CommonColors.DARK_GRAY)).height(1).build());
 
             list.addEntry(FZButton.builder()
                     .message(GLOBAL_SETTINGS_TEXT.copy().append(CommonComponents.ELLIPSIS))
