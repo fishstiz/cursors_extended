@@ -33,7 +33,7 @@ publishMods {
     github {
         accessToken = findProperty("GITHUB_TOKEN") ?: ""
         repository = "fishstiz/cursors_extended"
-        commitish = "mc/$minecraft_version"
+        commitish = "dev/26.3"
         version = mod_version
         tagName = "v${this.version}"
         displayName = "v${this.version}"

@@ -6,6 +6,7 @@ import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.Config;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
 import io.github.fishstiz.cursors_extended.cursor.CursorTypesExt;
+import io.github.fishstiz.cursors_extended.gui.CursorState;
 import io.github.fishstiz.cursors_extended.gui.components.OptionsListWidget;
 import io.github.fishstiz.cursors_extended.gui.components.CursorRenderable;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
@@ -14,10 +15,12 @@ import io.github.fishstiz.fidgetz.v0.gui.components.GuiComponentCollector;
 import io.github.fishstiz.fidgetz.v0.gui.components.WidgetRenderables;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
 import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
+import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
@@ -30,6 +33,7 @@ public class AdaptiveOptionsPanel extends AbstractContentPanel {
     private static final Component ITEM_GRAB = Component.translatable("cursors_extended.options.adapt.item_grab");
     private static final Component SCROLLBAR_POINTER = scrollbarText(CursorTypes.POINTING_HAND);
     private static final Component SCROLLBAR_RESIZE = scrollbarText(CursorTypes.RESIZE_NS);
+    private final Map<String, FZMutableRef<CursorState>> cursorStates;
     private OptionsListWidget list;
 
     private static Component scrollbarText(CursorType cursorType) {
@@ -38,8 +42,9 @@ public class AdaptiveOptionsPanel extends AbstractContentPanel {
         ));
     }
 
-    public AdaptiveOptionsPanel(Minecraft minecraft, Screen screen) {
+    public AdaptiveOptionsPanel(Minecraft minecraft, Screen screen, Map<String, FZMutableRef<CursorState>> cursorStates) {
         super("Adaptive", minecraft, screen, Component.translatable("cursors_extended.options.adapt"));
+        this.cursorStates = cursorStates;
     }
 
     @Override
@@ -123,7 +128,13 @@ public class AdaptiveOptionsPanel extends AbstractContentPanel {
                 loadCursor(cursor);
             }
 
-            CONFIG.getOrCreateSettings(cursor).setEnabled(adaptive);
+            Config.CursorSettings settings =  CONFIG.getOrCreateSettings(cursor);
+            settings.setEnabled(adaptive);
+
+            FZMutableRef<CursorState> cursorState = cursorStates.get(cursor.name());
+            if (cursorState != null) {
+                cursorState.set(prev -> prev.enabled(settings.enabled() && cursor.isTextureEnabled()));
+            }
         }
     }
 

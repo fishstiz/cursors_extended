@@ -125,7 +125,7 @@ public class ConfigScreen extends FZScreen {
     protected void init() {
         registerCategory(new GlobalOptionsPanel(minecraft, this, previewCursor, cursorStates, this::setContent));
 
-        AdaptiveOptionsPanel adaptiveOptions = new AdaptiveOptionsPanel(minecraft, this);
+        AdaptiveOptionsPanel adaptiveOptions = new AdaptiveOptionsPanel(minecraft, this, cursorStates);
 
         MutableObject<String> initialPanelId = new MutableObject<>(adaptiveOptions.getId());
 
