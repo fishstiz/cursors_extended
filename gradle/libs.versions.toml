@@ -1,5 +1,5 @@
 [versions]
-fidgetz = "0.6.0-alpha.11+26.3"
+fidgetz = "0.6.2-alpha.1+26.3"
 
 [libraries]
 fidgetz-common = { module = "io.github.fishstiz.fidgetz:fidgetz-common", version.ref = "fidgetz" }

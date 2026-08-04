@@ -14,7 +14,6 @@ import net.minecraft.server.packs.PackType;
 public class CursorsExtendedFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClientLifecycleEvents.CLIENT_STARTED.register(CursorsExtended.getInstance()::onClientStarted);
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(CursorTextureLoader.getDir(), CursorsExtended.getInstance().getLoader());
         FabricLoader.getInstance().getModContainer(CursorsExtended.MOD_ID).ifPresent(modContainer -> {
             registerCursorPack(modContainer, BuiltinCursorResourcePack.DEFAULT, PackActivationType.DEFAULT_ENABLED);

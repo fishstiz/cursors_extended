@@ -14,28 +14,22 @@ import org.jspecify.annotations.Nullable;
 
 public class CursorDisplay {
     private final CursorRegistry registry;
-    private Minecraft minecraft;
     private CursorDebugRenderer debugRenderer = CursorDebugRenderer.NOP;
     private CursorRenderer cursorRenderer;
     private @Nullable Screen visibleScreen;
 
     public CursorDisplay(CursorRegistry registry) {
         this.registry = registry;
-        this.cursorRenderer = new CursorRenderer.Native(registry);
-    }
-
-    public void onClientStarted(Minecraft minecraft) {
-        this.minecraft = minecraft;
-
-        if (CursorsExtended.CONFIG.isVirtualMode() != isVirtual()) {
-            this.toggleVirtual();
-        }
+        this.cursorRenderer = CursorsExtended.CONFIG.isVirtualMode()
+                ? new CursorRenderer.Virtual(registry)
+                : new CursorRenderer.Native(registry);
     }
 
     public CursorType getCursorAt(Window window) {
         Screen screen = getVisibleScreen();
 
         if (screen != null) {
+            Minecraft minecraft = Minecraft.getInstance();
             double mouseX = minecraft.mouseHandler.getScaledXPos(window);
             double mouseY = minecraft.mouseHandler.getScaledYPos(window);
             return getCursorAt(screen, mouseX, mouseY);
@@ -78,18 +72,18 @@ public class CursorDisplay {
     }
 
     public @Nullable Screen getVisibleScreen() {
-        Screen screen = minecraft.gui.screen();
+        Screen screen = Minecraft.getInstance().gui.screen();
         return screen != null ? screen : visibleScreen;
     }
 
     public void toggleVirtual() {
-        cursorRenderer.resetCursor(minecraft.getWindow());
+        cursorRenderer.resetCursor(Minecraft.getInstance().getWindow());
         cursorRenderer = isVirtual() ? new CursorRenderer.Native(registry) : new CursorRenderer.Virtual(registry);
-        cursorRenderer.applyCursor(minecraft.getWindow());
+        cursorRenderer.applyCursor(Minecraft.getInstance().getWindow());
     }
 
     public void renderCursor(Window window, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
-        cursorRenderer.render(window, minecraft, guiGraphics, mouseX, mouseY);
+        cursorRenderer.render(window, Minecraft.getInstance(), guiGraphics, mouseX, mouseY);
     }
 
     public boolean isVirtual() {
@@ -100,7 +94,7 @@ public class CursorDisplay {
         debugRenderer = debugRenderer.isActive() ? CursorDebugRenderer.NOP : CursorDebugRenderer.create();
     }
 
-    public void renderDebugger(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+    public void renderDebugger(GuiGraphicsExtractor guiGraphics, Minecraft minecraft, int mouseX, int mouseY) {
         debugRenderer.render(minecraft, this::getVisibleScreen, guiGraphics, mouseX, mouseY);
     }
 
@@ -117,10 +111,10 @@ public class CursorDisplay {
     }
 
     public Cursor getDisplayedCursor() {
-        return getDisplayedCursor(minecraft.getWindow());
+        return getDisplayedCursor(Minecraft.getInstance().getWindow());
     }
 
     public Window getWindow() {
-        return minecraft.getWindow();
+        return Minecraft.getInstance().getWindow();
     }
 }

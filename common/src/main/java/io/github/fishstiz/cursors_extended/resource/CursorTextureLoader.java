@@ -35,15 +35,10 @@ import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 public class CursorTextureLoader implements PreparableReloadListener {
     private final Map<String, CursorMetadata> preparedMetadata = new Object2ObjectOpenHashMap<>();
     private final CursorRegistry registry;
-    private Minecraft minecraft;
     private boolean prepared;
 
     public CursorTextureLoader(CursorRegistry registry) {
         this.registry = registry;
-    }
-
-    public void onClientStarted(Minecraft minecraft) {
-        this.minecraft = minecraft;
     }
 
     @Override
@@ -60,7 +55,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
     }
 
     public void reload() {
-        prepare(minecraft.getResourceManager());
+        prepare(Minecraft.getInstance().getResourceManager());
         loadTextures(registry.getCursors());
     }
 
@@ -143,9 +138,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
         if (texture != null) {
             texture.close();
             cursor.setTexture(null);
-            if (minecraft != null) {
-                minecraft.execute(() -> minecraft.getTextureManager().release(texture.texturePath()));
-            }
+            Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(texture.texturePath()));
         }
     }
 
@@ -169,7 +162,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
                     CursorTexture texture = createTexture(image, path, metadata, settings);
 
                     cursor.setTexture(texture);
-                    minecraft.execute(() -> minecraft.getTextureManager().release(path));
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().release(path));
                     loaded = true;
                 }
             }
@@ -187,7 +180,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
     }
 
     public boolean loadTexture(Cursor cursor) {
-        return loadTexture(minecraft.getResourceManager(), cursor);
+        return loadTexture(Minecraft.getInstance().getResourceManager(), cursor);
     }
 
     private void loadTextures(ResourceManager manager, Collection<Cursor> cursors) {
@@ -206,7 +199,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
     }
 
     public void loadTextures(Collection<Cursor> cursors) {
-        loadTextures(minecraft.getResourceManager(), cursors);
+        loadTextures(Minecraft.getInstance().getResourceManager(), cursors);
     }
 
     public void updateTexture(Cursor cursor, float scale, int xhot, int yhot, Boolean animated) {

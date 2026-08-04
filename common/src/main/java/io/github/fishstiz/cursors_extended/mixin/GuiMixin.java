@@ -32,7 +32,7 @@ public abstract class GuiMixin {
             @Local(ordinal = 1) int mouseY
     ) {
         CursorDisplay display = CursorsExtended.getInstance().getDisplay();
-        display.renderDebugger(guiGraphics, mouseX, mouseY);
+        display.renderDebugger(guiGraphics, minecraft, mouseX, mouseY);
         display.renderCursor(minecraft.getWindow(), guiGraphics, mouseX, mouseY);
     }
 }

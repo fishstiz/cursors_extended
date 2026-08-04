@@ -1,8 +1,6 @@
-- Port to 26.3 Snapshot 4
-- Migrated to SDL3
-- Animated Cursors are now animated natively via SDL3. 
-  - The main benefit is that animated cursors are no longer blocked from animating when the game slows done (i.e. during loading).  
-  - Added option to always use software animation under Compatibility Options, in case animated cursors are not supported by the platform.
-  - Does not support random animation modes and will automatically revert to software animation for the specific cursor only.
-  - Disabled for virtual rendering mode.
-- Temporarily disabled workarounds
+- Port to 26.3 Snapshot 7 (fixes crash on startup)
+- Updated the Cursor Settings screen (navigable from **Options**>**Controls**>**Mouse Settings**>**Cursor Settings** without mod menu like always).
+  - Added Hotspot widget for Global Cursor Settings.
+  - Added preview cursor dropdown for Global Cursor Settings.
+  - Other small changes.
+  - Fix toggling software animations not reloading animated cursors automatically.

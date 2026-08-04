@@ -20,11 +20,6 @@ public final class CursorsExtended {
     private CursorsExtended() {
     }
 
-    public void onClientStarted(Minecraft minecraft) {
-        textureLoader.onClientStarted(minecraft);
-        display.onClientStarted(minecraft);
-    }
-
     private static final class Holder {
         private static final CursorsExtended INSTANCE = new CursorsExtended();
     }
