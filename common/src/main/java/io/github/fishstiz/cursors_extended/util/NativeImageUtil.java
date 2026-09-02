@@ -3,17 +3,21 @@ package io.github.fishstiz.cursors_extended.util;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
-import io.github.fishstiz.cursors_extended.mixin.util.NativeImageAccess;
 import io.github.fishstiz.cursors_extended.resource.texture.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.SharedConstants;
 import org.lwjgl.sdl.*;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.util.spng.SPNG;
+import org.lwjgl.util.spng.spng_ihdr;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
@@ -74,16 +78,58 @@ public class NativeImageUtil {
         buffer.flip();
     }
 
+    // copy of NativeImage#writeToFile, except we write to baos
     public static byte[] getBytes(NativeImage image) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        WritableByteChannel channel = Channels.newChannel(baos);
+        if (image.getPointer() == 0) {
+            throw new IllegalStateException("Image is not allocated.");
+        }
 
-        boolean success = ((NativeImageAccess) (Object) image).cursors_extended$writeToChannel(channel);
-        channel.close();
+        long context = SPNG.spng_ctx_new(SPNG.SPNG_CTX_ENCODER);
 
-        if (!success) throw new IOException("Failed to write NativeImage to PNG bytes.");
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
+             WritableByteChannel channel = Channels.newChannel(output);
+             Arena arena = Arena.ofConfined();
+             MemoryStack stack = MemoryStack.stackPush()) {
 
-        return baos.toByteArray();
+            int width = image.getWidth();
+            int height = Math.min(image.getHeight(), Integer.MAX_VALUE / width / image.format().components());
+
+            NativeImage.WriteCallback writer = new NativeImage.WriteCallback(channel);
+            MemorySegment writerUpcall = writer.createUpcall(arena);
+
+            checkSpngError("set output", SPNG.nspng_set_png_stream(context, writerUpcall.address(), 0L));
+
+            spng_ihdr header = spng_ihdr.calloc(stack)
+                    .width(width)
+                    .height(height)
+                    .color_type((byte) image.format().pngColorType)
+                    .bit_depth((byte) 8);
+
+            checkSpngError("set header", SPNG.spng_set_ihdr(context, header));
+            checkSpngError("write image", SPNG.nspng_encode_image(
+                    context,
+                    image.getPointer(),
+                    getSize(image),
+                    SPNG.SPNG_FMT_PNG,
+                    SPNG.SPNG_ENCODE_FINALIZE
+            ));
+
+            writer.throwIfException();
+            return output.toByteArray();
+        } finally {
+            SPNG.spng_ctx_free(context);
+        }
+    }
+
+    private static long getSize(NativeImage image) {
+        return (long) image.getWidth() * (long) image.getHeight() * (long) image.format().components();
+    }
+
+    // copy of NativeImage#checkSpngError
+    private static void checkSpngError(final String operation, final int result) throws IOException {
+        if (result != 0) {
+            throw new IOException("SPNG operation '" + operation + "' failed: " + SPNG.spng_strerror(result) + " (" + result + ")");
+        }
     }
 
     public static long createCursor(NativeImage image, CursorProperties settings) throws IOException {
