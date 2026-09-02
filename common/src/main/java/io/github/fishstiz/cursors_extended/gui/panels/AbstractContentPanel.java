@@ -7,8 +7,10 @@ import io.github.fishstiz.cursors_extended.util.SettingsUtil;
 import io.github.fishstiz.fidgetz.v0.gui.components.GuiComponentCollector;
 import io.github.fishstiz.fidgetz.v0.gui.components.events.FZHoverableElement;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
+import io.github.fishstiz.fidgetz.v0.utils.NavigationUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -32,7 +34,6 @@ public abstract class AbstractContentPanel extends AbstractContainerWidget {
     protected static final Component GUI_SCALE_TEXT = Component.translatable("cursors_extended.options.scale.gui");
     protected static final Component XHOT_TEXT = Component.translatable("cursors_extended.options.xhot");
     protected static final Component YHOT_TEXT = Component.translatable("cursors_extended.options.yhot");
-    protected static final Component HOTSPOT_SUFFIX = Component.translatable("cursors_extended.options.hotspot-suffix");
     protected static final Component HOTSPOT_GUIDE_TEXT = Component.translatable("cursors_extended.options.hotspot-guide");
     protected static final int DEFAULT_SPACING = 8;
     protected final Minecraft minecraft;
@@ -74,6 +75,10 @@ public abstract class AbstractContentPanel extends AbstractContainerWidget {
     protected abstract void buildWidgets(GuiComponentCollector collector, FZFlexLayout layout);
 
     public final void buildWidgets() {
+        boolean focused = isFocused();
+
+        setFocused(null);
+
         layout.removeChildren();
         children.clear();
         renderables.clear();
@@ -87,6 +92,13 @@ public abstract class AbstractContentPanel extends AbstractContainerWidget {
 
         layout.visitWidgets(collector::renderableWidget);
         collector.flushTo(this::addWidget, renderables::add);
+
+        if (focused && getFocused() == null) {
+            ComponentPath path = NavigationUtils.initialFocus(this);
+            if (path != null) {
+                path.applyFocus(true);
+            }
+        }
     }
 
     private <T extends GuiEventListener & NarratableEntry> void addWidget(T widget) {
@@ -243,5 +255,9 @@ public abstract class AbstractContentPanel extends AbstractContainerWidget {
         if (texture != null && (texture.xhot() != xhot || texture.yhot() != yhot)) {
             CursorsExtended.getInstance().getLoader().updateTexture(cursor, texture.scale(), xhot, yhot);
         }
+    }
+
+    protected static Component pixelValue(Component label, int value) {
+        return Component.translatable("options.pixel_value", label, value);
     }
 }

@@ -5,7 +5,6 @@ import io.github.fishstiz.fidgetz.v0.gui.components.FZButton;
 import io.github.fishstiz.fidgetz.v0.gui.components.WidgetElements;
 import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
 import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
-import io.github.fishstiz.fidgetz.v0.gui.state.FZRef;
 import io.github.fishstiz.fidgetz.v0.gui.text.TextComponentUtils;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -40,6 +39,12 @@ public class CategoryListWidget extends FZAbstractListWidget<CategoryListWidget.
         return 0;
     }
 
+    public void addEntry(String id, AbstractWidget widget) {
+        Entry entry = Entry.simple(id, widget);
+        entries.put(id, entry);
+        addEntry(entry);
+    }
+
     public void addEntry(String id, Component message, WidgetElements icon) {
         Entry entry = Entry.simple(id, FZButton.builder()
                 .height(ITEM_HEIGHT)
@@ -55,24 +60,6 @@ public class CategoryListWidget extends FZAbstractListWidget<CategoryListWidget.
     }
 
     public void addEntry(String id, Component message) {
-        addEntry(id, message, DEFAULT_ICON);
-    }
-
-    public void addEntry(String id, FZRef<Component> message, WidgetElements icon) {
-        Entry entry = Entry.simple(id, FZButton.bind(id, message.map(value -> FZButton.builder()
-                .height(ITEM_HEIGHT)
-                .sprites(null)
-                .leftIcon(icon)
-                .message(value)
-                .leftAlignedMessage()
-                .onPress(() -> selector.accept(id))
-                .toProps())));
-
-        entries.put(id, entry);
-        addEntry(entry);
-    }
-
-    public void addEntry(String id, FZRef<Component> message) {
         addEntry(id, message, DEFAULT_ICON);
     }
 
@@ -234,8 +221,18 @@ public class CategoryListWidget extends FZAbstractListWidget<CategoryListWidget.
             collapse(true);
         }
 
+        public void addEntry(String id, AbstractWidget widget) {
+            widget.setHeight(ITEM_HEIGHT);
+
+            Entry entry = Entry.child(id, collapsedRef, widget);
+            entries.put(id, entry);
+            if (!collapsedRef.value()) {
+                CategoryListWidget.this.addEntry(entry);
+            }
+        }
+
         public void addEntry(String id, Component message, WidgetElements icon) {
-            Entry entry = Entry.child(id, collapsedRef, FZButton.builder()
+            addEntry(id, FZButton.builder()
                     .height(ITEM_HEIGHT)
                     .sprites(null)
                     .leftIcon(icon)
@@ -243,36 +240,9 @@ public class CategoryListWidget extends FZAbstractListWidget<CategoryListWidget.
                     .leftAlignedMessage()
                     .onPress(() -> selector.accept(id))
                     .build());
-
-            entries.put(id, entry);
-
-            if (!collapsedRef.value()) {
-                CategoryListWidget.this.addEntry(entry);
-            }
         }
 
         public void addEntry(String id, Component message) {
-            addEntry(id, message, DEFAULT_ICON);
-        }
-
-        public void addEntry(String id, FZRef<Component> message, WidgetElements icon) {
-            Entry entry = Entry.child(id, collapsedRef, FZButton.bind(id, message.map(value -> FZButton.builder()
-                    .height(ITEM_HEIGHT)
-                    .sprites(null)
-                    .leftIcon(icon)
-                    .message(value)
-                    .leftAlignedMessage()
-                    .onPress(() -> selector.accept(id))
-                    .toProps())));
-
-            entries.put(id, entry);
-
-            if (!collapsedRef.value()) {
-                CategoryListWidget.this.addEntry(entry);
-            }
-        }
-
-        public void addEntry(String id, FZRef<Component> message) {
             addEntry(id, message, DEFAULT_ICON);
         }
     }

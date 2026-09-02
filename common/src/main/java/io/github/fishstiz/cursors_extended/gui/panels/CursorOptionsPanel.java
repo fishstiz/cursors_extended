@@ -9,24 +9,22 @@ import io.github.fishstiz.cursors_extended.gui.components.*;
 import io.github.fishstiz.cursors_extended.resource.texture.CursorTexture;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import io.github.fishstiz.cursors_extended.util.SettingsUtil;
-import io.github.fishstiz.fidgetz.v0.gui.components.FZButton;
-import io.github.fishstiz.fidgetz.v0.gui.components.FZIcon;
-import io.github.fishstiz.fidgetz.v0.gui.components.FZSlider;
-import io.github.fishstiz.fidgetz.v0.gui.components.GuiComponentCollector;
+import io.github.fishstiz.fidgetz.v0.gui.components.*;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
 import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
 import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
+import io.github.fishstiz.fidgetz.v0.utils.NavigationUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import static io.github.fishstiz.cursors_extended.CursorsExtended.CONFIG;
@@ -38,26 +36,20 @@ public class CursorOptionsPanel extends AbstractContentPanel {
     private static final Tooltip GLOBAL_SCALE_TOOLTIP = createGlobalTooltip(SCALE_TEXT);
     private static final Tooltip GLOBAL_XHOT_TOOLTIP = createGlobalTooltip(XHOT_TEXT);
     private static final Tooltip GLOBAL_YHOT_TOOLTIP = createGlobalTooltip(YHOT_TEXT);
-    private final FZMutableRef<CursorState> state;
     private final FZMutableRef<Boolean> hotspotGuide = new FZMutableRef<>(CONFIG.isShowHotspotGuide());
     private final Cursor cursor;
     private final Runnable globalRedirect;
-    private final List<Runnable> subscriptions = new ArrayList<>();
+    private final FZMutableRef<CursorState> state;
+    private String lastFocusedId;
     private OptionsListWidget list;
     private CursorHotspotWidget hotspotWidget;
     private boolean scaling = false;
 
-    public CursorOptionsPanel(
-            Minecraft minecraft,
-            Screen screen,
-            Cursor cursor,
-            FZMutableRef<CursorState> state,
-            Runnable globalRedirect
-    ) {
+    public CursorOptionsPanel(Minecraft minecraft, Screen screen, Cursor cursor, Runnable globalRedirect) {
         Component title = Component.translatable("cursors_extended.options.cursor-type", cursor.text());
         Component shorthandTitle = cursor.text();
         super(cursor.text().toString(), minecraft, screen, title, shorthandTitle);
-        this.state = state;
+        this.state = new FZMutableRef<>(new CursorState(cursor));
         this.cursor = cursor;
         this.globalRedirect = globalRedirect;
     }
@@ -72,24 +64,36 @@ public class CursorOptionsPanel extends AbstractContentPanel {
 
     @Override
     protected void buildWidgets(GuiComponentCollector collector, FZFlexLayout layout) {
+        state.set(new CursorState(cursor));
+
         OptionsListWidget list = layout.child(new OptionsListWidget(), layout.flexChildSettings());
         {
-            list.addEntry(FZButton.bind("EnabledButton", state.map(CursorState::enabled).map(value -> FZButton.builder()
-                    .message(CommonComponents.optionNameValue(ENABLE_TEXT, CommonComponents.optionStatus(value && cursor.hasTexture())))
-                    .onPress(() -> {
-                        if (!cursor.hasTexture() && loadCursor(cursor)) {
-                            CONFIG.getOrCreateSettings(cursor).setEnabled(true);
-                            state.set(prev -> prev.enabled(true));
-                            buildWidgets();
-                            return;
-                        }
-                        if (this.cursor.hasTexture()) {
-                            boolean newValue = !value;
-                            CONFIG.getOrCreateSettings(cursor).setEnabled(newValue);
-                            state.set(prev -> prev.enabled(newValue));
-                        }
-                    })
-                    .toProps())));
+            FZButton enabledButton = list.addEntry(FZButton.bind("EnabledButton", state
+                    .map(CursorState::enabled)
+                    .map(value -> FZButton.builder()
+                            .id("EnabledButton")
+                            .message(CommonComponents.optionNameValue(ENABLE_TEXT, CommonComponents.optionStatus(value && cursor.hasTexture())))
+                            .onPress(e -> {
+                                this.lastFocusedId = e.target().fidgetz$componentId();
+
+                                if (!cursor.hasTexture() && loadCursor(cursor)) {
+
+                                    CONFIG.getOrCreateSettings(cursor).setEnabled(true);
+
+                                    state.set(prev -> prev.enabled(true));
+                                    buildWidgets();
+                                    return;
+                                }
+                                if (this.cursor.hasTexture()) {
+                                    boolean newValue = !value;
+                                    CONFIG.getOrCreateSettings(cursor).setEnabled(newValue);
+                                    state.set(prev -> prev.enabled(newValue));
+                                }
+                            })
+                            .focusOnInteraction(value)
+                            .toProps())));
+
+            refocusListElement(list, enabledButton);
 
             if (!cursor.hasTexture()) {
                 return;
@@ -122,33 +126,35 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                     .active(!SettingsUtil.isAutoScale(value) && !CONFIG.getGlobal().isScaleActive())
                     .toProps())));
 
-            subscriptions.add(state.subscribe("ScaleSettings", CursorState::scale, this::onChangeScale));
+            state.subscribe("ScaleSettings", CursorState::scale, this::onChangeScale);
 
-            FZSlider xhotSlider = list.addEntry(FZSlider.bind("XHotSlider", state.map(CursorState::xhot).map(value -> FZSlider.builder()
-                    .label(XHOT_TEXT)
-                    .min(SettingsUtil.HOT_MIN)
-                    .max(SettingsUtil.getMaxXHot(cursor))
-                    .step(SettingsUtil.HOT_STEP)
-                    .value(SettingsUtil.sanitizeXHot(value, cursor))
-                    .onChange(e -> state.set(prev -> prev.xhot((int) e.value())))
-                    .onFormat(e -> e.format(FZSlider.defaultValueFormat(e.target().getValue(), 0).copy().append(HOTSPOT_SUFFIX)))
-                    .active(!CONFIG.getGlobal().isXHotActive())
-                    .toProps())));
+            FZSlider xhotSlider = list.addEntry(FZSlider.bind("XHotSlider", state
+                    .map(CursorState::hotspots)
+                    .map(hotspots -> FZSlider.builder()
+                            .min(SettingsUtil.HOT_MIN)
+                            .max(SettingsUtil.getMaxXHot(cursor))
+                            .step(SettingsUtil.HOT_STEP)
+                            .value(SettingsUtil.sanitizeXHot(hotspots.x(), cursor))
+                            .onChange(e -> onChangeHotspots(hotspots.x(((int) e.value()))))
+                            .onFormat(e -> e.format(pixelValue(XHOT_TEXT, (int) e.target().getValue())))
+                            .active(!CONFIG.getGlobal().isXHotActive())
+                            .toProps())));
 
             if (CONFIG.getGlobal().isXHotActive()) {
                 collector.renderableWidget(new InactiveInfoWidget(xhotSlider, GLOBAL_XHOT_TOOLTIP, globalRedirect));
             }
 
-            FZSlider yhotSlider = list.addEntry(FZSlider.bind("YHotSlider", state.map(CursorState::yhot).map(value -> FZSlider.builder()
-                    .label(YHOT_TEXT)
-                    .min(SettingsUtil.HOT_MIN)
-                    .max(SettingsUtil.getMaxYHot(cursor))
-                    .step(SettingsUtil.HOT_STEP)
-                    .value(SettingsUtil.sanitizeYHot(value, cursor))
-                    .onChange(e -> state.set(prev -> prev.yhot((int) e.value())))
-                    .onFormat(e -> e.format(FZSlider.defaultValueFormat(e.target().getValue(), 0).copy().append(HOTSPOT_SUFFIX)))
-                    .active(!CONFIG.getGlobal().isYHotActive())
-                    .toProps())));
+            FZSlider yhotSlider = list.addEntry(FZSlider.bind("YHotSlider", state
+                    .map(CursorState::hotspots)
+                    .map(hotspots -> FZSlider.builder()
+                            .min(SettingsUtil.HOT_MIN)
+                            .max(SettingsUtil.getMaxYHot(cursor))
+                            .step(SettingsUtil.HOT_STEP)
+                            .value(SettingsUtil.sanitizeYHot(hotspots.y(), cursor))
+                            .onChange(e -> onChangeHotspots(hotspots.y(((int) e.value()))))
+                            .onFormat(e -> e.format(pixelValue(YHOT_TEXT, (int) e.target().getValue())))
+                            .active(!CONFIG.getGlobal().isYHotActive())
+                            .toProps())));
 
             if (CONFIG.getGlobal().isXHotActive()) {
                 collector.renderableWidget(new InactiveInfoWidget(yhotSlider, GLOBAL_YHOT_TOOLTIP, globalRedirect));
@@ -164,12 +170,21 @@ public class CursorOptionsPanel extends AbstractContentPanel {
             CursorTexture cursorTexture = cursor.getTexture();
 
             if (cursorTexture != null && cursorTexture.metadata().animation() != null) {
-                list.addEntry(FZButton.bind("AnimateButton", state.map(CursorState::animationEnabled).map(value -> FZButton.builder()
-                        .message(CommonComponents.optionNameValue(ANIMATE_TEXT, CommonComponents.optionStatus(value)))
-                        .onPress(() -> state.set(prev -> prev.animated(!prev.animationEnabled())))
-                        .toProps())));
+                FZButton animateButton = list.addEntry(FZButton.bind("AnimateButton", state
+                        .map(CursorState::animationEnabled)
+                        .map(value -> FZButton.builder()
+                                .id("AnimateButton")
+                                .message(CommonComponents.optionNameValue(ANIMATE_TEXT, CommonComponents.optionStatus(value)))
+                                .focusOnInteraction(false)
+                                .onPress(e -> {
+                                    this.lastFocusedId = e.target().fidgetz$componentId();
+                                    state.set(prev -> prev.animated(!prev.animationEnabled()));
+                                })
+                                .toProps())));
 
-                subscriptions.add(state.subscribe("AnimatedSettings", CursorState::animated, this::onChangeAnimated));
+                refocusListElement(list, animateButton);
+
+                state.subscribe("AnimatedSettings", CursorState::animated, this::onChangeAnimated);
 
                 list.addEntry(FZButton.builder()
                         .message(RESET_ANIMATION_TEXT)
@@ -182,9 +197,12 @@ public class CursorOptionsPanel extends AbstractContentPanel {
             }
 
             if (cursorTexture != null) {
-                list.addEntry(FZButton.bind("ResetDefaultButton", state.map(value -> FZButton.builder()
+                FZButton resetButton = list.addEntry(FZButton.bind("ResetDefaultButton", state.map(value -> FZButton.builder()
+                        .id("ResetDefaultButton")
                         .message(RESET_DEFAULTS_TEXT)
-                        .onPress(() -> {
+                        .onPress(e -> {
+                            this.lastFocusedId = e.target().fidgetz$componentId();
+
                             Config.CursorSettings defaults = getDefaults();
                             Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
 
@@ -192,10 +210,15 @@ public class CursorOptionsPanel extends AbstractContentPanel {
                             state.set(new CursorState(settings));
 
                             CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(defaults));
+
+
                             buildWidgets();
                         })
                         .active(!SettingsUtil.equalSettings(cursorTexture.metadata().cursor(), value, true))
+                        .focusOnInteraction(false)
                         .toProps())));
+
+                refocusListElement(list, resetButton);
             }
 
             list.addEntry(FZIcon.builder(Renderables.fill(CommonColors.DARK_GRAY)).height(1).build());
@@ -232,11 +255,13 @@ public class CursorOptionsPanel extends AbstractContentPanel {
         }
 
         if (this.list != null) {
+            this.list.onRemove();
             list.repositionEntries();
             list.setScrollAmount(this.list.scrollAmount());
         }
 
         this.list = list;
+        this.lastFocusedId = null;
     }
 
     private Config.CursorSettings getDefaults() {
@@ -257,15 +282,6 @@ public class CursorOptionsPanel extends AbstractContentPanel {
         }
 
         return defaultSettings;
-    }
-
-    @Override
-    public void onRemove() {
-        this.scaling = false;
-        for (Iterator<Runnable> it = subscriptions.iterator(); it.hasNext(); ) {
-            it.next().run();
-            it.remove();
-        }
     }
 
     private void onChangeScale(float scale) {
@@ -312,6 +328,18 @@ public class CursorOptionsPanel extends AbstractContentPanel {
             CursorType cursorType = this.hotspotWidget.cursors_extended$cursorType(mouseX, mouseY);
             if (cursorType != CursorType.DEFAULT) {
                 graphics.requestCursor(cursorType);
+            }
+        }
+    }
+
+    private <T extends FZComponent & GuiEventListener> void refocusListElement(OptionsListWidget newList, T component) {
+        if (!newList.isFocused() &&
+            this.lastFocusedId != null &&
+            Objects.equals(component.fidgetz$componentId(), this.lastFocusedId)) {
+            ComponentPath path = NavigationUtils.findPath(newList, component);
+            if (path != null) {
+                setFocused(newList);
+                path.applyFocus(true);
             }
         }
     }

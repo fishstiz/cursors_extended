@@ -13,6 +13,7 @@ import io.github.fishstiz.fidgetz.v0.gui.components.*;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
 import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
 import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
+import io.github.fishstiz.fidgetz.v0.gui.state.FZRef;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -21,7 +22,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -43,9 +43,9 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
     private static final Component RESET_TEXT = Component.translatable("cursors_extended.options.resource_pack.reset");
     private static final Component RESET_INFO = Component.translatable("cursors_extended.options.resource_pack.reset.tooltip");
     private final FZMutableRef<GlobalState> state = new FZMutableRef<>(new GlobalState());
-    private final Map<String, FZMutableRef<CursorState>> cursorStates;
-    private final FZMutableRef<Cursor> previewCursor;
     private final FZMutableRef<Boolean> hotspotGuide = new FZMutableRef<>(CONFIG.isShowHotspotGuide());
+    private final FZRef<Cursor> previewCursor;
+    private final Consumer<Cursor> changePreviewCursorHandler;
     private final Consumer<String> redirect;
     private OptionsListWidget list;
     private CursorHotspotWidget hotspotWidget;
@@ -54,14 +54,14 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
     public GlobalOptionsPanel(
             Minecraft minecraft,
             Screen screen,
-            FZMutableRef<Cursor> previewCursor,
-            Map<String, FZMutableRef<CursorState>> cursorStates,
+            FZRef<Cursor> previewCursor,
+            Consumer<Cursor> changePreviewCursorHandler,
             Consumer<String> redirect
     ) {
         Component shorthandTitle = Component.translatable("cursors_extended.options.global");
         super("Global", minecraft, screen, GLOBAL_SETTINGS_TEXT, shorthandTitle);
-        this.cursorStates = cursorStates;
         this.previewCursor = previewCursor;
+        this.changePreviewCursorHandler = changePreviewCursorHandler;
         this.redirect = redirect;
     }
 
@@ -99,7 +99,7 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                                             .message(cursor.text())
                                             .leftAlignedMessage()
                                             .active(value != cursor)
-                                            .onPress(() -> previewCursor.set(cursor))
+                                            .onPress(() -> changePreviewCursorHandler.accept(cursor))
                                             .build()))
                                     .collect(Collectors.toUnmodifiableList()))
                             .active(CONFIG.hasResourcePack())
@@ -164,13 +164,12 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                     .keyword(XHOT_TEXT)
                     .tooltip(XHOT_INFO)
                     .flexWidget(FZSlider.bind("XHotSlider", state.map(GlobalState::xhot).map(setting -> FZSlider.builder()
-                            .label(XHOT_TEXT)
                             .min(SettingsUtil.HOT_MIN)
                             .max(maxHotspots.firstInt())
                             .step(SettingsUtil.HOT_STEP)
                             .value(setting.value)
                             .onChange(e -> state.set(prev -> prev.xhot((int) e.value())))
-                            .onFormat(e -> e.format(FZSlider.defaultValueFormat(e.target().getValue(), 0).copy().append(HOTSPOT_SUFFIX)))
+                            .onFormat(e -> e.format(pixelValue(XHOT_TEXT, (int) e.target().getValue())))
                             .onRelease(_ -> onReleaseXHot())
                             .active(setting.active)
                             .toProps())))
@@ -185,13 +184,12 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
                     .keyword(YHOT_TEXT)
                     .tooltip(YHOT_INFO)
                     .flexWidget(FZSlider.bind("YHotSlider", state.map(GlobalState::yhot).map(setting -> FZSlider.builder()
-                            .label(YHOT_TEXT)
                             .min(SettingsUtil.HOT_MIN)
                             .max(maxHotspots.secondInt())
                             .step(SettingsUtil.HOT_STEP)
                             .value(setting.value)
                             .onChange(e -> state.set(prev -> prev.yhot((int) e.value())))
-                            .onFormat(e -> e.format(FZSlider.defaultValueFormat(e.target().getValue(), 0).copy().append(HOTSPOT_SUFFIX)))
+                            .onFormat(e -> e.format(pixelValue(YHOT_TEXT, (int) e.target().getValue())))
                             .onRelease(_ -> onReleaseYHot())
                             .active(setting.active)
                             .toProps())))
@@ -368,10 +366,6 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
             if (texture != null && texture.metadata().animation() != null) {
                 CursorsExtended.getInstance().getLoader().updateTexture(cursor, animated);
                 CONFIG.getOrCreateSettings(cursor).setAnimated(animated);
-                FZMutableRef<CursorState> cursorState = cursorStates.get(cursor.name());
-                if (cursorState != null) {
-                    cursorState.set(prev -> prev.animated(animated));
-                }
             }
         }
     }
@@ -382,11 +376,6 @@ public class GlobalOptionsPanel extends AbstractContentPanel {
             if (texture != null) {
                 Config.CursorSettings settings = CONFIG.getOrCreateSettings(cursor);
                 settings.mergeAll(texture.metadata().cursor());
-                FZMutableRef<CursorState> cursorState = cursorStates.get(cursor.name());
-                if (cursorState != null) {
-                    cursorState.set(new CursorState(settings));
-                }
-
                 CursorsExtended.getInstance().getLoader().updateTexture(cursor, CONFIG.getGlobal().apply(settings));
             }
         }

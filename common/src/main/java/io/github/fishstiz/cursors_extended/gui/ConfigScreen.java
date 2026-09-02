@@ -1,12 +1,13 @@
 package io.github.fishstiz.cursors_extended.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
+import io.github.fishstiz.cursors_extended.gui.components.CursorEntryWidget;
 import io.github.fishstiz.cursors_extended.gui.panels.*;
 import io.github.fishstiz.cursors_extended.gui.panels.AbstractContentPanel;
 import io.github.fishstiz.cursors_extended.gui.components.CategoryListWidget;
-import io.github.fishstiz.cursors_extended.gui.components.CursorRenderable;
 import io.github.fishstiz.cursors_extended.util.KeywordSearcher;
 import io.github.fishstiz.fidgetz.v0.gui.components.*;
 import io.github.fishstiz.fidgetz.v0.gui.layouts.FZComposedLayout;
@@ -21,11 +22,10 @@ import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -48,7 +48,6 @@ public class ConfigScreen extends FZScreen {
     private final Screen parent;
     private final Map<String, AbstractContentPanel> contentPanels = new LinkedHashMap<>();
     private final FZMutableRef<AbstractContentPanel> contentRef = new FZMutableRef<>(AbstractContentPanel.empty());
-    private final Map<String, FZMutableRef<CursorState>> cursorStates = new HashMap<>();
     private final KeywordSearcher<String> keywords = new KeywordSearcher<>();
     private final FZMutableRef<String> searchRef = new FZMutableRef<>("");
     private final CategoryListWidget categoryList = new CategoryListWidget(this::setContent);
@@ -71,8 +70,6 @@ public class ConfigScreen extends FZScreen {
             if (cursor.isLazy()) {
                 CursorsExtended.getInstance().getLoader().loadTexture(cursor);
             }
-
-            cursorStates.put(cursor.name(), new FZMutableRef<>(new CursorState(cursor)));
         }
     }
 
@@ -123,9 +120,9 @@ public class ConfigScreen extends FZScreen {
 
     @Override
     protected void init() {
-        registerCategory(new GlobalOptionsPanel(minecraft, this, previewCursor, cursorStates, this::setContent));
+        registerCategory(new GlobalOptionsPanel(minecraft, this, previewCursor, previewCursor::set, this::setContent));
 
-        AdaptiveOptionsPanel adaptiveOptions = new AdaptiveOptionsPanel(minecraft, this, cursorStates);
+        AdaptiveOptionsPanel adaptiveOptions = new AdaptiveOptionsPanel(minecraft, this);
 
         MutableObject<String> initialPanelId = new MutableObject<>(adaptiveOptions.getId());
 
@@ -134,32 +131,13 @@ public class ConfigScreen extends FZScreen {
         registerParentCategory("Cursors", CURSORS_TEXT, (parent, panelCollector) -> {
             boolean firstFound = false;
             for (Cursor cursor : CursorsExtended.getInstance().getRegistry().getInternalCursors()) {
-                FZMutableRef<CursorState> state = cursorStates.computeIfAbsent(
-                        cursor.name(),
-                        _ -> new FZMutableRef<>(new CursorState(cursor))
-                );
-
-                AbstractContentPanel panel = new CursorOptionsPanel(minecraft, this, cursor, state, () -> {
+                AbstractContentPanel panel = new CursorOptionsPanel(minecraft, this, cursor, () -> {
                     previewCursor.set(cursor);
                     setContent("Global");
                 });
 
                 parent.collapse(!CONFIG.hasResourcePack());
-
-                parent.addEntry(
-                        panel.getId(),
-                        state.map(CursorState::enabled).map(_ -> {
-                            MutableComponent message = panel.getShorthandTitle().plainCopy();
-                            if (cursor.isTextureEnabled()) {
-                                return message;
-                            }
-                            if (cursor.hasTexture()) {
-                                return message.withStyle(ChatFormatting.GRAY);
-                            }
-                            return message.withStyle(ChatFormatting.DARK_GRAY);
-                        }),
-                        CursorRenderable.widgetElements(cursor, 16)
-                );
+                parent.addEntry(panel.getId(), new CursorEntryWidget(cursor, () -> setContent(panel.getId())));
                 panelCollector.accept(panel);
 
                 if (!firstFound && cursor.isTextureEnabled()) {
@@ -303,10 +281,8 @@ public class ConfigScreen extends FZScreen {
         }
 
         AbstractContentPanel content = contentRef.value();
-        if (categoryList != null) {
-            String selected = content == null ? null : content.getId();
-            categoryList.onSearch(input, selected, results);
-        }
+        String selected = content == null ? null : content.getId();
+        categoryList.onSearch(input, selected, results);
 
         if (content != null) {
             content.onSearch(input);
@@ -318,29 +294,36 @@ public class ConfigScreen extends FZScreen {
 
         loadingRef.set(true);
 
-        CompletableFuture.runAsync(CursorsExtended.getInstance().getLoader()::reload, Util.backgroundExecutor())
-                .whenCompleteAsync((_, error) -> {
-                    loadingRef.set(false);
+        CompletableFuture
+                .runAsync(CursorsExtended.getInstance().getLoader()::reload, Util.backgroundExecutor())
+                .whenCompleteAsync(
+                        (_, error) -> {
+                            loadingRef.set(false);
 
-                    if (error != null) {
-                        CursorsExtended.LOGGER.error("[cursors_extended] An error occurred while refreshing cursors. ", error);
-                    }
+                            if (error != null) {
+                                CursorsExtended.LOGGER.error("[cursors_extended] An error occurred while refreshing cursors. ", error);
+                            }
 
-                    AbstractContentPanel content = contentRef.value();
-                    if (content != null) {
-                        content.buildWidgets();
-                    }
-                }, minecraft);
+                            AbstractContentPanel content = contentRef.value();
+                            if (content != null) {
+                                content.buildWidgets();
+                            }
+                        },
+                        minecraft
+                );
     }
 
     @Override
-    public boolean charTyped(CharacterEvent event) {
-        if (super.charTyped(event)) {
+    public boolean keyPressed(KeyEvent event) {
+        if (super.keyPressed(event)) {
             return true;
         }
-        if (searchField != null && !searchField.isFocused()) {
+        if (searchField != null
+            && getFocused() != searchField
+            && (event.modifiers() & InputConstants.MOD_CONTROL) != 0
+            && (event.key() == InputConstants.KEY_K || event.key() == InputConstants.KEY_F)) {
             setFocused(searchField);
-            return searchField.charTyped(event);
+            return true;
         }
         return false;
     }

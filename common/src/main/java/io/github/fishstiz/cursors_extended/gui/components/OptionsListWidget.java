@@ -41,6 +41,7 @@ public class OptionsListWidget extends FZAbstractListWidget<OptionsListWidget.En
     private final KeywordSearcher<Entry> keywords = new KeywordSearcher<>();
     private List<Entry> matches = Collections.emptyList();
     private @Nullable Entry lastHovered;
+    private boolean removed;
 
     public <T extends LayoutElement> T addEntry(List<Component> keywords, T element, @Nullable Component tooltip) {
         Entry entry = new Entry(element, tooltip);
@@ -172,6 +173,15 @@ public class OptionsListWidget extends FZAbstractListWidget<OptionsListWidget.En
     @Override
     public void repositionEntries() {
         super.repositionEntries();
+    }
+
+    public void onRemove() {
+        this.removed = true;
+    }
+
+    @Override
+    public boolean shouldTakeFocusAfterInteraction() {
+        return !removed;
     }
 
     class Entry extends FZAbstractListWidget.Entry {

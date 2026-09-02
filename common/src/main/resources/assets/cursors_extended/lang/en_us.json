@@ -11,7 +11,6 @@
   "cursors_extended.options.scale.gui": "Use GUI Scale",
   "cursors_extended.options.xhot": "Offset X",
   "cursors_extended.options.yhot": "Offset Y",
-  "cursors_extended.options.hotspot-suffix": "px",
   "cursors_extended.options.hotspot-guide": "Show Guide",
   "cursors_extended.options.animate": "Animate",
   "cursors_extended.options.animate-reset": "Restart Animation",
