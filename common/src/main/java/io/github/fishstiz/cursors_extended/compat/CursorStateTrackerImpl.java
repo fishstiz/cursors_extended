@@ -12,18 +12,17 @@ import org.lwjgl.system.MemoryUtil;
 import java.util.Map;
 
 final class CursorStateTrackerImpl implements CursorStateTracker {
-    private static volatile boolean tracking = false;
-    private final Map<Long, ModCursor> cursors = new Long2ObjectOpenHashMap<>();
-    private final Map<Long, Map<String, ModCursorState>> states = new Long2ObjectOpenHashMap<>();
-    private final Map<Long, ModCursorState> latestStates = new Long2ObjectOpenHashMap<>();
+    private static CursorStateTracker instance = new DefaultTracker();
+    private final Long2ObjectOpenHashMap<ModCursor> cursors = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<Map<String, ModCursorState>> windowStates = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<ModCursorState> latestStates = new Long2ObjectOpenHashMap<>();
 
     private CursorStateTrackerImpl() {
-        tracking = true;
         CursorsExtended.LOGGER.info("[cursors_extended] Found mod creating its own cursors outside the vanilla API. Initialized cursor state tracker.");
     }
 
-    static CursorStateTracker getOrDefault() {
-        return !tracking ? DefaultTracker.INSTANCE : Holder.INSTANCE;
+    static CursorStateTracker getInstance() {
+        return instance;
     }
 
     static StackWalker getStackWalker() {
@@ -33,11 +32,13 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
     private static final class Holder {
         static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
         static final CursorStateTracker INSTANCE = new CursorStateTrackerImpl();
+
+        static {
+            CursorStateTrackerImpl.instance = INSTANCE;
+        }
     }
 
     static final class DefaultTracker implements CursorStateTracker {
-        private static final CursorStateTracker INSTANCE = new DefaultTracker();
-
         @Override
         public void trackCursor(ModCursor cursor) {
             Holder.INSTANCE.trackCursor(cursor);
@@ -56,12 +57,7 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public void trackCursor(ModCursor modCursor) {
-        if (modCursor.handle() == MemoryUtil.NULL) {
-            CursorsExtended.LOGGER.error("[cursors_extended] ", new NullPointerException("Cannot track null cursor handle"));
-            return;
-        }
-
-        synchronized (cursors) {
+        if (modCursor.handle() != MemoryUtil.NULL) {
             cursors.put(modCursor.handle(), modCursor);
         }
     }
@@ -79,9 +75,7 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
             }
         }
 
-        synchronized (cursors) {
-            cursors.remove(modCursor.handle());
-        }
+        cursors.remove(modCursor.handle());
     }
 
     @Override
@@ -91,28 +85,24 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public @Nullable ModCursor getCursor(long handle) {
-        synchronized (cursors) {
-            return cursors.get(handle);
-        }
+        return cursors.get(handle);
     }
 
     private void setCursor(String source, long window, CursorType cursorType, boolean custom) {
-        Map<String, ModCursorState> windowStates = states.computeIfAbsent(window, k -> new Object2ObjectOpenHashMap<>());
-        ModCursorState state = windowStates.get(source);
+        Map<String, ModCursorState> windowState = windowStates.computeIfAbsent(window, _ -> new Object2ObjectOpenHashMap<>());
+        ModCursorState state = windowState.get(source);
 
         if (state == null) {
             state = new ModCursorState(cursorType, custom);
-            windowStates.put(source, state);
+            windowState.put(source, state);
             CursorsExtended.LOGGER.info("[cursors_extended] Tracking cursor state from '{}'", source);
         } else {
             state.update(cursorType, custom);
         }
 
-        synchronized (latestStates) {
-            ModCursorState currentLatest = latestStates.get(window);
-            if (shouldReplaceState(currentLatest, state)) {
-                latestStates.put(window, state);
-            }
+        ModCursorState currentLatest = latestStates.get(window);
+        if (shouldReplaceState(currentLatest, state)) {
+            latestStates.put(window, state);
         }
     }
 
@@ -152,10 +142,7 @@ final class CursorStateTrackerImpl implements CursorStateTracker {
 
     @Override
     public CursorType getCurrentCursor(long window) {
-        ModCursorState state;
-        synchronized (latestStates) {
-            state = latestStates.get(window);
-        }
+        ModCursorState state = latestStates.get(window);
         return state == null ? CursorType.DEFAULT : state.getCursorType();
     }
 }

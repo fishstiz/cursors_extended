@@ -1,7 +1,7 @@
 package io.github.fishstiz.cursors_extended.cursor.debug;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
-import io.github.fishstiz.cursors_extended.platform.Services;
+import io.github.fishstiz.cursors_extended.services.PlatformHelper;
 import io.github.fishstiz.cursors_extended.util.CursorTypeUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -111,8 +111,8 @@ class CursorDebugRendererImpl implements CursorDebugRenderer {
     }
 
     private String getClassName(GuiEventListener element) {
-        String namespace = Services.PLATFORM.isDevelopmentEnvironment() ? "named" : "intermediary";
-        return Services.PLATFORM.unmapClassName(namespace, element.getClass().getName());
+        String namespace = PlatformHelper.INSTANCE.isDevelopmentEnvironment() ? "named" : "intermediary";
+        return PlatformHelper.INSTANCE.unmapClassName(namespace, element.getClass().getName());
     }
 
     private static @Nullable GuiEventListener findDeepest(ContainerEventHandler parent, double mouseX, double mouseY) {

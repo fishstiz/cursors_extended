@@ -289,7 +289,7 @@ public class CursorTextureLoader implements PreparableReloadListener {
         if (CONFIG.shouldAnimateCursorsNatively()) {
             try {
                 return new OSAnimatedCursorTexture(image, path, metadata, settings);
-            } catch (OSUnsupportedException e) {
+            } catch (OSUnsupportedAnimationException e) {
                 CursorsExtended.LOGGER.warn(
                         "[cursors_extended] Failed to create native animated cursor for {}, reverting to software animation. {}",
                         path, e.getMessage()

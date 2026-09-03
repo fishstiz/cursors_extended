@@ -7,6 +7,7 @@
     "CursorTypeMixin",
     "GuiMixin",
     "WindowMixin",
+    "compat.CursorTypeMixin",
     "cursorprovider.AbstractButtonMixin",
     "cursorprovider.AbstractScrollAreaMixin",
     "cursorprovider.AbstractSliderButtonMixin",

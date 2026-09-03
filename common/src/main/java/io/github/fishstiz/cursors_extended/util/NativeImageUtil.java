@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.config.CursorProperties;
 import io.github.fishstiz.cursors_extended.resource.texture.*;
+import io.github.fishstiz.cursors_extended.services.SDLMouseOpsHandler;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -163,7 +164,10 @@ public class NativeImageUtil {
                 throw new IOException("Failed to create SDL Surface for cursor: " + SDLError.SDL_GetError());
             }
 
+            SDLMouseOpsHandler.INSTANCE.beforeCreateCursor(surface, scaledXHot, scaledYHot);
             long handle = SDLMouse.SDL_CreateColorCursor(surface, scaledXHot, scaledYHot);
+            SDLMouseOpsHandler.INSTANCE.afterCreateCursor(handle, surface, scaledXHot, scaledYHot);
+
             if (handle == MemoryUtil.NULL) {
                 throw new IOException("Failed to create SDL Cursor: " + SDLError.SDL_GetError());
             }
@@ -187,9 +191,9 @@ public class NativeImageUtil {
             AnimationMode mode,
             List<AnimatedCursorFrame> frames,
             CursorProperties settings
-    ) throws IOException, OSUnsupportedException {
+    ) throws IOException, OSUnsupportedAnimationException {
         if (mode.random()) {
-            throw new OSUnsupportedException("Random animation modes are not supported by native animated cursors.");
+            throw new OSUnsupportedAnimationException("Random animation modes are not supported by native animated cursors.");
         }
 
         float scale = SettingsUtil.sanitizeScale(settings.scale());
@@ -213,7 +217,7 @@ public class NativeImageUtil {
                 }
             }
             default ->
-                    throw new OSUnsupportedException("Unsupported animation mode for native animated cursor " + mode);
+                    throw new OSUnsupportedAnimationException("Unsupported animation mode for native animated cursor " + mode);
         }
         int frameCount = sortedFrames.size();
 
@@ -265,11 +269,12 @@ public class NativeImageUtil {
             int hotFrameWidth = scale == 1 ? firstFrame.spriteWidth() : Math.round(firstFrame.spriteWidth() * trueScale);
             int hotFrameHeight = scale == 1 ? firstFrame.spriteHeight() : Math.round(firstFrame.spriteHeight() * trueScale);
 
-            long handle = SDLMouse.SDL_CreateAnimatedCursor(
-                    frameBuffer,
-                    Math.min(scaledXHot, hotFrameWidth - 1),
-                    Math.min(scaledYHot, hotFrameHeight - 1)
-            );
+            int clampedXHot = Math.min(scaledXHot, hotFrameWidth - 1);
+            int clampedYHot = Math.min(scaledYHot, hotFrameHeight - 1);
+
+            SDLMouseOpsHandler.INSTANCE.beforeCreateAnimatedCursor(frameBuffer, clampedXHot, clampedYHot);
+            long handle = SDLMouse.SDL_CreateAnimatedCursor(frameBuffer, clampedXHot, clampedYHot);
+            SDLMouseOpsHandler.INSTANCE.afterCreateAnimatedCursor(handle, frameBuffer, clampedXHot, clampedYHot);
 
             if (handle == MemoryUtil.NULL) {
                 throw new IOException("Failed to create native animated cursor: " + SDLError.SDL_GetError());

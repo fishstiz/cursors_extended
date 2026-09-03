@@ -99,7 +99,7 @@ public class CompatibilityOptionsPanel extends AbstractContentPanel {
                 .tooltip(NATIVE_ANIMATED_CURSORS_INFO)
                 .toggleBuilder()
                 .defaultValue(defaults.shouldAnimateCursorsNatively())
-                .state(this::onUpdateNativeAnimatedCursors, CONFIG::shouldAnimateCursorsNatively)
+                .state(this::onUpdateNativeAnimatedCursors, () -> CONFIG.shouldAnimateCursorsNatively() && virtualModeRef.value())
                 .active(virtualModeRef.map(value -> !value))
                 .build();
 

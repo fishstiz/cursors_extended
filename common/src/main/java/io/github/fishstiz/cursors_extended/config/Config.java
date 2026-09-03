@@ -2,7 +2,7 @@ package io.github.fishstiz.cursors_extended.config;
 
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import io.github.fishstiz.cursors_extended.cursor.Cursor;
-import io.github.fishstiz.cursors_extended.platform.Services;
+import io.github.fishstiz.cursors_extended.services.PlatformHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -30,6 +30,7 @@ public class Config implements Serializable {
     private final Object2ObjectOpenHashMap<String, CursorSettings> cursors = new Object2ObjectOpenHashMap<>();
     private transient Map<String, CursorSettings> unknownCursors;
     private transient boolean stale = false;
+    private transient boolean workaroundsApplied = true;
 
     Config() {
     }
@@ -71,11 +72,11 @@ public class Config implements Serializable {
     }
 
     public static Config load() {
-        return JsonLoader.loadOrDefault(Config.class, Services.PLATFORM.getConfigDir().resolve(CursorsExtended.MOD_ID), Config::new);
+        return JsonLoader.loadOrDefault(Config.class, PlatformHelper.INSTANCE.getConfigDir().resolve(CursorsExtended.MOD_ID), Config::new);
     }
 
     public void save() {
-        JsonLoader.save(Services.PLATFORM.getConfigDir().resolve(CursorsExtended.MOD_ID + ".json"), this);
+        JsonLoader.save(PlatformHelper.INSTANCE.getConfigDir().resolve(CursorsExtended.MOD_ID + ".json"), this);
     }
 
     public GlobalSettings getGlobal() {
@@ -115,7 +116,7 @@ public class Config implements Serializable {
     }
 
     public boolean shouldAnimateCursorsNatively() {
-        return !this.virtualMode && this.nativeAnimatedCursors;
+        return this.nativeAnimatedCursors;
     }
 
     public void setNativeAnimatedCursors(boolean nativeAnimatedCursors) {
@@ -176,6 +177,14 @@ public class Config implements Serializable {
 
     public void setWorkarounds(boolean workarounds) {
         this.workarounds = workarounds;
+    }
+
+    public boolean isWorkaroundsApplied() {
+        return workaroundsApplied;
+    }
+
+    public void setWorkaroundsApplied(boolean workaroundsApplied) {
+        this.workaroundsApplied = workaroundsApplied;
     }
 
     public static class CursorSettings extends AbstractCursorSettings implements Serializable {

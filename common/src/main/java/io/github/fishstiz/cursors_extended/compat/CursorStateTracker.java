@@ -5,7 +5,7 @@ import com.mojang.blaze3d.platform.cursor.CursorType;
 import io.github.fishstiz.cursors_extended.CursorsExtended;
 import org.jspecify.annotations.Nullable;
 
-public sealed interface CursorStateTracker permits CursorStateTrackerImpl, CursorStateTrackerImpl.DefaultTracker {
+public interface CursorStateTracker {
     void trackCursor(ModCursor cursor);
 
     void resetCursor(long window, String source);
@@ -28,7 +28,7 @@ public sealed interface CursorStateTracker permits CursorStateTrackerImpl, Curso
     }
 
     static CursorStateTracker get() {
-        return CursorStateTrackerImpl.getOrDefault();
+        return CursorStateTrackerImpl.getInstance();
     }
 
     static StackWalker getStackWalker() {

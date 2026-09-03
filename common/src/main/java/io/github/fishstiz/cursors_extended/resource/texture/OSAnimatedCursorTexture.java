@@ -30,7 +30,7 @@ public class OSAnimatedCursorTexture extends AbstractCursorTexture implements Cu
             Identifier path,
             CursorMetadata metadata,
             CursorProperties settings
-    ) throws IOException, OSUnsupportedException {
+    ) throws IOException, OSUnsupportedAnimationException {
         CursorMetadata.Animation animation = metadata.requireAnimation();
 
         int imageWidth = image.getWidth();
