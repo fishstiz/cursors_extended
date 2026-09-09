@@ -25,7 +25,8 @@
     "cursorprovider.menus.access.RecipeBookResultsAccessor",
     "cursorprovider.menus.access.RecipeBookWidgetAccessor",
     "options.MinecraftMixin",
-    "options.MouseOptionsScreenMixin"
+    "options.MouseOptionsScreenMixin",
+    "utils.NativeImageAccess"
   ],
   "mixinextras": {
     "minVersion": "0.5.0"

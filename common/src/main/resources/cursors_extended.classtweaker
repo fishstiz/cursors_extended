@@ -2,6 +2,3 @@ classTweaker v1 official
 accessible method com/mojang/blaze3d/platform/cursor/CursorType <init> (Ljava/lang/String;J)V
 accessible field com/mojang/blaze3d/platform/cursor/CursorType handle J
 accessible field com/mojang/blaze3d/platform/Window currentCursor Lcom/mojang/blaze3d/platform/cursor/CursorType;
-accessible class com/mojang/blaze3d/platform/NativeImage$WriteCallback
-accessible method com/mojang/blaze3d/platform/NativeImage$WriteCallback <init> (Ljava/nio/channels/WritableByteChannel;)V
-accessible field com/mojang/blaze3d/platform/NativeImage$Format pngColorType I

@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.net.URI;
 import java.util.function.Consumer;
 
 public class DebugOptionsPanel extends AbstractContentPanel {
@@ -46,13 +47,13 @@ public class DebugOptionsPanel extends AbstractContentPanel {
         this.list.addEntry(REPORT_ISSUES_TEXT, FZButton.builder()
                 .message(REPORT_ISSUES_TEXT)
                 .leftAlignedMessage()
-                .onPress(e -> ConfirmLinkScreen.confirmLink(screen, ISSUES_LINK, true).onPress(e.target()))
+                .onPress(e -> ConfirmLinkScreen.confirmLink(screen, URI.create(ISSUES_LINK), true).onPress(e.target()))
                 .build());
 
         this.list.addEntry(OPEN_WIKI_TEXT, FZButton.builder()
                 .message(OPEN_WIKI_TEXT)
                 .leftAlignedMessage()
-                .onPress(e -> ConfirmLinkScreen.confirmLink(screen, WIKI_LINK, true).onPress(e.target()))
+                .onPress(e -> ConfirmLinkScreen.confirmLink(screen, URI.create(WIKI_LINK), true).onPress(e.target()))
                 .build());
 
         layout.child(this.list, layout.flexChildSettings());
