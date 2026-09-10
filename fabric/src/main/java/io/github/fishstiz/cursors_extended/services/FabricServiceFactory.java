@@ -10,7 +10,7 @@ public class FabricServiceFactory implements ServiceFactory {
 
     @Override
     public SDLMouseOpsHandler createSDLMouseOpsHandler() {
-        return CursorsExtended.CONFIG.isWorkaroundsEnabled() && CursorsExtended.CONFIG.isWorkaroundsApplied()
+        return CursorsExtended.CONFIG.isWorkaroundsEnabled() && CursorsExtended.CONFIG.isWorkaroundsApplicable()
                 ? new SDLMouseOpsCompat()
                 : new SDLMouseOpsHandler() {};
     }

@@ -17,7 +17,8 @@
   "cursors_extended.options.reset-defaults": "Reset to Defaults",
   "cursors_extended.options.preview": "Preview",
   "cursors_extended.options.image_too_large": "Image too large!",
-
+  "cursors_extended.options.restart_to_apply": "Requires restart for changes to apply.",
+  "cursors_extended.options.unable_to_apply": "Unable to apply. Please check the logs.",
   "cursors_extended.options.search": "Search",
   "cursors_extended.options.search.clear": "Clear Search",
   "cursors_extended.options.refresh.info": "Refresh cursors from resource packs.",
@@ -67,9 +68,9 @@
 
   "cursors_extended.options.compat": "Compatibility",
   "cursors_extended.options.compat.workarounds": "State Tracking Workarounds",
-  "cursors_extended.options.compat.workarounds.info": "Tracks the standard and custom cursors created by other mods.\n\nRequires restart to apply.",
+  "cursors_extended.options.compat.workarounds.info": "Attempts to track and synchronize the cursor state of other mods.",
   "cursors_extended.options.compat.remap_cursors": "Remap Standard Cursors",
-  "cursors_extended.options.compat.remap_cursors.info": "Remaps standard system cursors created by other mods.",
+  "cursors_extended.options.compat.remap_cursors.info": "Remaps system cursors created by other mods with the equivalent custom cursor.",
   "cursors_extended.options.compat.aggressive_cursor": "Aggressive cursor updates",
   "cursors_extended.options.compat.aggressive_cursor.info": "Aggressively updates the cursor instead of only when it changes.",
   "cursors_extended.options.compat.virtual_mode": "Virtual Rendering",
@@ -77,7 +78,7 @@
   "cursors_extended.options.compat.native_animated_cursors": "Native Animated Cursors",
   "cursors_extended.options.compat.native_animated_cursors.info": "Cursors are animated natively by the operating system.\n\nDoes not support all animation modes.",
   "cursors_extended.options.compat.legacy_mode": "Legacy Cursor Mode",
-  "cursors_extended.options.compat.legacy_mode.info": "Enhanced cursor logic, traverses the GUI hierarchy to determine the cursor shape.\n\nOther legacy options can be toggled from the Adaptive Cursor Options.",
+  "cursors_extended.options.compat.legacy_mode.info": "Changes the cursor based on legacy (pre-1.21.9) conditions, which traverses the gui tree to resolve the cursor shape.",
 
   "cursors_extended.options.debug": "Debug",
   "cursors_extended.options.debug.inspect": "Inspect Element",

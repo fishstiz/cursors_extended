@@ -21,6 +21,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.CommonColors;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -28,6 +30,9 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class AbstractContentPanel extends AbstractContainerWidget {
+    protected static final Component UNABLE_TO_APPLY_TEXT = Component.translatable("cursors_extended.options.unable_to_apply")
+            .withColor(CommonColors.SOFT_RED);
+    protected static final Component RESTART_TEXT = Component.translatable("cursors_extended.options.restart_to_apply");
     protected static final Component GLOBAL_SETTINGS_TEXT = Component.translatable("cursors_extended.options.global.title");
     protected static final Component ENABLE_TEXT = Component.translatable("cursors_extended.options.enabled");
     protected static final Component SCALE_TEXT = Component.translatable("cursors_extended.options.scale");
@@ -207,6 +212,14 @@ public abstract class AbstractContentPanel extends AbstractContainerWidget {
         @Override
         protected void buildWidgets(GuiComponentCollector collector, FZFlexLayout layout) {
         }
+    }
+
+    protected static MutableComponent appendRestart(MutableComponent component) {
+        return component.append("\n\n").append(RESTART_TEXT);
+    }
+
+    protected static MutableComponent appendUnableToApply(MutableComponent component, boolean applicable) {
+        return applicable ? component : component.append("\n\n").append(UNABLE_TO_APPLY_TEXT);
     }
 
     protected static boolean loadCursor(@NonNull Cursor deferredCursor) {

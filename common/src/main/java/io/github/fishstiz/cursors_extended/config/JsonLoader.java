@@ -24,7 +24,7 @@ public class JsonLoader {
     private JsonLoader() {
     }
 
-    public static <T extends Serializable> T fromResource(Class<T> clazz, Resource resource) {
+    public static <T> T fromResource(Class<T> clazz, Resource resource) {
         try (InputStream stream = resource.open()) {
             return fromStream(clazz, stream);
         } catch (IOException e) {
@@ -33,7 +33,7 @@ public class JsonLoader {
         }
     }
 
-    public static <T extends Serializable> T fromStream(Class<T> clazz, InputStream stream) {
+    public static <T> T fromStream(Class<T> clazz, InputStream stream) {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             return GSON.fromJson(reader, clazz);
         } catch (IOException e) {
@@ -42,7 +42,7 @@ public class JsonLoader {
         }
     }
 
-    public static <T extends Serializable> T loadOrDefault(Class<T> clazz, Path path, Supplier<T> defaultSupplier) {
+    public static <T> T loadOrDefault(Class<T> clazz, Path path, Supplier<T> defaultSupplier) {
         path = ensureJsonSuffix(path);
 
         try (Reader reader = Files.newBufferedReader(path)) {
@@ -58,7 +58,7 @@ public class JsonLoader {
         }
     }
 
-    public static void save(Path path, Serializable obj) {
+    public static void save(Path path, Object obj) {
         path = ensureJsonSuffix(path);
 
         try (Writer writer = Files.newBufferedWriter(path)) {

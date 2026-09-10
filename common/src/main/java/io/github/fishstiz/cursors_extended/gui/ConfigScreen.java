@@ -10,13 +10,11 @@ import io.github.fishstiz.cursors_extended.gui.panels.AbstractContentPanel;
 import io.github.fishstiz.cursors_extended.gui.components.CategoryListWidget;
 import io.github.fishstiz.cursors_extended.util.KeywordSearcher;
 import io.github.fishstiz.fidgetz.v0.gui.components.*;
-import io.github.fishstiz.fidgetz.v0.gui.layouts.FZComposedLayout;
-import io.github.fishstiz.fidgetz.v0.gui.layouts.FZFlexLayout;
-import io.github.fishstiz.fidgetz.v0.gui.layouts.FZLayout;
-import io.github.fishstiz.fidgetz.v0.gui.layouts.Justification;
+import io.github.fishstiz.fidgetz.v0.gui.layouts.*;
 import io.github.fishstiz.fidgetz.v0.gui.renderables.Renderables;
 import io.github.fishstiz.fidgetz.v0.gui.screens.FZScreen;
 import io.github.fishstiz.fidgetz.v0.gui.state.FZMutableRef;
+import io.github.fishstiz.fidgetz.v0.utils.GuiGraphicsUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -27,6 +25,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -235,16 +234,29 @@ public class ConfigScreen extends FZScreen {
 
                 FZFlexLayout footer = contentPanel.child(FZFlexLayout.horizontal(), contentPanel.flexChildHorizontalSettings());
                 {
-                    footer.justifyContents(Justification.SPACE_BETWEEN).defaultChildSettings().alignVerticallyMiddle();
+                    footer.spacing(SPACING).defaultChildSettings().alignVerticallyMiddle();
 
-                    footer.child(FZText.builder(getTitle().copy().withStyle(ChatFormatting.GRAY))
-                            .build());
+                    FZFlexSpacerElement spacer = footer.spacer(footer.flexChildSettings());
 
                     footer.child(FZButton.builder()
                             .width(128)
                             .message(CommonComponents.GUI_DONE)
                             .onPress(this::onClose)
                             .build());
+
+                    Component footerTitle = getTitle().copy().withStyle(ChatFormatting.GRAY);
+                    Component restartRequired = Component.translatable("options.restartRequired").withColor(CommonColors.SOFT_RED);
+
+                    collector.renderableOnly((graphics, _, _, _) -> GuiGraphicsUtils.scrollingText(
+                            graphics,
+                            getFont(),
+                            CONFIG.isRestartRequiredToApply() ? restartRequired : footerTitle,
+                            spacer.getX(),
+                            spacer.getY(),
+                            spacer.getX() + spacer.getWidth(),
+                            spacer.getY() + spacer.getHeight(),
+                            CommonColors.WHITE
+                    ));
                 }
             }
         }

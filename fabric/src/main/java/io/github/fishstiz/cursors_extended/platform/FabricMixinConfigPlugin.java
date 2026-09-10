@@ -43,17 +43,15 @@ public class FabricMixinConfigPlugin implements IMixinConfigPlugin {
 
         if (!CursorsExtended.CONFIG.isWorkaroundsEnabled()) {
             CursorsExtended.LOGGER.info("[cursors_extended] Compatibility workarounds disabled by config.");
-            CursorsExtended.CONFIG.setWorkaroundsApplied(false);
             return null;
         }
 
         if (FabricLauncherBase.getLauncher().isClassLoaded("org.lwjgl.sdl.SDLMouse")) {
             CursorsExtended.LOGGER.warn("[cursors_extended] SDLMouse has been loaded early, unable to apply compatibility workarounds.");
-            CursorsExtended.CONFIG.setWorkaroundsApplied(false);
+            CursorsExtended.CONFIG.setWorkaroundsApplicable(false);
             return null;
         }
 
-        CursorsExtended.CONFIG.setWorkaroundsApplied(true);
         return List.of("compat.sdl.SDLMouseMixin");
     }
 

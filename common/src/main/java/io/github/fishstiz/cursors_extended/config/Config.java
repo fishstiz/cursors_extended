@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static io.github.fishstiz.cursors_extended.util.SettingsUtil.*;
 
-public class Config implements Serializable {
+public class Config {
     private String _hash;
     private boolean itemSlotEnabled = true;
     private boolean itemGrabbingEnabled = true;
@@ -30,12 +30,15 @@ public class Config implements Serializable {
     private final Object2ObjectOpenHashMap<String, CursorSettings> cursors = new Object2ObjectOpenHashMap<>();
     private transient Map<String, CursorSettings> unknownCursors;
     private transient boolean stale = false;
-    private transient boolean workaroundsApplied = true;
+    private transient boolean workaroundsApplicable = true;
+    private transient Config initialValues;
 
     Config() {
     }
 
     public static Config defaults() {
+        Config config = new Config();
+        config.initialValues = new Config();
         return new Config();
     }
 
@@ -72,7 +75,27 @@ public class Config implements Serializable {
     }
 
     public static Config load() {
-        return JsonLoader.loadOrDefault(Config.class, PlatformHelper.INSTANCE.getConfigDir().resolve(CursorsExtended.MOD_ID), Config::new);
+        Config config = JsonLoader.loadOrDefault(
+                Config.class,
+                PlatformHelper.INSTANCE.getConfigDir().resolve(CursorsExtended.MOD_ID),
+                Config::defaults
+        );
+
+        config.initialValues = new Config();
+        config.initialValues.itemSlotEnabled = config.itemSlotEnabled;
+        config.initialValues.itemGrabbingEnabled = config.itemGrabbingEnabled;
+        config.initialValues.pointerScrollbarEnabled = config.pointerScrollbarEnabled;
+        config.initialValues.resizeScrollbarEnabled = config.resizeScrollbarEnabled;
+        config.initialValues.heldCursorsEnabled = config.heldCursorsEnabled;
+        config.initialValues.aggressiveCursor = config.aggressiveCursor;
+        config.initialValues.virtualMode = config.virtualMode;
+        config.initialValues.nativeAnimatedCursors = config.nativeAnimatedCursors;
+        config.initialValues.legacyMode = config.legacyMode;
+        config.initialValues.showHotspotGuide = config.showHotspotGuide;
+        config.initialValues.remapStandardCursors = config.remapStandardCursors;
+        config.initialValues.workarounds = config.workarounds;
+
+        return config;
     }
 
     public void save() {
@@ -179,12 +202,16 @@ public class Config implements Serializable {
         this.workarounds = workarounds;
     }
 
-    public boolean isWorkaroundsApplied() {
-        return workaroundsApplied;
+    public boolean isWorkaroundsApplicable() {
+        return workaroundsApplicable;
     }
 
-    public void setWorkaroundsApplied(boolean workaroundsApplied) {
-        this.workaroundsApplied = workaroundsApplied;
+    public void setWorkaroundsApplicable(boolean workaroundsApplicable) {
+        this.workaroundsApplicable = workaroundsApplicable;
+    }
+
+    public boolean isRestartRequiredToApply() {
+        return initialValues.workarounds != workarounds;
     }
 
     public static class CursorSettings extends AbstractCursorSettings implements Serializable {
