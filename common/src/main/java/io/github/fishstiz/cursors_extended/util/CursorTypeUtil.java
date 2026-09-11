@@ -73,13 +73,22 @@ public class CursorTypeUtil {
             case SDLMouse.SDL_SYSTEM_CURSOR_POINTER -> CursorTypes.POINTING_HAND;
             case SDLMouse.SDL_SYSTEM_CURSOR_TEXT -> CursorTypes.IBEAM;
             case SDLMouse.SDL_SYSTEM_CURSOR_CROSSHAIR -> CursorTypes.CROSSHAIR;
-            case SDLMouse.SDL_SYSTEM_CURSOR_EW_RESIZE -> CursorTypes.RESIZE_EW;
-            case SDLMouse.SDL_SYSTEM_CURSOR_NS_RESIZE -> CursorTypes.RESIZE_NS;
-            case SDLMouse.SDL_SYSTEM_CURSOR_NWSE_RESIZE -> CursorTypesExt.RESIZE_NWSE;
-            case SDLMouse.SDL_SYSTEM_CURSOR_NESW_RESIZE -> CursorTypesExt.RESIZE_NESW;
+            case SDLMouse.SDL_SYSTEM_CURSOR_EW_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_E_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_W_RESIZE -> CursorTypes.RESIZE_EW;
+            case SDLMouse.SDL_SYSTEM_CURSOR_NS_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_N_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_S_RESIZE -> CursorTypes.RESIZE_NS;
+            case SDLMouse.SDL_SYSTEM_CURSOR_NWSE_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_SE_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_NW_RESIZE -> CursorTypesExt.RESIZE_NWSE;
+            case SDLMouse.SDL_SYSTEM_CURSOR_NESW_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_NE_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_SW_RESIZE -> CursorTypesExt.RESIZE_NESW;
             case SDLMouse.SDL_SYSTEM_CURSOR_MOVE -> CursorTypes.RESIZE_ALL;
             case SDLMouse.SDL_SYSTEM_CURSOR_NOT_ALLOWED -> CursorTypes.NOT_ALLOWED;
-            case SDLMouse.SDL_SYSTEM_CURSOR_WAIT, SDLMouse.SDL_SYSTEM_CURSOR_PROGRESS -> CursorTypesExt.BUSY;
+            case SDLMouse.SDL_SYSTEM_CURSOR_WAIT,
+                 SDLMouse.SDL_SYSTEM_CURSOR_PROGRESS -> CursorTypesExt.BUSY;
             default -> null;
         };
     }
@@ -91,13 +100,22 @@ public class CursorTypeUtil {
             case SDLMouse.SDL_SYSTEM_CURSOR_POINTER -> "pointing_hand";
             case SDLMouse.SDL_SYSTEM_CURSOR_TEXT -> "ibeam";
             case SDLMouse.SDL_SYSTEM_CURSOR_CROSSHAIR -> "crosshair";
-            case SDLMouse.SDL_SYSTEM_CURSOR_EW_RESIZE -> "resize_ew";
-            case SDLMouse.SDL_SYSTEM_CURSOR_NS_RESIZE -> "resize_ns";
-            case SDLMouse.SDL_SYSTEM_CURSOR_NWSE_RESIZE -> "resize_nwse";
-            case SDLMouse.SDL_SYSTEM_CURSOR_NESW_RESIZE -> "resize_nesw";
+            case SDLMouse.SDL_SYSTEM_CURSOR_EW_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_E_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_W_RESIZE -> "resize_ew";
+            case SDLMouse.SDL_SYSTEM_CURSOR_NS_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_N_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_S_RESIZE -> "resize_ns";
+            case SDLMouse.SDL_SYSTEM_CURSOR_NWSE_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_SE_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_NW_RESIZE -> "resize_nwse";
+            case SDLMouse.SDL_SYSTEM_CURSOR_NESW_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_NE_RESIZE,
+                 SDLMouse.SDL_SYSTEM_CURSOR_SW_RESIZE -> "resize_nesw";
             case SDLMouse.SDL_SYSTEM_CURSOR_MOVE -> "resize_all";
             case SDLMouse.SDL_SYSTEM_CURSOR_NOT_ALLOWED -> "not_allowed";
-            case SDLMouse.SDL_SYSTEM_CURSOR_WAIT, SDLMouse.SDL_SYSTEM_CURSOR_PROGRESS -> "busy";
+            case SDLMouse.SDL_SYSTEM_CURSOR_WAIT,
+                 SDLMouse.SDL_SYSTEM_CURSOR_PROGRESS -> "busy";
             default -> null;
         };
     }
